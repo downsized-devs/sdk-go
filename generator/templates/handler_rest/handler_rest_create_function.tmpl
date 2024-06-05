@@ -1,0 +1,34 @@
+// @Summary Create {{ .EntityNameUpperSpace }}
+// @Description Create a new {{ .EntityNameLowerSpace }}
+// @Security BearerAuth
+// @Tags {{ .EntityNameUpperSpace }}
+// @Param {{ .EntityNameSnakeCase }} body entity.{{ .EntityNameUpper }}CreateParam true "{{ .EntityNameLowerSpace }} info"
+// @Produce json
+// @Success 200 {object} entity.HTTPResp{data=entity.{{ .EntityNameUpper }}{}}
+// @Failure 400 {object} entity.HTTPResp{}
+// @Failure 401 {object} entity.HTTPResp{}
+// @Failure 500 {object} entity.HTTPResp{}
+// @Router /v1/{{ .EntityNameLowerDash }} [POST]
+func (r *rest) Create{{ .EntityNameUpper }}(ctx *gin.Context) {
+	var new{{ .EntityNameUpper }} entity.{{ .EntityNameUpper }}CreateParam
+	defer func() {
+		r.LogEvent(ctx, audit.Collection{
+			EventName:        entity.{{ .EntityNameUpper }}Create,
+			EventDescription: "create {{ .EntityNameLowerSpace }}",
+			RequestBody:      new{{ .EntityNameUpper }},
+		})
+	}()
+
+	if err := r.Bind(ctx, &new{{ .EntityNameUpper }}); err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	{{ .EntityName }}, err := r.uc.{{ .EntityNameUpper }}.Create(ctx.Request.Context(), new{{ .EntityNameUpper }})
+	if err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	r.httpRespSuccess(ctx, codes.CodeSuccess, {{ .EntityName }}, nil)
+}

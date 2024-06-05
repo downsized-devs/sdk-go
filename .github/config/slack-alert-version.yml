@@ -1,0 +1,50 @@
+text: |
+  *<{{workflowRunUrl}}|Workflow _{{workflow}}_ is _{{jobStatus}}_>*
+
+fallback: |-
+  [GitHub] {{workflow}} #{{runNumber}} {{jobName}} is {{jobStatus}}
+
+fields:
+  - title: Job Steps
+    value: "{{#each jobSteps}}{{icon this.outcome}} {{@key}}\n{{/each}}"
+    short: false
+  - title: Workflow
+    value: "<{{workflowUrl}}|{{workflow}}>"
+    short: true
+  - title: Git Ref
+    value: "<{{refUrl}}|{{ref}} ({{refType}})>"
+    short: true
+  - title: Trigger
+    value: "{{eventName}}"
+    short: true
+  - title: Job Status
+    value: "{{jobStatus}}"
+    short: true
+  - title: Actor
+    value: <{{mention.actor}}>
+    short: true
+  - title: Notify Group
+    value: <{{mention.group.tech-be}}>
+    short: true
+  - title: Version
+    value: "{{ env.SERVICE_VERSION }}"
+    short: true
+
+footer: >-
+  <{{repositoryUrl}}|{{repositoryName}}>
+
+colors:
+  success: "good"
+  failure: "danger"
+  cancelled: "warning"
+
+icons:
+  success: ":pepe_ok:"
+  failure: ":duarr:"
+  cancelled: ":warning:"
+  skipped: ":heavy_minus_sign:"
+  default: ":60fps_parrot:"
+
+filter:
+  steps:
+    - create-release

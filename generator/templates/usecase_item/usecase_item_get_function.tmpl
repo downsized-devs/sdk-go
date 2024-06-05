@@ -1,0 +1,7 @@
+func (uc *{{ .EntityName }}) GetListAdmin(ctx context.Context, params entity.{{ .EntityNameUpper }}Param) ([]entity.{{ .EntityNameUpper }}, *entity.Pagination, error) {
+	{{ .EntityName }}s, _, paging, err := uc.{{ .EntityName }}.GetList(ctx, params)
+	if err != nil {
+		return {{ .EntityName }}s, paging, err
+	}
+	return {{ .EntityName }}s, paging, nil
+}

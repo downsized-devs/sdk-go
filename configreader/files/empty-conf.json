@@ -1,0 +1,11 @@
+{
+    "String": "",
+    "Boolean": "",
+    "Duration": "",
+    "Object": {
+        "String": "",
+        "Boolean": "",
+        "Duration": ""
+    },
+    "Reference": "$ref:#/Object"
+}

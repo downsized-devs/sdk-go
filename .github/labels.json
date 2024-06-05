@@ -1,0 +1,143 @@
+{
+    "labels": {
+        "improvements": {
+            "name": "improvements",
+            "colour": "#00ff40",
+            "description": "Code improvements or optimization"
+        },
+        "features": {
+            "name": "features",
+            "colour": "#00ff40",
+            "description": "New features addition"
+        },
+        "bugfix": {
+            "name": "bugfix",
+            "colour": "#ffff00",
+            "description": "Fix for known bugs"
+        },
+        "hotfix": {
+            "name": "hotfix",
+            "colour": "#ffff00",
+            "description": "Temporary fix for urgent bugs or broken features"
+        },
+        "breaking": {
+            "name": "breaking",
+            "colour": "#ff0000",
+            "description": "Codes contains breaking changes"
+        },
+        "version:major": {
+            "name": "version:major",
+            "colour": "#00bfff",
+            "description": "Major version bump"
+        },
+        "version:minor": {
+            "name": "version:minor",
+            "colour": "#00bfff",
+            "description": "Minor version bump"
+        },
+        "version:patch": {
+            "name": "version:patch",
+            "colour": "#00bfff",
+            "description": "Patch version bump"
+        }
+    },
+    "pr": {
+        "improvements": {
+            "requires": 1,
+            "conditions": [
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[x\\] code improvements.*"
+                }
+            ]
+        },
+        "features": {
+            "requires": 1,
+            "conditions": [
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[x\\] new features.*"
+                }
+            ]
+        },
+        "bugfix": {
+            "requires": 1,
+            "conditions": [
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[x\\] bugfix.*"
+                }
+            ]
+        },
+        "hotfix": {
+            "requires": 1,
+            "conditions": [
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[x\\] hotfix.*"
+                }
+            ]
+        },
+        "reseed": {
+            "requires": 1,
+            "conditions": [
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[x\\] database seed or schema update.*"
+                },
+                {
+                    "type": "filesMatch",
+                    "glob": "docs/sql/**"
+                }
+            ]
+        },
+        "breaking": {
+            "requires": 1,
+            "conditions": [
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[x\\] breaking changes.*"
+                }
+            ]
+        },
+        "version:major": {
+            "requires": 1,
+            "conditions": [
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[x\\] major.*"
+                }
+            ]
+        },
+        "version:minor": {
+            "requires": 2,
+            "conditions": [
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[x\\] minor.*"
+                },
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[ \\] major.*"
+                }
+            ]
+        },
+        "version:patch": {
+            "requires": 3,
+            "conditions": [
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[x\\] patch.*"
+                },
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[ \\] minor.*"
+                },
+                {
+                    "type": "descriptionMatches",
+                    "pattern": ".*- \\[ \\] major.*"
+                }
+            ]
+        }
+    }
+}

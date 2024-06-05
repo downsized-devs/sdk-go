@@ -1,0 +1,16 @@
+func (uc *{{ .EntityName }}) Update(ctx context.Context, updateParam entity.{{ .EntityNameUpper }}UpdateParam, selectParam entity.{{ .EntityNameUpper }}Param) error {
+	user, err := uc.auth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+
+	updateParam.UpdatedAt = null.TimeFrom(Now())
+	updateParam.UpdatedBy = null.StringFrom(fmt.Sprintf("%v", user.User.ID))
+
+	err = uc.{{ .EntityName }}.Update(ctx, updateParam, selectParam)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

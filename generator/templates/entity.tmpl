@@ -1,0 +1,58 @@
+package entity
+
+import (
+	"github.com/downsized-devs/sdk-go/null"
+	"github.com/downsized-devs/sdk-go/query"
+)
+
+const (
+	{{ .EntityNameUpper }}Create     			= "{{ .EntityName }}:create"
+	{{ .EntityNameUpper }}Update      			= "{{ .EntityName }}:update"
+	{{ .EntityNameUpper }}Delete      			= "{{ .EntityName }}:delete"
+	{{ .EntityNameUpper }}Activate    			= "{{ .EntityName }}:activate"
+	Create{{ .EntityNameUpper }}Schema          = "create_{{ .EntityNameSnakeCase }}"
+)
+
+type {{ .EntityNameUpper }} struct {
+	ID int64 `db:"id" json:"id"`
+	// Fill this space with entity items
+	Status     int16       `db:"status" json:"status"`
+	Flag       int         `db:"flag" json:"flag"`
+	Meta       null.String `db:"meta" json:"meta" swaggertype:"string"`
+	CreatedAt  null.Time   `db:"created_at" json:"createdAt" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	CreatedBy  null.String `db:"created_by" json:"createdBy" swaggertype:"string"`
+	UpdatedAt  null.Time   `db:"updated_at" json:"updatedAt" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	UpdatedBy  null.String `db:"updated_by" json:"updatedBy" swaggertype:"string"`
+	DeletedAt  null.Time   `db:"deleted_at" json:"deletedAt" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	DeletedBy  null.String `db:"deleted_by" json:"deletedBy" swaggertype:"string"`
+
+}
+
+type {{ .EntityNameUpper }}Param struct {
+	ID   null.Int64 `uri:"id" param:"id" db:"id" swaggertype:"integer"`
+	// Fill this space with parameter items
+	PaginationParam
+    BypassCache bool `json:"-"`
+	QueryOption query.Option
+}
+
+type {{ .EntityNameUpper }}UpdateParam struct {
+	// Fill this space with entity items
+	Status     null.Int64  `db:"status" json:"-"`
+	UpdatedAt  null.Time   `db:"updated_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	UpdatedBy  null.String `db:"updated_by" json:"-" swaggertype:"string"`
+	DeletedAt  null.Time   `db:"deleted_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	DeletedBy  null.String `db:"deleted_by" json:"-" swaggertype:"string"`
+}
+
+type {{ .EntityNameUpper }}CreateParam struct {
+	ID int64 `db:"id" json:"-"`
+	// Fill this space with entity items
+	Status     null.Int64  `db:"status" json:"-"`
+	CreatedAt  null.Time   `db:"created_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	CreatedBy  null.String `db:"created_by" json:"-" swaggertype:"string"`
+	UpdatedAt  null.Time   `db:"updated_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	UpdatedBy  null.String `db:"updated_by" json:"-" swaggertype:"string"`
+	DeletedAt  null.Time   `db:"deleted_at" json:"-" swaggertype:"string" example:"2022-06-21T10:32:29Z"`
+	DeletedBy  null.String `db:"deleted_by" json:"-" swaggertype:"string"`
+}

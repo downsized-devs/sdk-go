@@ -1,0 +1,21 @@
+package {{ .EntityNameSnakeCase }}
+
+const (
+	createNew{{ .EntityNameUpper }} = `
+		INSERT INTO {{ .EntityNameSnakeCase }} (created_at, created_by)
+		    VALUES (:created_at, :created_by)`
+
+	update{{ .EntityNameUpper }} = `UPDATE {{ .EntityNameSnakeCase }}`
+
+	read{{ .EntityNameUpper }} = `
+		SELECT
+		    id, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
+		FROM
+		    {{ .EntityNameSnakeCase }}`
+
+	Read{{ .EntityNameUpper }}Count = `
+		SELECT
+		    COUNT(*)
+		FROM
+		    {{ .EntityNameSnakeCase }}`
+)

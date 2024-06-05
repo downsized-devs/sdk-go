@@ -1,0 +1,243 @@
+package {{ .EntityNameSnakeCase }}
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/delosaqua/aquahero-service/src/business/entity"
+	"github.com/downsized-devs/sdk-go/audit"
+	"github.com/downsized-devs/sdk-go/codes"
+	"github.com/downsized-devs/sdk-go/errors"
+	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/null"
+	"github.com/downsized-devs/sdk-go/parser"
+	"github.com/downsized-devs/sdk-go/query"
+	"github.com/downsized-devs/sdk-go/redis"
+	"github.com/downsized-devs/sdk-go/sql"
+)
+
+type Interface interface {
+	Get(ctx context.Context, params entity.{{ .EntityNameUpper }}Param) (entity.{{ .EntityNameUpper }}, error)
+	GetList(ctx context.Context, params entity.{{ .EntityNameUpper }}Param) ([]entity.{{ .EntityNameUpper }}, map[int64]entity.{{ .EntityNameUpper }}, *entity.Pagination, error)
+	Create(ctx context.Context, {{ .EntityName }} entity.{{ .EntityNameUpper }}CreateParam) (entity.{{ .EntityNameUpper }}, error)
+	Update(ctx context.Context, updateParam entity.{{ .EntityNameUpper }}UpdateParam, selectParam entity.{{ .EntityNameUpper }}Param) error
+}
+
+type {{ .EntityName }} struct {
+	log     log.Interface
+	db      sql.Interface
+	redis   redis.Interface
+	json    parser.JSONInterface
+	audit   audit.Interface
+}
+
+func Init(log log.Interface, db sql.Interface, rd redis.Interface, jsonParser parser.JSONInterface, au audit.Interface) Interface {
+	d := &{{ .EntityName }}{
+		log:     log,
+		db:      db,
+		redis:   rd,
+		json:    jsonParser,
+		audit:   au,
+	}
+
+	return d
+}
+
+func (d *{{ .EntityName }}) Create(ctx context.Context, {{ .EntityName }} entity.{{ .EntityNameUpper }}CreateParam) (entity.{{ .EntityNameUpper }}, error) {
+	d.log.Debug(ctx, "creating new {{ .EntityNameLowerSpace }}")
+
+	var err error
+	defer func() {
+		d.audit.Record(ctx, audit.Collection{
+			EventName:        entity.{{ .EntityNameUpper }}Create,
+			EventDescription: "insert {{ .EntityNameLowerSpace }}",
+			InsertParam:      fmt.Sprintf("%+v", {{ .EntityName }}),
+			Error:            err,
+		})
+	}()
+
+	result := entity.{{ .EntityNameUpper }}{}
+	tx, err := d.db.Leader().BeginTx(ctx, "tx{{ .EntityNameUpper }}", sql.TxOptions{})
+	if err != nil {
+		return result, errors.NewWithCode(codes.CodeSQLTxBegin, err.Error())
+	}
+	defer tx.Rollback()
+
+	res, err := tx.NamedExec("iNew{{ .EntityNameUpper }}", createNew{{ .EntityNameUpper }}, {{ .EntityName }})
+	if err != nil {
+		return result, errors.NewWithCode(codes.CodeSQLTxExec, err.Error())
+	}
+
+	rowCount, err := res.RowsAffected()
+	if err != nil {
+		return result, errors.NewWithCode(codes.CodeSQLNoRowsAffected, err.Error())
+	} else if rowCount < 1 {
+		return result, errors.NewWithCode(codes.CodeSQLNoRowsAffected, "no {{ .EntityNameLowerSpace }} created")
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return result, errors.NewWithCode(codes.CodeSQLNoRowsAffected, err.Error())
+	}
+	if err := tx.Commit(); err != nil {
+		return result, errors.NewWithCode(codes.CodeSQLTxCommit, err.Error())
+	}
+
+	{{ .EntityName }}.ID = lastID
+
+	d.log.Debug(ctx, fmt.Sprintf("successfully created new {{ .EntityNameLowerSpace }}: %#v", {{ .EntityName }}))
+
+	if err = d.delete{{ .EntityNameUpper }}Cache(ctx); err != nil {
+		d.log.Error(ctx, err)
+	}
+
+	return d.Get(ctx, entity.{{ .EntityNameUpper }}Param{
+		ID: null.Int64From({{ .EntityName }}.ID),
+	})
+
+}
+
+func (d *{{ .EntityName }}) Get(ctx context.Context, params entity.{{ .EntityNameUpper }}Param) (entity.{{ .EntityNameUpper }}, error) {
+	params.QueryOption.DisableLimit = true
+	d.log.Debug(ctx, fmt.Sprintf("getting {{ .EntityNameLowerSpace }} ID: %v", params))
+
+	{{ .EntityName }} := entity.{{ .EntityNameUpper }}{}
+
+	key, err := d.json.Marshal(params)
+	if err != nil {
+		return {{ .EntityName }}, nil
+	}
+
+	if !params.BypassCache {
+		cached{{ .EntityNameUpper }}, err := d.getCache(ctx, fmt.Sprintf(get{{ .EntityNameUpper }}ByIdKey, string(key)))
+		switch {
+		case errors.Is(err, redis.Nil):
+			d.log.Info(ctx, fmt.Sprintf(entity.ErrorRedisNil, err.Error()))
+		case err != nil:
+			d.log.Error(ctx, fmt.Sprintf(entity.ErrorRedis, err.Error()))
+		default:
+			return cached{{ .EntityNameUpper }}, nil
+		}
+	}
+
+	qb := query.NewSQLQueryBuilder(d.db, "param", "db", &params.QueryOption)
+
+	queryExt, queryArgs, _, _, err := qb.Build(&params)
+	if err != nil {
+		return {{ .EntityName }}, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
+	}
+
+	rows, err := d.db.Follower().QueryRow(ctx, "rCycleByID", read{{ .EntityNameUpper }}+queryExt, queryArgs...)
+	if err != nil && !errors.Is(err, sql.ErrNotFound) {
+		return {{ .EntityName }}, errors.NewWithCode(codes.CodeSQLRead, err.Error())
+	}
+
+	if err := rows.StructScan(&{{ .EntityName }}); err != nil {
+		return {{ .EntityName }}, errors.NewWithCode(codes.CodeCycleNotFound, err.Error())
+	}
+
+	if err = d.upsertCache(ctx, fmt.Sprintf(get{{ .EntityNameUpper }}ByIdKey, string(key)), {{ .EntityName }}, time.Minute); err != nil {
+		d.log.Error(ctx, err)
+	}
+
+	return {{ .EntityName }}, nil
+}
+
+func (d *{{ .EntityName }}) GetList(ctx context.Context, params entity.{{ .EntityNameUpper }}Param) ([]entity.{{ .EntityNameUpper }}, map[int64]entity.{{ .EntityNameUpper }}, *entity.Pagination, error) {
+	d.log.Debug(ctx, "getting {{ .EntityNameLowerSpace }} list")
+
+	{{ .EntityName }}s := []entity.{{ .EntityNameUpper }}{}
+	{{ .EntityName }}Map := make(map[int64]entity.{{ .EntityNameUpper }})
+
+	if !params.BypassCache {
+		cacheResult, mapCache, cachePagination, err := d.getCacheList(ctx, params)
+		switch {
+		case errors.Is(err, redis.Nil):
+			d.log.Info(ctx, fmt.Sprintf(entity.ErrorRedisNil, err.Error()))
+		case err != nil:
+			d.log.Error(ctx, fmt.Sprintf(entity.ErrorRedis, err.Error()))
+		default:
+			return cacheResult, mapCache, &cachePagination, nil
+		}
+	}
+
+	qb := query.NewSQLQueryBuilder(d.db, "param", "db", &params.QueryOption)
+	queryExt, queryArgs, countExt, countArgs, err := qb.Build(&params)
+	if err != nil {
+		return {{ .EntityName }}s, {{ .EntityName }}Map, nil, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
+	}
+
+	rows, err := d.db.Follower().Query(ctx, "r{{ .EntityNameUpper }}List", read{{ .EntityNameUpper }}+queryExt, queryArgs...)
+	if err != nil && !errors.Is(err, sql.ErrNotFound) {
+		return {{ .EntityName }}s, {{ .EntityName }}Map, nil, errors.NewWithCode(codes.CodeSQLRead, err.Error())
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		{{ .EntityName }} := entity.{{ .EntityNameUpper }}{}
+		if err := rows.StructScan(&{{ .EntityName }}); err != nil {
+			d.log.Error(ctx, errors.NewWithCode(codes.CodeSQLRowScan, err.Error()))
+			continue
+		}
+		{{ .EntityName }}s = append({{ .EntityName }}s, {{ .EntityName }})
+		{{ .EntityName }}Map[{{ .EntityName }}.ID] = {{ .EntityName }}
+	}
+
+	pg := entity.Pagination{
+		CurrentPage:     params.Page,
+		CurrentElements: int64(len({{ .EntityName }}s)),
+	}
+	if len({{ .EntityName }}s) > 0 && !params.QueryOption.DisableLimit {
+		if err := d.db.Follower().Get(ctx, "c{{ .EntityNameUpper }}List", Read{{ .EntityNameUpper }}Count+countExt, &pg.TotalElements, countArgs...); err != nil {
+			return {{ .EntityName }}s, {{ .EntityName }}Map, nil, errors.NewWithCode(codes.CodeSQLRead, err.Error())
+		}
+	}
+
+	pg.ProcessPagination(params.Limit)
+
+	if err := d.upsertCacheList(ctx, params, {{ .EntityName }}s, {{ .EntityName }}Map, pg, time.Minute); err != nil {
+		d.log.Error(ctx, err)
+	}
+
+	return {{ .EntityName }}s, {{ .EntityName }}Map, &pg, nil
+}
+
+func (d *{{ .EntityName }}) Update(ctx context.Context, updateParam entity.{{ .EntityNameUpper }}UpdateParam, selectParam entity.{{ .EntityNameUpper }}Param) error {
+	qb := query.NewSQLQueryBuilder(d.db, "param", "db", &selectParam.QueryOption)
+
+	var err error
+	defer func() {
+		d.audit.Record(ctx, audit.Collection{
+			EventName:        entity.{{ .EntityNameUpper }}Update,
+			EventDescription: "update {{ .EntityNameLowerSpace }}",
+			UpdateParam:      fmt.Sprintf("%+v", updateParam),
+			SelectParam:      fmt.Sprintf("%+v", selectParam),
+			Error:            err,
+		})
+	}()
+
+	queryUpdate, args, err := qb.BuildUpdate(&updateParam, &selectParam)
+	if err != nil {
+		return errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
+	}
+
+	res, err := d.db.Leader().Exec(ctx, "u{{ .EntityNameUpper }}", update{{ .EntityNameUpper }}+queryUpdate, args...)
+	if err != nil {
+		return errors.NewWithCode(codes.CodeSQLTxExec, err.Error())
+	}
+
+	rowCount, err := res.RowsAffected()
+	if err != nil {
+		return errors.NewWithCode(codes.CodeSQLNoRowsAffected, err.Error())
+	} else if rowCount < 1 {
+		return errors.NewWithCode(codes.CodeSQLNoRowsAffected, "no rows affected")
+	}
+
+	if err = d.delete{{ .EntityNameUpper }}Cache(ctx); err != nil {
+		d.log.Error(ctx, err)
+	}
+
+	return nil
+}

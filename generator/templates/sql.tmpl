@@ -1,0 +1,17 @@
+-- Create {{ .EntityNameUpperSpace }} Table
+DROP TABLE IF EXISTS `{{ .EntityNameSnakeCase }}`;
+CREATE TABLE IF NOT EXISTS `{{ .EntityNameSnakeCase }}` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    -- Fill this space with entity items as a query
+    -- Utility Columns
+    `status` SMALLINT NOT NULL DEFAULT '1',
+    `flag` INT NOT NULL DEFAULT '0',
+    `meta` VARCHAR(255) DEFAULT '',
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` VARCHAR(255),
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `updated_by` VARCHAR(255),
+    `deleted_at`TIMESTAMP,
+    `deleted_by` VARCHAR(255),
+    PRIMARY KEY (`id`)
+) ENGINE = INNODB;

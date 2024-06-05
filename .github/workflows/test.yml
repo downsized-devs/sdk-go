@@ -1,0 +1,57 @@
+name: "PR: Test"
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_ALERT_DEVOPS_STAGING }}
+
+jobs:
+  test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.21
+
+      - name: Run Go Test
+        id: test
+        run: make run-tests-report
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v1.2.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONARQUBE_HOST }}
+
+      - uses: DelosAqua/slack@v2.1.0
+        with:
+          status: ${{ job.status }}
+          config: .github/config/slack-alert.yml
+          slack_info: .github/config/slack-info.yml
+          steps: ${{ toJson(steps) }}
+        if: failure()

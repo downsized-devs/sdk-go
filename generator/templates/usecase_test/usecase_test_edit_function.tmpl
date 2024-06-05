@@ -1,0 +1,47 @@
+func Test_{{ .EntityName }}_Update(t *testing.T) {
+
+	type expdomain struct {
+		response entity.{{ .EntityNameUpper }}
+		err      error
+	}
+	type expauth struct {
+		respauth auth.UserAuthInfo
+		err      error
+	}
+	type args struct {
+		ctx         context.Context
+		updateParam entity.{{ .EntityNameUpper }}UpdateParam
+		selectParam entity.{{ .EntityNameUpper }}Param
+	}
+	tests := []struct {
+		name      string
+		expdomain expdomain
+		expauth   expauth
+		args      args
+		want      entity.{{ .EntityNameUpper }}
+		wantErr   bool
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			logger := mock_log.NewMockInterface(ctrl)
+			logger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
+
+			mockAuth := mock_auth.NewMockInterface(ctrl)
+			mockAuth.EXPECT().GetUserAuthInfo(gomock.Any()).Return(tt.expauth.respauth, tt.expauth.err).AnyTimes()
+
+			{{ .EntityName }}Domain := mock_{{ .EntityNameSnakeCase }}.NewMockInterface(ctrl)
+			{{ .EntityName }}Domain.EXPECT().Update(gomock.Any(), gomock.Any(), gomock.Any()).Return(tt.expdomain.response, tt.expdomain.err).AnyTimes()
+
+			initParams := InitParam{Log: logger, Dom: {{ .EntityName }}Domain, Auth: mockAuth}
+			p := Init(initParams)
+			err := p.Update(context.Background(), tt.args.updateParam, tt.args.selectParam)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("{{ .EntityName }}.Update() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}

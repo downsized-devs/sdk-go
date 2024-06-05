@@ -1,0 +1,11 @@
+{
+    "String": "Test String",
+    "Boolean": "true",
+    "Duration": "1m",
+    "Object": {
+        "String": "Test String",
+        "Boolean": "true",
+        "Duration": "1m"
+    },
+    "Reference": "$ref:#/Object"
+}

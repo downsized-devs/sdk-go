@@ -1,0 +1,28 @@
+
+// @Summary Get {{ .EntityNameUpperSpace }} List As Admin
+// @Description Get list of all {{ .EntityNameLowerSpace }} as admin
+// @Security BearerAuth
+// @Tags Admin
+// @Param limit query integer false "limit"
+// @Param page query integer false "page"
+// @Param disableLimit query boolean false "disable limit" Enums(true, false)
+// @Produce json
+// @Success 200 {object} entity.HTTPResp{data=[]entity.{{ .EntityNameUpper }}{}}
+// @Failure 401 {object} entity.HTTPResp{}
+// @Failure 500 {object} entity.HTTPResp{}
+// @Router /v1/admin/{{ .EntityNameLowerDash }} [GET]
+func (r *rest) Get{{ .EntityNameUpper }}ListForAdmin(ctx *gin.Context) {
+	var param entity.{{ .EntityNameUpper }}Param
+	if err := r.BindParams(ctx, &param); err != nil {
+		r.httpRespError(ctx, errors.NewWithCode(codes.CodeInvalidValue, err.Error()))
+		return
+	}
+
+	{{ .EntityName }}s, pg, err := r.uc.{{ .EntityNameUpper }}.GetListAdmin(ctx.Request.Context(), param)
+	if err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	r.httpRespSuccess(ctx, codes.CodeSuccess, {{ .EntityName }}s, pg)
+}
