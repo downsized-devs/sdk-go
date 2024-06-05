@@ -1,0 +1,70 @@
+name: "SDK: Release"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionbump:
+        description: "Version Bump"
+        type: choice
+        required: true
+        options:
+          - "patch"
+          - "minor"
+          - "major"
+
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_ALERT_DEVOPS_STAGING }}
+
+jobs:
+  release:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: DelosAqua/slack@v2.2.0
+        with:
+          status: starting
+          config: .github/config/slack-alert-start.yml
+          slack_info: .github/config/slack-info.yml
+
+      - name: Get Latest Tag
+        id: latest-tag
+        run: |
+          git config --global --add safe.directory /github/workspace
+          echo "tag=$(git tag --merged | sort -V | tail -1)" >> "$GITHUB_OUTPUT"
+
+      - name: Generate New Bumped Version
+        uses: DelosAqua/action-bump-semver@v1.1.0
+        id: bump-semver
+        with:
+          current_version: ${{ steps.latest-tag.outputs.tag }}
+          level: ${{ github.event.inputs.versionbump }}
+
+      - name: Check Semver Format
+        run: ./semver -v ${{ steps.bump-semver.outputs.new_version }}
+
+      - name: Create Release Notes
+        id: create-release
+        run: |
+          curl -f -X POST -H "Accept: application/vnd.github.v3+json" \
+            -H "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases \
+            -d '{"tag_name":"${{ steps.bump-semver.outputs.new_version }}", "generate_release_notes":true}'
+
+      - uses: DelosAqua/slack@v2.2.0
+        with:
+          status: ${{ job.status }}
+          config: .github/config/slack-alert-version.yml
+          slack_info: .github/config/slack-info.yml
+          steps: ${{ toJson(steps) }}
+        env:
+          SERVICE_VERSION: ${{ steps.bump-semver.outputs.new_version }}
+        if: always()

@@ -1,0 +1,9 @@
+{
+    "Meta": {
+        "Title": "Aquahero",
+        "Description": "Delos Aquahero API Collection",
+        "Host": "delosaqua.com",
+        "Basepath": "/",
+        "Version": ""
+    }
+}

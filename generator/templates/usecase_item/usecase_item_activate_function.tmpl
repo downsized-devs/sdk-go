@@ -1,0 +1,13 @@
+func (uc *{{ .EntityName }}) Activate(ctx context.Context, params entity.{{ .EntityNameUpper }}Param) error {
+	user, err := uc.auth.GetUserAuthInfo(ctx)
+	if err != nil {
+		return err
+	}
+	userIDStr := fmt.Sprintf("%d", user.User.ID)
+	activateParam := entity.{{ .EntityNameUpper }}UpdateParam{
+		Status:    null.Int64From(1),
+		UpdatedBy: null.NewString(userIDStr, true),
+	}
+
+	return uc.{{ .EntityName }}.Update(ctx, activateParam, params)
+}

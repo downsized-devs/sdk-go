@@ -1,0 +1,129 @@
+package {{ .EntityNameSnakeCase }}
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/delosaqua/aquahero-service/src/business/entity"
+	"github.com/downsized-devs/sdk-go/codes"
+	"github.com/downsized-devs/sdk-go/errors"
+)
+
+const (
+	get{{ .EntityNameUpper }}ByIdKey              = `aquahero:{{ .EntityNameSnakeCase }}:get:%s`
+	get{{ .EntityNameUpper }}ByQueryKey           = `aquahero:{{ .EntityNameSnakeCase }}:get:q:%s`
+	get{{ .EntityNameUpper }}ByMapQueryKey        = `aquahero:{{ .EntityNameSnakeCase }}:get:mq:%s`
+	get{{ .EntityNameUpper }}ByPaginationQueryKey = `aquahero:{{ .EntityNameSnakeCase }}:get:pq:%s`
+	delete{{ .EntityNameUpper }}KeysPattern       = `aquahero:{{ .EntityNameSnakeCase }}*`
+)
+
+func (d *{{ .EntityName }}) upsertCache(ctx context.Context, key string, value entity.{{ .EntityNameUpper }}, expTime time.Duration) error {
+	{{ .EntityName }}, err := d.json.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	return d.redis.SetEX(ctx, key, string({{ .EntityName }}), expTime)
+}
+
+func (d *{{ .EntityName }}) upsertCacheList(ctx context.Context, params entity.{{ .EntityNameUpper }}Param, value []entity.{{ .EntityNameUpper }}, valueMap map[int64]entity.{{ .EntityNameUpper }}, valuePagination entity.Pagination, exptTime time.Duration) error {
+	key, err := d.json.Marshal(params)
+	if err != nil {
+		return errors.NewWithCode(codes.CodeCacheMarshal, err.Error())
+	}
+
+	{{ .EntityName }}s, err := d.json.Marshal(value)
+	if err != nil {
+		return errors.NewWithCode(codes.CodeCacheMarshal, err.Error())
+	}
+
+	if err := d.redis.SetEX(ctx, fmt.Sprintf(get{{ .EntityNameUpper }}ByQueryKey, string(key)), string({{ .EntityName }}s), exptTime); err != nil {
+		return errors.NewWithCode(codes.CodeCacheSetSimpleKey, err.Error())
+	}
+
+	map{{ .EntityNameUpper }}s, err := d.json.Marshal(valueMap)
+	if err != nil {
+		return errors.NewWithCode(codes.CodeCacheMarshal, err.Error())
+	}
+
+	if err := d.redis.SetEX(ctx, fmt.Sprintf(get{{ .EntityNameUpper }}ByMapQueryKey, string(key)), string(map{{ .EntityNameUpper }}s), exptTime); err != nil {
+		return errors.NewWithCode(codes.CodeCacheSetSimpleKey, err.Error())
+	}
+
+	pagination, err := d.json.Marshal(valuePagination)
+	if err != nil {
+		return errors.NewWithCode(codes.CodeCacheMarshal, err.Error())
+	}
+
+	if err := d.redis.SetEX(ctx, fmt.Sprintf(get{{ .EntityNameUpper }}ByPaginationQueryKey, string(key)), string(pagination), exptTime); err != nil {
+		return errors.NewWithCode(codes.CodeCacheSetSimpleKey, err.Error())
+	}
+
+	return nil
+}
+
+func (d *{{ .EntityName }}) getCacheList(ctx context.Context, params entity.{{ .EntityNameUpper }}Param) ([]entity.{{ .EntityNameUpper }}, map[int64]entity.{{ .EntityNameUpper }}, entity.Pagination, error) {
+	var (
+		result     []entity.{{ .EntityNameUpper }}
+		resultMap  map[int64]entity.{{ .EntityNameUpper }}
+		pagination entity.Pagination
+	)
+
+	key, err := d.json.Marshal(params)
+	if err != nil {
+		return result, resultMap, pagination, errors.NewWithCode(codes.CodeCacheMarshal, err.Error())
+	}
+
+	{{ .EntityName }}sRedis, err := d.redis.Get(ctx, fmt.Sprintf(get{{ .EntityNameUpper }}ByQueryKey, string(key)))
+	if err != nil {
+		return result, resultMap, pagination, err
+	}
+
+	data := []byte({{ .EntityName }}sRedis)
+	if err := d.json.Unmarshal(data, &result); err != nil {
+		return result, resultMap, pagination, errors.NewWithCode(codes.CodeCacheUnmarshal, err.Error())
+	}
+
+	map{{ .EntityNameUpper }}Redis, err := d.redis.Get(ctx, fmt.Sprintf(get{{ .EntityNameUpper }}ByMapQueryKey, string(key)))
+	if err != nil {
+		return result, resultMap, pagination, err
+	}
+
+	dataMap{{ .EntityNameUpper }} := []byte(map{{ .EntityNameUpper }}Redis)
+	if err := d.json.Unmarshal(dataMap{{ .EntityNameUpper }}, &resultMap); err != nil {
+		return result, resultMap, pagination, err
+	}
+
+	paginationRedis, err := d.redis.Get(ctx, fmt.Sprintf(get{{ .EntityNameUpper }}ByPaginationQueryKey, string(key)))
+	if err != nil {
+		return result, resultMap, pagination, err
+	}
+
+	dataPagination := []byte(paginationRedis)
+	if err := d.json.Unmarshal(dataPagination, &pagination); err != nil {
+		return result, resultMap, pagination, errors.NewWithCode(codes.CodeCacheUnmarshal, err.Error())
+	}
+
+	return result, resultMap, pagination, nil
+}
+
+func (d *{{ .EntityName }}) getCache(ctx context.Context, key string) (entity.{{ .EntityNameUpper }}, error) {
+	var result entity.{{ .EntityNameUpper }}
+
+	{{ .EntityName }}, err := d.redis.Get(ctx, key)
+	if err != nil {
+		return result, err
+	}
+
+	data := []byte({{ .EntityName }})
+
+	return result, d.json.Unmarshal(data, &result)
+}
+
+func (d *{{ .EntityName }}) delete{{ .EntityNameUpper }}Cache(ctx context.Context) error {
+	if err := d.redis.Del(ctx, delete{{ .EntityNameUpper }}KeysPattern); err != nil {
+		return errors.NewWithCode(codes.CodeCacheDeleteSimpleKey, "delete cache by keys pattern")
+	}
+	return nil
+}

@@ -1,0 +1,42 @@
+// @Summary Update {{ .EntityNameUpperSpace }}
+// @Description Update an existing {{ .EntityNameLowerSpace }}
+// @Security BearerAuth
+// @Tags {{ .EntityNameUpperSpace }}
+// @Param id path integer true "{{ .EntityNameLowerSpace }} id"
+// @Param {{ .EntityName }} body entity.{{ .EntityNameUpper }}UpdateParam true "{{ .EntityNameLowerSpace }} info"
+// @Produce json
+// @Success 200 {object} entity.HTTPResp{data=entity.{{ .EntityNameUpper }}{}}
+// @Failure 401 {object} entity.HTTPResp{}
+// @Failure 404 {object} entity.HTTPResp{}
+// @Failure 500 {object} entity.HTTPResp{}
+// @Router /v1/{{ .EntityNameLowerDash }}/{id} [PUT]
+func (r *rest) Update{{ .EntityNameUpper }}(ctx *gin.Context) {
+	var updateParam entity.{{ .EntityNameUpper }}UpdateParam
+
+	defer func() {
+		r.LogEvent(ctx, audit.Collection{
+			EventName:        entity.{{ .EntityNameUpper }}Update,
+			EventDescription: "update {{ .EntityNameLowerSpace }}",
+			RequestBody:      updateParam,
+		})
+	}()
+
+	if err := r.Bind(ctx, &updateParam); err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	var selectParam entity.{{ .EntityNameUpper }}Param
+	if err := r.BindParams(ctx, &selectParam); err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	err := r.uc.{{ .EntityNameUpper }}.Update(ctx.Request.Context(), updateParam, selectParam)
+	if err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	r.httpRespSuccess(ctx, codes.CodeSuccess, nil, nil)
+}

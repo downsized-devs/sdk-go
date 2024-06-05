@@ -1,0 +1,37 @@
+{
+    "$id" : "file://./files/test.schema.json",
+    "$schema" : "http://json-schema.org/draft-07/schema#",
+    "type" : "object",
+    "properties" : {
+        "farmId" : {
+            "description": "The unique identifier for a farm",
+            "type" : "integer"
+        },
+        "companyId" : {
+            "description": "The unique identifier for a farm company",
+            "type" : "integer"
+        },
+        "farmName" : {
+            "description": "Name of the farm",
+            "type" : "string"
+        },
+        "farmCode" : {
+            "description": "Code of the farm",
+            "type" : "string"
+        },
+        "farmLocation" : {
+            "description": "Location of the farm",
+            "type" : "string"
+        },
+        "farmCoordinate" : {
+            "type" : "string",
+            "description" : "coordinate of farm"
+        },
+        "pondCount" : {
+            "description": "Count of the pond on the farm",
+            "type" : "integer"
+        }
+    },
+    "required" : ["farmId", "companyId", "farmName", "farmCode", "farmLocation"],
+    "definitions": {}
+}

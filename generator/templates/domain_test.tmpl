@@ -1,0 +1,281 @@
+package {{ .EntityNameSnakeCase }}
+
+import (
+	"context"
+	"database/sql"
+	"testing"
+
+	"github.com/delosaqua/aquahero-service/src/business/entity"
+	libsql "github.com/downsized-devs/sdk-go/sql"
+	mock_audit "github.com/downsized-devs/sdk-go/tests/mock/audit"
+	mock_log "github.com/downsized-devs/sdk-go/tests/mock/log"
+	mock_parser "github.com/downsized-devs/sdk-go/tests/mock/parser"
+	mock_redis "github.com/downsized-devs/sdk-go/tests/mock/redis"
+	"go.uber.org/mock/gomock"
+	"github.com/stretchr/testify/assert"
+)
+
+func Test_{{ .EntityName }}_Create(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	logger := mock_log.NewMockInterface(ctrl)
+	logger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
+
+	mockRedis := mock_redis.NewMockInterface(ctrl)
+	mockJson := mock_parser.NewMockJSONInterface(ctrl)
+
+	audit := mock_audit.NewMockInterface(ctrl)
+	audit.EXPECT().Record(gomock.Any(), gomock.Any()).AnyTimes()
+
+	type mockFields struct {
+		logger *mock_log.MockInterface
+		redis  *mock_redis.MockInterface
+		json   *mock_parser.MockJSONInterface
+	}
+
+	mocks := mockFields{
+		logger: logger,
+		redis:  mockRedis,
+		json:   mockJson,
+	}
+
+	type args struct {
+		ctx        context.Context
+		{{ .EntityName }} entity.{{ .EntityNameUpper }}CreateParam
+	}
+	tests := []struct {
+		name        string
+		args        args
+		prepSqlMock func() (*sql.DB, error)
+		mockFunc    func(mock mockFields)
+		want        entity.{{ .EntityNameUpper }}
+		wantErr     bool
+	}{}
+	for _, tt := range tests {
+		tt.mockFunc(mocks)
+		t.Run(tt.name, func(t *testing.T) {
+			sqlServer, err := tt.prepSqlMock()
+			if err != nil {
+				t.Error(err)
+			}
+			defer sqlServer.Close()
+
+			sqlClient := libsql.Init(libsql.Config{
+				Driver: "sqlmock",
+				Leader: libsql.ConnConfig{
+					MockDB: sqlServer,
+				},
+				Follower: libsql.ConnConfig{
+					MockDB: sqlServer,
+				},
+			}, logger, nil)
+
+			f := Init(logger, sqlClient, mockRedis, mockJson, audit)
+			got, err := f.Create(tt.args.ctx, tt.args.{{ .EntityName }})
+			if (err != nil) != tt.wantErr {
+				t.Errorf("{{ .EntityName }}.Create() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_{{ .EntityName }}_Get(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	logger := mock_log.NewMockInterface(ctrl)
+	logger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
+
+	mockRedis := mock_redis.NewMockInterface(ctrl)
+	mockJson := mock_parser.NewMockJSONInterface(ctrl)
+
+	type mockFields struct {
+		logger *mock_log.MockInterface
+		redis  *mock_redis.MockInterface
+		json   *mock_parser.MockJSONInterface
+	}
+
+	mocks := mockFields{
+		logger: logger,
+		redis:  mockRedis,
+		json:   mockJson,
+	}
+
+	type args struct {
+		ctx    context.Context
+		params entity.{{ .EntityNameUpper }}Param
+	}
+	tests := []struct {
+		name        string
+		args        args
+		prepSqlMock func() (*sql.DB, error)
+		mockFunc    func(mock mockFields)
+		want        entity.{{ .EntityNameUpper }}
+		wantErr     bool
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockFunc(mocks)
+			sqlServer, err := tt.prepSqlMock()
+			if err != nil {
+				t.Error(err)
+			}
+			defer sqlServer.Close()
+
+			sqlClient := libsql.Init(libsql.Config{
+				Driver: "sqlmock",
+				Leader: libsql.ConnConfig{
+					MockDB: sqlServer,
+				},
+				Follower: libsql.ConnConfig{
+					MockDB: sqlServer,
+				},
+			}, logger, nil)
+
+			f := Init(logger, sqlClient, mockRedis, mockJson, nil)
+			got, err := f.Get(tt.args.ctx, tt.args.params)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("{{ .EntityName }}.Get() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_{{ .EntityName }}_GetList(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	logger := mock_log.NewMockInterface(ctrl)
+	logger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
+
+	mockRedis := mock_redis.NewMockInterface(ctrl)
+	mockJson := mock_parser.NewMockJSONInterface(ctrl)
+
+	type mockFields struct {
+		logger *mock_log.MockInterface
+		redis  *mock_redis.MockInterface
+		json   *mock_parser.MockJSONInterface
+	}
+
+	mocks := mockFields{
+		logger: logger,
+		redis:  mockRedis,
+		json:   mockJson,
+	}
+
+	type args struct {
+		ctx    context.Context
+		params entity.{{ .EntityNameUpper }}Param
+	}
+	tests := []struct {
+		name        string
+		args        args
+		prepSqlMock func() (*sql.DB, error)
+		mockFunc    func(mock mockFields)
+		want        []entity.{{ .EntityNameUpper }}
+		want1       map[int64]entity.{{ .EntityNameUpper }}
+		want2       *entity.Pagination
+		wantErr     bool
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockFunc(mocks)
+			sqlServer, err := tt.prepSqlMock()
+			if err != nil {
+				t.Error(err)
+			}
+			defer sqlServer.Close()
+
+			sqlClient := libsql.Init(libsql.Config{
+				Driver: "sqlmock",
+				Leader: libsql.ConnConfig{
+					MockDB: sqlServer,
+				},
+				Follower: libsql.ConnConfig{
+					MockDB: sqlServer,
+				},
+			}, logger, nil)
+
+			f := Init(logger, sqlClient, mockRedis, mockJson, nil)
+			got, got1, got2, err := f.GetList(tt.args.ctx, tt.args.params)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("{{ .EntityName }}.GetList() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.want1, got1)
+			assert.Equal(t, tt.want2, got2)
+		})
+	}
+}
+
+func Test_{{ .EntityName }}_Update(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	logger := mock_log.NewMockInterface(ctrl)
+	logger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
+
+	mockRedis := mock_redis.NewMockInterface(ctrl)
+
+	audit := mock_audit.NewMockInterface(ctrl)
+	audit.EXPECT().Record(gomock.Any(), gomock.Any()).AnyTimes()
+
+	type mockFields struct {
+		logger *mock_log.MockInterface
+		redis  *mock_redis.MockInterface
+	}
+
+	mocks := mockFields{
+		logger: logger,
+		redis:  mockRedis,
+	}
+
+	type args struct {
+		ctx         context.Context
+		updateParam entity.{{ .EntityNameUpper }}UpdateParam
+		selectParam entity.{{ .EntityNameUpper }}Param
+	}
+	tests := []struct {
+		name        string
+		args        args
+		prepSqlMock func() (*sql.DB, error)
+		mockFunc    func(mock mockFields)
+		wantErr     bool
+	}{}
+	for _, tt := range tests {
+		tt.mockFunc(mocks)
+		t.Run(tt.name, func(t *testing.T) {
+			sqlServer, err := tt.prepSqlMock()
+			if err != nil {
+				t.Error(err)
+			}
+			defer sqlServer.Close()
+
+			sqlClient := libsql.Init(libsql.Config{
+				Driver: "sqlmock",
+				Leader: libsql.ConnConfig{
+					MockDB: sqlServer,
+				},
+				Follower: libsql.ConnConfig{
+					MockDB: sqlServer,
+				},
+			}, logger, nil)
+
+			f := Init(logger, sqlClient, mockRedis, nil, audit)
+			if err := f.Update(tt.args.ctx, tt.args.updateParam, tt.args.selectParam); (err != nil) != tt.wantErr {
+				t.Errorf("{{ .EntityName }}.Update() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

@@ -1,0 +1,13 @@
+text: |
+  *<{{workflowRunUrl}}|Workflow _{{workflow}}_ is _{{jobStatus}}_>* triggered by <{{mention.actor}}>
+
+fallback: |-
+  [GitHub] {{workflow}} #{{runNumber}} {{jobName}} is {{jobStatus}}
+
+footer: >-
+  <{{repositoryUrl}}|{{repositoryName}}>
+
+colors:
+  success: "good"
+  failure: "danger"
+  cancelled: "warning"

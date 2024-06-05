@@ -1,0 +1,51 @@
+
+func Test_{{ .EntityName }}_GetListAdmin(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	logger := mock_log.NewMockInterface(ctrl)
+	logger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
+
+	{{ .EntityName }}Dom := mock_{{ .EntityNameSnakeCase }}.NewMockInterface(ctrl)
+
+	initParams := InitParam{Log: logger, Dom: {{ .EntityName }}Dom}
+	p := Init(initParams)
+
+	type mockFields struct {
+		{{ .EntityName }} *mock_{{ .EntityNameSnakeCase }}.MockInterface
+		logger     *mock_log.MockInterface
+	}
+
+	mocks := mockFields{
+		{{ .EntityName }}: {{ .EntityName }}Dom,
+		logger:     logger,
+	}
+
+	type args struct {
+		ctx    context.Context
+		params entity.{{ .EntityNameUpper }}Param
+	}
+	tests := []struct {
+		name     string
+		mockfunc func(mock mockFields)
+		args     args
+		want     []entity.{{ .EntityNameUpper }}
+		want1    *entity.Pagination
+		wantErr  bool
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockfunc(mocks)
+
+			got, pagination, err := p.GetListAdmin(tt.args.ctx, tt.args.params)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("{{ .EntityName }}.GetListAdmin() error = %v, wantErr %v", got, tt.wantErr)
+				return
+			}
+
+			assert.Equal(t, tt.want, got)
+			assert.Equal(t, tt.want1, pagination)
+		})
+	}
+}

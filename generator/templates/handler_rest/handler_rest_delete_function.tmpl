@@ -1,0 +1,36 @@
+// @Summary Delete {{ .EntityNameUpperSpace }}
+// @Description Soft delete an existing {{ .EntityNameLowerSpace }}
+// @Security BearerAuth
+// @Tags {{ .EntityNameUpperSpace }}
+// @Param id path integer true "{{ .EntityNameLowerSpace }} id"
+// @Produce json
+// @Success 200 {object} entity.HTTPResp{}
+// @Failure 401 {object} entity.HTTPResp{}
+// @Failure 404 {object} entity.HTTPResp{}
+// @Failure 500 {object} entity.HTTPResp{}
+// @Router /v1/{{ .EntityNameLowerDash }}/{id} [DELETE]
+func (r *rest) Delete{{ .EntityNameUpper }}(ctx *gin.Context) {
+
+	var param entity.{{ .EntityNameUpper }}Param
+
+	defer func() {
+		r.LogEvent(ctx, audit.Collection{
+			EventName:        entity.{{ .EntityNameUpper }}Delete,
+			EventDescription: "delete {{ .EntityNameLowerSpace }}",
+			RequestBody:      param,
+		})
+	}()
+
+	if err := r.BindParams(ctx, &param); err != nil {
+		r.httpRespError(ctx, errors.NewWithCode(codes.CodeInvalidValue, err.Error()))
+		return
+	}
+
+	err := r.uc.{{ .EntityNameUpper }}.Delete(ctx.Request.Context(), param)
+	if err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	r.httpRespSuccess(ctx, codes.CodeSuccess, nil, nil)
+}

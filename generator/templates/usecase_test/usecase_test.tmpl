@@ -1,0 +1,15 @@
+package {{ .EntityNameSnakeCase }}
+
+import (
+	"context"
+	"reflect"
+	"testing"
+
+	mock_{{ .EntityNameSnakeCase }} "github.com/delosaqua/aquahero-service/src/business/domain/mock/{{ .EntityNameSnakeCase }}"
+	"github.com/delosaqua/aquahero-service/src/business/entity"
+	"github.com/downsized-devs/sdk-go/auth"
+	mock_auth "github.com/downsized-devs/sdk-go/tests/mock/auth"
+	mock_log "github.com/downsized-devs/sdk-go/tests/mock/log"
+	"go.uber.org/mock/gomock"
+	"github.com/stretchr/testify/assert"
+)

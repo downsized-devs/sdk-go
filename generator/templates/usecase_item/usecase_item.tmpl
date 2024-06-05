@@ -1,0 +1,40 @@
+package {{ .EntityNameSnakeCase }}
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	{{ .EntityName }}Dom "github.com/delosaqua/aquahero-service/src/business/domain/{{ .EntityNameSnakeCase }}"
+	"github.com/delosaqua/aquahero-service/src/business/entity"
+	"github.com/downsized-devs/sdk-go/auth"
+	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/null"
+)
+
+type Interface interface {
+	
+}
+
+type {{ .EntityName }} struct {
+	log         log.Interface
+	{{ .EntityName }} {{ .EntityName }}Dom.Interface
+	auth        auth.Interface
+}
+
+type InitParam struct {
+	Log  log.Interface
+	Dom   {{ .EntityName }}Dom.Interface
+	Auth auth.Interface
+}
+
+func Init(params InitParam) Interface {
+	uc := &{{ .EntityName }}{
+		{{ .EntityName }}: params.Dom,
+		log:         params.Log,
+		auth:        params.Auth,
+	}
+	return uc
+}
+
+var Now = time.Now
