@@ -72,23 +72,23 @@ func Init(opt Options) Interface {
 }
 
 func (c *configReader) mergeEnvConfig() {
-	var svcVersion string
-	switch {
-	case os.Getenv("AQUAHERO_SERVICE_VERSION") != "":
-		svcVersion = os.Getenv("AQUAHERO_SERVICE_VERSION")
-	case os.Getenv("SERVICE_VERSION") != "":
-		svcVersion = os.Getenv("SERVICE_VERSION")
-	default:
-		svcVersion = "dev"
+	svcVersion := os.Getenv("SERVICE_VERSION")
+	svcEnvironment := os.Getenv("SERVICE_ENVIRONMENT")
+	if svcVersion == "" {
+		svcVersion = "v0.0.0"
 	}
-	meta := c.viper.GetStringMap("meta")
-	meta["version"] = svcVersion
-	c.viper.Set("meta", meta)
+	if svcEnvironment == "" {
+		svcEnvironment = "dev"
+	}
+	sm := c.viper.GetStringMap("meta")
+	sm["version"] = svcVersion
+	sm["environment"] = svcEnvironment
+	c.viper.Set("meta", sm)
 }
 
 func (c *configReader) resolveJSONRef() {
 	refmap := make(map[string]interface{})
-	refregxp := regexp.MustCompile("^\\$ref:#\\/(.*)$")
+	refregxp := regexp.MustCompile(`^\$ref:#\/(.*)$`)
 	for _, k := range c.viper.AllKeys() {
 		refpath := c.viper.GetString(k)
 		if refregxp.MatchString(refpath) {
