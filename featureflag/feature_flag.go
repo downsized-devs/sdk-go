@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	ffclient "github.com/thomaspoignant/go-feature-flag"
 	"github.com/thomaspoignant/go-feature-flag/ffuser"
 	"github.com/thomaspoignant/go-feature-flag/retriever"
@@ -29,12 +29,12 @@ type Config struct {
 
 type featureFlag struct {
 	cfg       Config
-	log       log.Interface
+	log       logger.Interface
 	client    *ffclient.GoFeatureFlag
 	retriever retriever.Retriever
 }
 
-func Init(cfg Config, log log.Interface, ret retriever.Retriever) Interface {
+func Init(cfg Config, log logger.Interface, ret retriever.Retriever) Interface {
 	ffLag := &featureFlag{
 		log:       log,
 		cfg:       cfg,

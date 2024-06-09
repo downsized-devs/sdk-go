@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"testing"
 
-	mock_log "github.com/downsized-devs/sdk-go/tests/mock/log"
+	mock_log "github.com/downsized-devs/sdk-go/tests/mock/logger"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )
@@ -52,7 +52,7 @@ func Test_storage_Upload_Download_Delete(t *testing.T) {
 				filemimetype: "json",
 				data:         data,
 			},
-			want:     "https://aquahero-storage-staging.s3.ap-southeast-1.amazonaws.com/220426/11/testfile.json",
+			want:     "https://generic-storage-staging.s3.ap-southeast-1.amazonaws.com/220426/11/testfile.json",
 			wantByte: data,
 			wantErr:  false,
 		},

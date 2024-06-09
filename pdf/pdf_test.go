@@ -6,14 +6,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
 )
 
 func Test_pdf_SetPasswordFile(t *testing.T) {
 	type fields struct {
 		config *model.Configuration
-		log    log.Interface
+		log    logger.Interface
 	}
 
 	pdfFile := "example.pdf"

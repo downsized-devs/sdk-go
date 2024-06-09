@@ -28,7 +28,7 @@ mock-all:
 	@make mock util=configbuilder subutil=configbuilder
 	@make mock util=configreader subutil=configreader
 	@make mock util=instrument subutil=instrument
-	@make mock util=log subutil=log
+	@make mock util=logger subutil=logger
 	@make mock util=parser subutil=parser
 	@make mock util=parser subutil=csv
 	@make mock util=parser subutil=excel

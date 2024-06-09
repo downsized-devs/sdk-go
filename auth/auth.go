@@ -10,7 +10,7 @@ import (
 	firebase_auth "firebase.google.com/go/auth"
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/downsized-devs/sdk-go/null"
 	"github.com/downsized-devs/sdk-go/parser"
 	identitytoolkitv1 "google.golang.org/api/identitytoolkit/v1"
@@ -40,7 +40,7 @@ type Interface interface {
 }
 
 type auth struct {
-	log               log.Interface
+	log               logger.Interface
 	json              parser.JSONInterface
 	firebase          *firebase_auth.Client
 	identitytoolkitv1 *identitytoolkitv1.Service
@@ -72,7 +72,7 @@ type FirebaseAccountKey struct {
 	Clientx509CertURL       string `json:"client_x509_cert_url"`
 }
 
-func Init(cfg Config, log log.Interface, json parser.JSONInterface, httpClient *http.Client) Interface {
+func Init(cfg Config, log logger.Interface, json parser.JSONInterface, httpClient *http.Client) Interface {
 	if cfg.SkipFirebaseInit {
 		return &auth{
 			log:  log,

@@ -7,14 +7,12 @@ import (
 	"context"
 	"fmt"
 	"testing"
-
-	"github.com/downsized-devs/sdk-go/log"
 )
 
 func Test_tracker_Push(t *testing.T) {
 	type fields struct {
 		opt Options
-		log log.Interface
+		log logger.Interface
 	}
 	type args struct {
 		ctx          context.Context

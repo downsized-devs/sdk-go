@@ -9,7 +9,7 @@ import (
 	"github.com/Boostport/mjml-go"
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 )
 
 type TemplateInterface interface {
@@ -19,7 +19,7 @@ type TemplateInterface interface {
 
 type emailtemplate struct {
 	config   TemplateConfig
-	log      log.Interface
+	log      logger.Interface
 	template map[string]*template.Template
 }
 
@@ -27,7 +27,7 @@ type TemplateConfig struct {
 	FileDirectory string
 }
 
-func initTemplate(conf TemplateConfig, log log.Interface) TemplateInterface {
+func initTemplate(conf TemplateConfig, log logger.Interface) TemplateInterface {
 	return &emailtemplate{
 		config:   conf,
 		log:      log,

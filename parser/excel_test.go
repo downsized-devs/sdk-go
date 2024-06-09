@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/downsized-devs/sdk-go/log"
-	mock_log "github.com/downsized-devs/sdk-go/tests/mock/log"
+	"github.com/downsized-devs/sdk-go/logger"
+	mock_log "github.com/downsized-devs/sdk-go/tests/mock/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/mock/gomock"
@@ -957,11 +957,11 @@ func TestMapper_ParseString(t *testing.T) {
 func Test_initExcel(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	logger := mock_log.NewMockInterface(ctrl)
-	logger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
-	logger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
+	loggerMock := mock_log.NewMockInterface(ctrl)
+	loggerMock.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
+	loggerMock.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
 	type args struct {
-		log log.Interface
+		log logger.Interface
 	}
 	tests := []struct {
 		name string
@@ -971,10 +971,10 @@ func Test_initExcel(t *testing.T) {
 		{
 			name: "init success",
 			args: args{
-				log: logger,
+				log: loggerMock,
 			},
 			want: &excelParser{
-				logger,
+				loggerMock,
 			},
 		},
 	}
@@ -2503,7 +2503,7 @@ func Test_excelParser_Marshal(t *testing.T) {
 							"B1": "Sample Name",
 							"C1": "Sample Number",
 							"D1": "Address",
-							"A2": "Delos",
+							"A2": "Devs",
 							"B2": "A1",
 							"C2": "123",
 							"D2": "Jl. Damai Indah Sentosa No 420, RT 6 RW 9",
@@ -2515,10 +2515,10 @@ func Test_excelParser_Marshal(t *testing.T) {
 							"A1": "Facility Name",
 							"B1": "Sample Name",
 							"C1": "Status",
-							"A2": "Delos",
+							"A2": "Devs",
 							"B2": "A1",
 							"C2": "Positive",
-							"A3": "Delos",
+							"A3": "Devs",
 							"B3": "A2",
 							"C3": "Negative",
 						},

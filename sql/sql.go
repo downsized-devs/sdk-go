@@ -10,7 +10,7 @@ import (
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
 	"github.com/downsized-devs/sdk-go/instrument"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -61,11 +61,11 @@ type sqlDB struct {
 	leader     Command
 	follower   Command
 	cfg        Config
-	log        log.Interface
+	log        logger.Interface
 	instrument instrument.Interface
 }
 
-func Init(cfg Config, log log.Interface, instr instrument.Interface) Interface {
+func Init(cfg Config, log logger.Interface, instr instrument.Interface) Interface {
 	if cfg.Driver == "sqlmock" {
 		cfg.UseInstrument = false
 	}

@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/delosaqua/aquahero-service/src/business/entity"
+	"github.com/downsized-devs/generic-service/src/business/entity"
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
 )
 
 const (
-	get{{ .EntityNameUpper }}ByIdKey              = `aquahero:{{ .EntityNameSnakeCase }}:get:%s`
-	get{{ .EntityNameUpper }}ByQueryKey           = `aquahero:{{ .EntityNameSnakeCase }}:get:q:%s`
-	get{{ .EntityNameUpper }}ByMapQueryKey        = `aquahero:{{ .EntityNameSnakeCase }}:get:mq:%s`
-	get{{ .EntityNameUpper }}ByPaginationQueryKey = `aquahero:{{ .EntityNameSnakeCase }}:get:pq:%s`
-	delete{{ .EntityNameUpper }}KeysPattern       = `aquahero:{{ .EntityNameSnakeCase }}*`
+	get{{ .EntityNameUpper }}ByIdKey              = `generic:{{ .EntityNameSnakeCase }}:get:%s`
+	get{{ .EntityNameUpper }}ByQueryKey           = `generic:{{ .EntityNameSnakeCase }}:get:q:%s`
+	get{{ .EntityNameUpper }}ByMapQueryKey        = `generic:{{ .EntityNameSnakeCase }}:get:mq:%s`
+	get{{ .EntityNameUpper }}ByPaginationQueryKey = `generic:{{ .EntityNameSnakeCase }}:get:pq:%s`
+	delete{{ .EntityNameUpper }}KeysPattern       = `generic:{{ .EntityNameSnakeCase }}*`
 )
 
 func (d *{{ .EntityName }}) upsertCache(ctx context.Context, key string, value entity.{{ .EntityNameUpper }}, expTime time.Duration) error {

@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/downsized-devs/sdk-go/instrument"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -37,13 +37,13 @@ type command struct {
 	db            *sqlx.DB
 	connName      string
 	connType      string
-	log           log.Interface
+	log           logger.Interface
 	instrument    instrument.Interface
 	useInstrument bool
 	logQuery      bool
 }
 
-func initCommand(db *sqlx.DB, connName string, instr instrument.Interface, log log.Interface, isLeader, useInstr, logQuery bool) Command {
+func initCommand(db *sqlx.DB, connName string, instr instrument.Interface, log logger.Interface, isLeader, useInstr, logQuery bool) Command {
 	c := &command{
 		db:            db,
 		connName:      connName,

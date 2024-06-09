@@ -1,8 +1,6 @@
 package parser
 
-import (
-	"github.com/downsized-devs/sdk-go/log"
-)
+import "github.com/downsized-devs/sdk-go/logger"
 
 type Parser interface {
 	JSONParser() JSONInterface
@@ -22,7 +20,7 @@ type parser struct {
 	excel ExcelInterface
 }
 
-func InitParser(log log.Interface, opt Options) Parser {
+func InitParser(log logger.Interface, opt Options) Parser {
 	return &parser{
 		json:  initJSON(opt.JSONOptions, log),
 		csv:   initCSV(),

@@ -7,7 +7,7 @@ import (
 
 	firebase "firebase.google.com/go"
 	firebase_messaging "firebase.google.com/go/messaging"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/downsized-devs/sdk-go/parser"
 	"google.golang.org/api/option"
 )
@@ -24,7 +24,7 @@ type Interface interface {
 }
 
 type messaging struct {
-	log      log.Interface
+	log      logger.Interface
 	firebase *firebase_messaging.Client
 }
 
@@ -51,7 +51,7 @@ type Config struct {
 	Firebase         FirebaseConf
 }
 
-func Init(cfg Config, log log.Interface, json parser.JSONInterface, httpClient *http.Client) Interface {
+func Init(cfg Config, log logger.Interface, json parser.JSONInterface, httpClient *http.Client) Interface {
 	if cfg.SkipFirebaseInit {
 		return &messaging{
 			log: log,

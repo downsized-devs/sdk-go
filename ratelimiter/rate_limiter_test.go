@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/downsized-devs/sdk-go/log"
-	mock_log "github.com/downsized-devs/sdk-go/tests/mock/log"
+	"github.com/downsized-devs/sdk-go/logger"
+	mock_log "github.com/downsized-devs/sdk-go/tests/mock/logger"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/mock/gomock"
 )
@@ -14,8 +14,8 @@ func Test_Limiter(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	logger := mock_log.NewMockInterface(ctrl)
-	logger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
+	loggerMock := mock_log.NewMockInterface(ctrl)
+	loggerMock.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
 
 	configTrue := Config{
 		Enabled: true,
@@ -36,7 +36,7 @@ func Test_Limiter(t *testing.T) {
 	}
 
 	type args struct {
-		log log.Interface
+		log logger.Interface
 		cfg Config
 	}
 
@@ -48,18 +48,18 @@ func Test_Limiter(t *testing.T) {
 		{
 			name: "rate limiter false",
 			args: args{
-				log: logger,
+				log: loggerMock,
 				cfg: configFalse,
 			},
-			want: Init(configFalse, logger).Limiter(),
+			want: Init(configFalse, loggerMock).Limiter(),
 		},
 		{
 			name: "rate limiter true",
 			args: args{
-				log: logger,
+				log: loggerMock,
 				cfg: configTrue,
 			},
-			want: Init(configTrue, logger).Limiter(),
+			want: Init(configTrue, loggerMock).Limiter(),
 		},
 	}
 	for _, tt := range tests {

@@ -9,7 +9,7 @@ import (
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
 	"github.com/downsized-devs/sdk-go/language"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/go-playground/locales"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/id"
@@ -28,10 +28,10 @@ type Config struct {
 
 type translator struct {
 	translator *ut.UniversalTranslator
-	log        log.Interface
+	log        logger.Interface
 }
 
-func Init(conf Config, log log.Interface) Interface {
+func Init(conf Config, log logger.Interface) Interface {
 	fallback, supported, err := parseLanguageId(conf)
 	if err != nil {
 		log.Fatal(context.Background(), err)

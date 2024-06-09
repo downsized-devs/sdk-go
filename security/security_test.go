@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,12 +31,12 @@ func Test_security_Encrypt_Decrypt(t *testing.T) {
 			wantError: false,
 		},
 		{
-			name: "success encrypted & decrypted text: aquahero",
+			name: "success encrypted & decrypted text: generic",
 			args: args{
 				ctx:        context.Background(),
 				passphrase: "testing123",
 				timestamp:  54321,
-				plaintext:  "aquahero",
+				plaintext:  "generic",
 			},
 			wantError: false,
 		},
@@ -54,7 +54,7 @@ func Test_security_Encrypt_Decrypt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &security{
-				log: log.Init(log.Config{}),
+				log: logger.Init(logger.Config{}),
 			}
 
 			enc := s.Encrypt(tt.args.ctx, tt.args.passphrase, tt.args.timestamp, tt.args.plaintext)
@@ -74,7 +74,7 @@ func Test_security_Encrypt_Decrypt(t *testing.T) {
 
 func Test_security_HashPassword(t *testing.T) {
 	type fields struct {
-		log log.Interface
+		log logger.Interface
 	}
 	type args struct {
 		ctx       context.Context
@@ -90,7 +90,7 @@ func Test_security_HashPassword(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				log: log.Init(log.Config{}),
+				log: logger.Init(logger.Config{}),
 			},
 			args: args{
 				ctx:       context.Background(),
@@ -114,7 +114,7 @@ func Test_security_HashPassword(t *testing.T) {
 
 func Test_security_CompareHashPassword(t *testing.T) {
 	type fields struct {
-		log log.Interface
+		log logger.Interface
 	}
 	type args struct {
 		ctx          context.Context
@@ -131,7 +131,7 @@ func Test_security_CompareHashPassword(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				log: log.Init(log.Config{}),
+				log: logger.Init(logger.Config{}),
 			},
 			args: args{
 				ctx:          context.Background(),
@@ -144,7 +144,7 @@ func Test_security_CompareHashPassword(t *testing.T) {
 		{
 			name: "failed",
 			fields: fields{
-				log: log.Init(log.Config{}),
+				log: logger.Init(logger.Config{}),
 			},
 			args: args{
 				ctx:          context.Background(),
@@ -175,7 +175,7 @@ func Test_security_ScryptPassword(t *testing.T) {
 		MemoryCost:          14,
 	}
 	type fields struct {
-		log    log.Interface
+		log    logger.Interface
 		scrypt ScryptConfig
 	}
 	type args struct {
@@ -192,13 +192,13 @@ func Test_security_ScryptPassword(t *testing.T) {
 		{
 			name: "success scrypt my password",
 			fields: fields{
-				log:    log.Init(log.Config{}),
+				log:    logger.Init(logger.Config{}),
 				scrypt: config,
 			},
 			args: args{
 				ctx:      context.Background(),
 				salt:     "ekr/rlgB6tovww==",
-				password: "Delos@qua12345",
+				password: "D0wn5izeDd3v5",
 			},
 			want: "8bVI07w7zmyTgnSU8fE2C6Nn/pzEiukZJEFkWSFch5zOxypmjRt67C0aikpfQ/3z5T2XF9vmJF5PkaskD9D1sw==",
 		},
@@ -224,7 +224,7 @@ func Test_security_CompareScryptPassword(t *testing.T) {
 		MemoryCost:          14,
 	}
 	type fields struct {
-		log    log.Interface
+		log    logger.Interface
 		scrypt ScryptConfig
 	}
 	type args struct {
@@ -242,21 +242,21 @@ func Test_security_CompareScryptPassword(t *testing.T) {
 		{
 			name: "success compare scrypt password",
 			fields: fields{
-				log:    log.Init(log.Config{}),
+				log:    logger.Init(logger.Config{}),
 				scrypt: config,
 			},
 			args: args{
 				ctx:          context.Background(),
 				passwordHash: "8bVI07w7zmyTgnSU8fE2C6Nn/pzEiukZJEFkWSFch5zOxypmjRt67C0aikpfQ/3z5T2XF9vmJF5PkaskD9D1sw==",
 				salt:         "ekr/rlgB6tovww==",
-				password:     "Delos@qua12345",
+				password:     "D0wn5izeDd3v5",
 			},
 			want: true,
 		},
 		{
 			name: "success compare scrypt password: test+3",
 			fields: fields{
-				log:    log.Init(log.Config{}),
+				log:    logger.Init(logger.Config{}),
 				scrypt: config,
 			},
 			args: args{
@@ -270,14 +270,14 @@ func Test_security_CompareScryptPassword(t *testing.T) {
 		{
 			name: "failed compare scrypt password: wrong password",
 			fields: fields{
-				log:    log.Init(log.Config{}),
+				log:    logger.Init(logger.Config{}),
 				scrypt: config,
 			},
 			args: args{
 				ctx:          context.Background(),
 				passwordHash: "8bVI07w7zmyTgnSU8fE2C6Nn/pzEiukZJEFkWSFch5zOxypmjRt67C0aikpfQ/3z5T2XF9vmJF5PkaskD9D1sw==",
 				salt:         "ekr/rlgB6tovww==",
-				password:     "Delos@qua123456",
+				password:     "D0wn5izeDd3v5",
 			},
 			want: false,
 		},

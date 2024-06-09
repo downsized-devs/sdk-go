@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/blevesearch/bleve"
-	mock_log "github.com/downsized-devs/sdk-go/tests/mock/log"
+	mock_log "github.com/downsized-devs/sdk-go/tests/mock/logger"
 	"go.uber.org/mock/gomock"
 )
 

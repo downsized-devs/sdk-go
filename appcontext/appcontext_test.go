@@ -1008,9 +1008,9 @@ func TestSetServiceName(t *testing.T) {
 			name: "set service name",
 			args: args{
 				ctx: context.Background(),
-				val: "aquamd",
+				val: "generic-service",
 			},
-			want: context.WithValue(context.Background(), serviceName, "aquamd"),
+			want: context.WithValue(context.Background(), serviceName, "generic-service"),
 		},
 	}
 	for _, tt := range tests {
@@ -1041,9 +1041,9 @@ func TestGetServiceName(t *testing.T) {
 		{
 			name: "success get service",
 			args: args{
-				ctx: context.WithValue(context.Background(), serviceName, "aquamd"),
+				ctx: context.WithValue(context.Background(), serviceName, "generic-service"),
 			},
-			want: "aquamd",
+			want: "generic-service",
 		},
 	}
 	for _, tt := range tests {

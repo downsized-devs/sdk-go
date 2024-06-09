@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/delosaqua/aquahero-service/src/business/entity"
+	"github.com/downsized-devs/generic-service/src/business/entity"
 	"github.com/downsized-devs/sdk-go/audit"
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/loggerger"
 	"github.com/downsized-devs/sdk-go/null"
 	"github.com/downsized-devs/sdk-go/parser"
 	"github.com/downsized-devs/sdk-go/query"
@@ -25,14 +25,14 @@ type Interface interface {
 }
 
 type {{ .EntityName }} struct {
-	log     log.Interface
+	log     logger.Interface
 	db      sql.Interface
 	redis   redis.Interface
 	json    parser.JSONInterface
 	audit   audit.Interface
 }
 
-func Init(log log.Interface, db sql.Interface, rd redis.Interface, jsonParser parser.JSONInterface, au audit.Interface) Interface {
+func Init(log logger.Interface, db sql.Interface, rd redis.Interface, jsonParser parser.JSONInterface, au audit.Interface) Interface {
 	d := &{{ .EntityName }}{
 		log:     log,
 		db:      db,

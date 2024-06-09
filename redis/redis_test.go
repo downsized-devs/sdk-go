@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/bsm/redislock"
-	mock_log "github.com/downsized-devs/sdk-go/tests/mock/log"
+	mock_log "github.com/downsized-devs/sdk-go/tests/mock/logger"
 	"github.com/go-redis/redis/v8"
 	"go.uber.org/mock/gomock"
 )

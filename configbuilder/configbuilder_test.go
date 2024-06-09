@@ -15,7 +15,7 @@ import (
 const (
 	configfile   string = "./conf.json"
 	templatefile string = "./files/conf.template"
-	appnamespace string = "aquaheroservice"
+	appnamespace string = "generic-service"
 )
 
 func Test_configBuilder_BuildConfig(t *testing.T) {
