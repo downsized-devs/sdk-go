@@ -80,9 +80,13 @@ func (c *configReader) mergeEnvConfig() {
 	default:
 		svcVersion = "dev"
 	}
-	meta := c.viper.GetStringMap("meta")
-	meta["version"] = svcVersion
-	c.viper.Set("meta", meta)
+	if svcEnvironment == "" {
+		svcEnvironment = "dev"
+	}
+	sm := c.viper.GetStringMap("meta")
+	sm["version"] = svcVersion
+	sm["environment"] = svcEnvironment
+	c.viper.Set("meta", sm)
 }
 
 func (c *configReader) resolveJSONRef() {
