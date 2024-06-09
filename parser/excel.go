@@ -11,7 +11,7 @@ import (
 
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -79,7 +79,7 @@ type ExcelResult struct {
 	Details []ExcelResultDetails
 }
 
-// TODO: implemented on one template in aquahero, later will be moved here
+// TODO: implemented on one template in curent service, later will be moved here
 type ExcelError []struct {
 	RowNum   int
 	ColNum   int
@@ -128,10 +128,10 @@ type ExcelInterface interface {
 }
 
 type excelParser struct {
-	log log.Interface
+	log logger.Interface
 }
 
-func initExcel(log log.Interface) ExcelInterface {
+func initExcel(log logger.Interface) ExcelInterface {
 	return &excelParser{
 		log: log,
 	}

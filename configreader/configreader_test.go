@@ -249,7 +249,7 @@ func Test_configReader_AllSettings(t *testing.T) {
 				},
 			},
 			mockFunc: func() {
-				os.Setenv("AQUAHERO_SERVICE_VERSION", "v1.0.0")
+				os.Setenv("SERVICE_VERSION", "v1.0.0")
 			},
 			want: map[string]interface{}{
 				"string":   "Test String",

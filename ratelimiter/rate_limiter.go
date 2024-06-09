@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/ulule/limiter/v3"
 	"github.com/ulule/limiter/v3/drivers/store/memory"
@@ -30,12 +30,12 @@ type Config struct {
 
 type rateLimiter struct {
 	cfg             Config
-	log             log.Interface
+	log             logger.Interface
 	middleware      gin.HandlerFunc
 	middlewarePaths map[string]GinMiddleware
 }
 
-func Init(cfg Config, log log.Interface) Interface {
+func Init(cfg Config, log logger.Interface) Interface {
 	rl := &rateLimiter{
 		cfg: cfg,
 		log: log,
@@ -70,7 +70,7 @@ func (rl *rateLimiter) InitConfiguration() {
 	rl.middleware = skipMiddleware()
 }
 
-func getLimiter(conf Config, log log.Interface) *limiter.Limiter {
+func getLimiter(conf Config, log logger.Interface) *limiter.Limiter {
 	ctx := context.Background()
 	time, err := time.ParseDuration(conf.Period)
 	if err != nil {

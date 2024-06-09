@@ -7,7 +7,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 )
 
 func initTestEmail() Interface {
@@ -21,7 +21,7 @@ func initTestEmail() Interface {
 		},
 	}
 
-	return Init(conf, log.Init(log.Config{Level: "debug"}))
+	return Init(conf, logger.Init(logger.Config{Level: "debug"}))
 }
 
 func Test_email_SendEmail(t *testing.T) {
@@ -42,10 +42,10 @@ func Test_email_SendEmail(t *testing.T) {
 					Body:        "<strong>This is a test email</strong> and <a href=\"https://www.google.com\">This is a link</a>",
 					BodyType:    BodyContentTypeHTML,
 					Subject:     "Test Email",
-					SenderName:  "Delos Test",
-					SenderEmail: "no-reply@delosaqua.com",
+					SenderName:  "Service Test",
+					SenderEmail: "no-reply@downsized-devs.com",
 					Recipients: Recipient{
-						ToEmails: []string{"bambang.widyatmoko@delosaqua.com"},
+						ToEmails: []string{"bambang@downsized-devs.com"},
 					},
 					Headers: map[string]string{
 						"X-PM-Message-Stream": "outbound",

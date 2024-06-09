@@ -13,7 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 )
 
 type Interface interface {
@@ -40,10 +40,10 @@ type AWSS3Config struct {
 type storage struct {
 	s3     *s3.S3
 	config Config
-	log    log.Interface
+	log    logger.Interface
 }
 
-func Init(cfg Config, log log.Interface) Interface {
+func Init(cfg Config, log logger.Interface) Interface {
 	if cfg.AWSS3.AccessKeyID == "" || cfg.AWSS3.SecretAccessKey == "" {
 		log.Fatal(context.Background(), "storage credentials not found")
 	}

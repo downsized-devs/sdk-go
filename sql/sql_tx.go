@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/downsized-devs/sdk-go/instrument"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -31,13 +31,13 @@ type commandTx struct {
 	connName      string
 	connType      string
 	tx            *sqlx.Tx
-	log           log.Interface
+	log           logger.Interface
 	instrument    instrument.Interface
 	useInstrument bool
 	logQuery      bool
 }
 
-func initTx(ctx context.Context, name, connName string, tx *sqlx.Tx, opts *sql.TxOptions, log log.Interface, instr instrument.Interface, isLeader, useInstr, logQuery bool) CommandTx {
+func initTx(ctx context.Context, name, connName string, tx *sqlx.Tx, opts *sql.TxOptions, log logger.Interface, instr instrument.Interface, isLeader, useInstr, logQuery bool) CommandTx {
 	c := &commandTx{
 		ctx:           ctx,
 		name:          name,

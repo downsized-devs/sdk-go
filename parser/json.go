@@ -7,7 +7,7 @@ import (
 
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -55,10 +55,10 @@ type JSONInterface interface {
 type jsonParser struct {
 	API    jsoniter.API
 	schema map[string]*gojsonschema.Schema
-	logger log.Interface
+	logger logger.Interface
 }
 
-func initJSON(opt JSONOptions, log log.Interface) JSONInterface {
+func initJSON(opt JSONOptions, log logger.Interface) JSONInterface {
 	var jsonAPI jsoniter.API
 	switch opt.Config {
 	case defaultConfig:

@@ -7,8 +7,7 @@ import (
 	"testing"
 
 	"github.com/downsized-devs/sdk-go/instrument"
-	"github.com/downsized-devs/sdk-go/log"
-	mock_log "github.com/downsized-devs/sdk-go/tests/mock/log"
+	mock_log "github.com/downsized-devs/sdk-go/tests/mock/logger"
 	"go.uber.org/mock/gomock"
 )
 
@@ -20,18 +19,18 @@ func initTestMysqlDatabase() Interface {
 		Leader: ConnConfig{
 			Host:     "127.0.0.1",
 			Port:     3306,
-			DB:       "delos_db",
+			DB:       "generic_db",
 			User:     "root",
 			Password: "password",
 		},
 		Follower: ConnConfig{
 			Host:     "127.0.0.1",
 			Port:     3306,
-			DB:       "delos_db",
+			DB:       "generic_db",
 			User:     "root",
 			Password: "password",
 		},
-	}, log.Init(log.Config{Level: "debug"}),
+	}, logger.Init(logger.Config{Level: "debug"}),
 		instrument.Init(instrument.Config{
 			Metrics: instrument.MetricsConfig{
 				Enabled: true,
@@ -47,18 +46,18 @@ func initTestPostgresDatabase() Interface {
 		Leader: ConnConfig{
 			Host:     "127.0.0.1",
 			Port:     5432,
-			DB:       "delos_db",
+			DB:       "generic_db",
 			User:     "postgres",
 			Password: "",
 		},
 		Follower: ConnConfig{
 			Host:     "127.0.0.1",
 			Port:     5432,
-			DB:       "delos_db",
+			DB:       "generic_db",
 			User:     "root",
 			Password: "",
 		},
-	}, log.Init(log.Config{Level: "debug"}),
+	}, logger.Init(logger.Config{Level: "debug"}),
 		instrument.Init(instrument.Config{
 			Metrics: instrument.MetricsConfig{
 				Enabled: true,
@@ -76,11 +75,11 @@ func TestInit(t *testing.T) {
 	conConfig := ConnConfig{
 		Host:     "127.0.0.1",
 		Port:     3306,
-		DB:       "delos_db",
+		DB:       "generic_db",
 		User:     "root",
 		Password: "password",
 	}
-	logInit := log.Init(log.Config{Level: "debug"})
+	logInit := logger.Init(logger.Config{Level: "debug"})
 	instr := instrument.Init(instrument.Config{
 		Metrics: instrument.MetricsConfig{
 			Enabled: true,
@@ -89,7 +88,7 @@ func TestInit(t *testing.T) {
 
 	type args struct {
 		cfg   Config
-		log   log.Interface
+		log   logger.Interface
 		instr instrument.Interface
 	}
 

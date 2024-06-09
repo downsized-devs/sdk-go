@@ -6,7 +6,7 @@ import (
 
 	"github.com/downsized-devs/sdk-go/appcontext"
 	"github.com/downsized-devs/sdk-go/language"
-	mock_log "github.com/downsized-devs/sdk-go/tests/mock/log"
+	mock_log "github.com/downsized-devs/sdk-go/tests/mock/logger"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 )

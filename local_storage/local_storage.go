@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/blevesearch/bleve"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 )
 
 type Interface interface {
@@ -22,11 +22,11 @@ type Config struct {
 
 type indexer struct {
 	conf  Config
-	log   log.Interface
+	log   logger.Interface
 	index bleve.Index
 }
 
-func Init(cfg Config, log log.Interface) Interface {
+func Init(cfg Config, log logger.Interface) Interface {
 
 	i := &indexer{
 		conf: cfg,

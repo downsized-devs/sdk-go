@@ -7,7 +7,7 @@ import (
 
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"gopkg.in/gomail.v2"
 )
 
@@ -48,11 +48,11 @@ type AWSSESConfig struct {
 type email struct {
 	dialer   *gomail.Dialer
 	config   Config
-	log      log.Interface
+	log      logger.Interface
 	template TemplateInterface
 }
 
-func Init(cfg Config, log log.Interface) Interface {
+func Init(cfg Config, log logger.Interface) Interface {
 	dialer := gomail.NewDialer(cfg.SMTP.Host, cfg.SMTP.Port, cfg.SMTP.Username, cfg.SMTP.Password)
 	if cfg.SMTP.TLSConfig.InsecureSkipVerify {
 		dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}

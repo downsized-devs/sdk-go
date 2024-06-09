@@ -6,14 +6,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_emailtemplate_FromHTML(t *testing.T) {
 	pwd, _ := os.Getwd()
 	fileDir := fmt.Sprintf("%s/test_files", pwd)
-	email := Init(Config{Template: TemplateConfig{FileDirectory: fileDir}}, log.Init(log.Config{Level: "debug"}))
+	email := Init(Config{Template: TemplateConfig{FileDirectory: fileDir}}, logger.Init(logger.Config{Level: "debug"}))
 	tests := []struct {
 		name    string
 		params  BodyFromHTMLParams
@@ -81,7 +81,7 @@ func Test_emailtemplate_FromHTML(t *testing.T) {
 func Test_emailtemplate_FromMJML(t *testing.T) {
 	pwd, _ := os.Getwd()
 	fileDir := fmt.Sprintf("%s/test_files", pwd)
-	email := Init(Config{Template: TemplateConfig{FileDirectory: fileDir}}, log.Init(log.Config{Level: "debug"}))
+	email := Init(Config{Template: TemplateConfig{FileDirectory: fileDir}}, logger.Init(logger.Config{Level: "debug"}))
 	ctxTimeout, cancel := context.WithTimeout(context.Background(), 1)
 	defer cancel()
 	type args struct {

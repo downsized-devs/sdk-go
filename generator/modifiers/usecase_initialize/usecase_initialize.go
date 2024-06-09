@@ -42,7 +42,7 @@ func (d *usecaseInitialize) Initialize() error {
 		ln := scanner.Text()
 		lines = append(lines, ln)
 		if strings.Contains(ln, "import (") {
-			lines = append(lines, "	\"github.com/delosaqua/aquahero-service/src/business/usecase/"+d.EntityNameSnakeCase+"\"")
+			lines = append(lines, "	\"github.com/downsized-devs/generic-service/src/business/usecase/"+d.EntityNameSnakeCase+"\"")
 			continue
 		} else if strings.Contains(ln, "type Usecases struct {") {
 			lines = append(lines, "	"+d.EntityNameUpper+" "+d.EntityNameSnakeCase+".Interface")

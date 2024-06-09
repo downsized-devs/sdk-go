@@ -1,8 +1,8 @@
 {
     "Meta": {
-        "Title": "Aquahero",
-        "Description": "Delos Aquahero API Collection",
-        "Host": "delosaqua.com",
+        "Title": "Generic Service",
+        "Description": "Generic Service API Collection",
+        "Host": "downsized-devs.com",
         "Basepath": "/",
         "Version": ""
     }

@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/downsized-devs/sdk-go/instrument"
-	"github.com/downsized-devs/sdk-go/log"
 	"github.com/downsized-devs/sdk-go/null"
 	"github.com/downsized-devs/sdk-go/sql"
 	"github.com/stretchr/testify/assert"
@@ -101,7 +100,7 @@ func initTestDatabase() sql.Interface {
 			User:     "root",
 			Password: "password",
 		},
-	}, log.Init(log.Config{Level: "debug"}),
+	}, logger.Init(logger.Config{Level: "debug"}),
 		instrument.Init(instrument.Config{}))
 }
 

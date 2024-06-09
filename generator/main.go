@@ -10,7 +10,7 @@ import (
 func main() {
 
 	entityName := flag.String("entity_name", "example", "entity name as a camelCase string")
-	fileLocation := flag.String("file_location", "generate", "aquahero-service file location as a string")
+	fileLocation := flag.String("file_location", "generate", "generic-service file location as a string")
 	api := flag.String("api", "create, edit, get, activate, delete", "choose generated api method \"create, edit, get, activate, delete\"")
 	flag.Parse()
 	apis := strings.Split(*api, ",")

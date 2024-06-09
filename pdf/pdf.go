@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
 )
@@ -22,10 +22,10 @@ type PdfInterface interface {
 
 type pdf struct {
 	config *model.Configuration
-	log    log.Interface
+	log    logger.Interface
 }
 
-func Init(log log.Interface) PdfInterface {
+func Init(log logger.Interface) PdfInterface {
 	p := &pdf{
 		config: model.NewDefaultConfiguration(),
 		log:    log,

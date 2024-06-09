@@ -9,7 +9,7 @@ import (
 	"github.com/bsm/redislock"
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/go-redis/redis/v8"
 )
 
@@ -53,11 +53,11 @@ type Config struct {
 type cache struct {
 	conf  Config
 	rdb   *redis.Client
-	log   log.Interface
+	log   logger.Interface
 	rlock *redislock.Client
 }
 
-func Init(cfg Config, log log.Interface) Interface {
+func Init(cfg Config, log logger.Interface) Interface {
 	c := &cache{
 		conf: cfg,
 		log:  log,

@@ -15,7 +15,7 @@ import (
 
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/crypto/scrypt"
 )
@@ -34,7 +34,7 @@ type Interface interface {
 }
 
 type security struct {
-	log    log.Interface
+	log    logger.Interface
 	scrypt ScryptConfig
 }
 
@@ -45,7 +45,7 @@ type ScryptConfig struct {
 	MemoryCost          int
 }
 
-func Init(log log.Interface, scrypt ScryptConfig) Interface {
+func Init(log logger.Interface, scrypt ScryptConfig) Interface {
 	return &security{
 		log:    log,
 		scrypt: scrypt,

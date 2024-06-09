@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	mock_log "github.com/downsized-devs/sdk-go/tests/mock/log"
+	mock_log "github.com/downsized-devs/sdk-go/tests/mock/logger"
 	"go.uber.org/mock/gomock"
 )
 

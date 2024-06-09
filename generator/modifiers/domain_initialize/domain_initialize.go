@@ -42,7 +42,7 @@ func (d *domainInitialize) Initialize() error {
 		ln := scanner.Text()
 		lines = append(lines, ln)
 		if strings.Contains(ln, "import (") {
-			lines = append(lines, "	\"github.com/delosaqua/aquahero-service/src/business/domain/"+d.EntityNameSnakeCase+"\"")
+			lines = append(lines, "	\"github.com/downsized-devs/generic-service/src/business/domain/"+d.EntityNameSnakeCase+"\"")
 			continue
 		} else if strings.Contains(ln, "type Domains struct {") {
 			lines = append(lines, "	"+d.EntityNameUpper+" "+d.EntityNameSnakeCase+".Interface")

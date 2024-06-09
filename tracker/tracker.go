@@ -10,7 +10,7 @@ import (
 
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/downsized-devs/sdk-go/log"
+	"github.com/downsized-devs/sdk-go/logger"
 	"github.com/downsized-devs/sdk-go/operator"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/push"
@@ -48,11 +48,11 @@ type WebhookOptions struct {
 
 type tracker struct {
 	opt           Options
-	log           log.Interface
+	log           logger.Interface
 	webhookClient *http.Client
 }
 
-func Init(opt Options, log log.Interface) Interface {
+func Init(opt Options, log logger.Interface) Interface {
 
 	return &tracker{
 		opt: opt,

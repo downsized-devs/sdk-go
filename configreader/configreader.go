@@ -30,6 +30,7 @@ type Options struct {
 	// additional configuration to append to the main config
 	AdditionalConfig []AdditionalConfigOptions
 }
+
 type AdditionalConfigOptions struct {
 	// key is the location in the main config to append the additional config
 	// with dot delimiter. e.g. 'Parser.ExcelOptions'
@@ -72,10 +73,12 @@ func Init(opt Options) Interface {
 }
 
 func (c *configReader) mergeEnvConfig() {
-	svcVersion := os.Getenv("SERVICE_VERSION")
-	svcEnvironment := os.Getenv("SERVICE_ENVIRONMENT")
-	if svcVersion == "" {
-		svcVersion = "v0.0.0"
+	var svcVersion string
+	switch {
+	case os.Getenv("SERVICE_VERSION") != "":
+		svcVersion = os.Getenv("SERVICE_VERSION")
+	default:
+		svcVersion = "dev"
 	}
 	if svcEnvironment == "" {
 		svcEnvironment = "dev"
@@ -88,7 +91,7 @@ func (c *configReader) mergeEnvConfig() {
 
 func (c *configReader) resolveJSONRef() {
 	refmap := make(map[string]interface{})
-	refregxp := regexp.MustCompile(`^\$ref:#\/(.*)$`)
+	refregxp := regexp.MustCompile(`^\\$ref:#\\/(.*)$`)
 	for _, k := range c.viper.AllKeys() {
 		refpath := c.viper.GetString(k)
 		if refregxp.MatchString(refpath) {
