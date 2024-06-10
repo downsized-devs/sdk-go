@@ -39,18 +39,18 @@ func (m *MockParser) EXPECT() *MockParserMockRecorder {
 	return m.recorder
 }
 
-// CSVParser mocks base method.
-func (m *MockParser) CSVParser() parser.CSVInterface {
+// CsvParser mocks base method.
+func (m *MockParser) CsvParser() parser.CsvInterface {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CSVParser")
-	ret0, _ := ret[0].(parser.CSVInterface)
+	ret := m.ctrl.Call(m, "CsvParser")
+	ret0, _ := ret[0].(parser.CsvInterface)
 	return ret0
 }
 
-// CSVParser indicates an expected call of CSVParser.
-func (mr *MockParserMockRecorder) CSVParser() *gomock.Call {
+// CsvParser indicates an expected call of CsvParser.
+func (mr *MockParserMockRecorder) CsvParser() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CSVParser", reflect.TypeOf((*MockParser)(nil).CSVParser))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CsvParser", reflect.TypeOf((*MockParser)(nil).CsvParser))
 }
 
 // ExcelParser mocks base method.
@@ -67,16 +67,16 @@ func (mr *MockParserMockRecorder) ExcelParser() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExcelParser", reflect.TypeOf((*MockParser)(nil).ExcelParser))
 }
 
-// JSONParser mocks base method.
-func (m *MockParser) JSONParser() parser.JSONInterface {
+// JsonParser mocks base method.
+func (m *MockParser) JsonParser() parser.JsonInterface {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "JSONParser")
-	ret0, _ := ret[0].(parser.JSONInterface)
+	ret := m.ctrl.Call(m, "JsonParser")
+	ret0, _ := ret[0].(parser.JsonInterface)
 	return ret0
 }
 
-// JSONParser indicates an expected call of JSONParser.
-func (mr *MockParserMockRecorder) JSONParser() *gomock.Call {
+// JsonParser indicates an expected call of JsonParser.
+func (mr *MockParserMockRecorder) JsonParser() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JSONParser", reflect.TypeOf((*MockParser)(nil).JSONParser))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JsonParser", reflect.TypeOf((*MockParser)(nil).JsonParser))
 }

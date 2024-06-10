@@ -16,31 +16,31 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockCSVInterface is a mock of CSVInterface interface.
-type MockCSVInterface struct {
+// MockCsvInterface is a mock of CsvInterface interface.
+type MockCsvInterface struct {
 	ctrl     *gomock.Controller
-	recorder *MockCSVInterfaceMockRecorder
+	recorder *MockCsvInterfaceMockRecorder
 }
 
-// MockCSVInterfaceMockRecorder is the mock recorder for MockCSVInterface.
-type MockCSVInterfaceMockRecorder struct {
-	mock *MockCSVInterface
+// MockCsvInterfaceMockRecorder is the mock recorder for MockCsvInterface.
+type MockCsvInterfaceMockRecorder struct {
+	mock *MockCsvInterface
 }
 
-// NewMockCSVInterface creates a new mock instance.
-func NewMockCSVInterface(ctrl *gomock.Controller) *MockCSVInterface {
-	mock := &MockCSVInterface{ctrl: ctrl}
-	mock.recorder = &MockCSVInterfaceMockRecorder{mock}
+// NewMockCsvInterface creates a new mock instance.
+func NewMockCsvInterface(ctrl *gomock.Controller) *MockCsvInterface {
+	mock := &MockCsvInterface{ctrl: ctrl}
+	mock.recorder = &MockCsvInterfaceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCSVInterface) EXPECT() *MockCSVInterfaceMockRecorder {
+func (m *MockCsvInterface) EXPECT() *MockCsvInterfaceMockRecorder {
 	return m.recorder
 }
 
 // Marshal mocks base method.
-func (m *MockCSVInterface) Marshal(orig any) ([]byte, error) {
+func (m *MockCsvInterface) Marshal(orig any) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Marshal", orig)
 	ret0, _ := ret[0].([]byte)
@@ -49,13 +49,13 @@ func (m *MockCSVInterface) Marshal(orig any) ([]byte, error) {
 }
 
 // Marshal indicates an expected call of Marshal.
-func (mr *MockCSVInterfaceMockRecorder) Marshal(orig any) *gomock.Call {
+func (mr *MockCsvInterfaceMockRecorder) Marshal(orig any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Marshal", reflect.TypeOf((*MockCSVInterface)(nil).Marshal), orig)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Marshal", reflect.TypeOf((*MockCsvInterface)(nil).Marshal), orig)
 }
 
 // MarshalWithoutHeaders mocks base method.
-func (m *MockCSVInterface) MarshalWithoutHeaders(orig any) ([]byte, error) {
+func (m *MockCsvInterface) MarshalWithoutHeaders(orig any) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MarshalWithoutHeaders", orig)
 	ret0, _ := ret[0].([]byte)
@@ -64,37 +64,37 @@ func (m *MockCSVInterface) MarshalWithoutHeaders(orig any) ([]byte, error) {
 }
 
 // MarshalWithoutHeaders indicates an expected call of MarshalWithoutHeaders.
-func (mr *MockCSVInterfaceMockRecorder) MarshalWithoutHeaders(orig any) *gomock.Call {
+func (mr *MockCsvInterfaceMockRecorder) MarshalWithoutHeaders(orig any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MarshalWithoutHeaders", reflect.TypeOf((*MockCSVInterface)(nil).MarshalWithoutHeaders), orig)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MarshalWithoutHeaders", reflect.TypeOf((*MockCsvInterface)(nil).MarshalWithoutHeaders), orig)
 }
 
 // SetOptionsRead mocks base method.
-func (m *MockCSVInterface) SetOptionsRead(opt parser.CSVOptions) {
+func (m *MockCsvInterface) SetOptionsRead(opt parser.CsvOptions) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "SetOptionsRead", opt)
 }
 
 // SetOptionsRead indicates an expected call of SetOptionsRead.
-func (mr *MockCSVInterfaceMockRecorder) SetOptionsRead(opt any) *gomock.Call {
+func (mr *MockCsvInterfaceMockRecorder) SetOptionsRead(opt any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetOptionsRead", reflect.TypeOf((*MockCSVInterface)(nil).SetOptionsRead), opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetOptionsRead", reflect.TypeOf((*MockCsvInterface)(nil).SetOptionsRead), opt)
 }
 
 // SetOptionsWrite mocks base method.
-func (m *MockCSVInterface) SetOptionsWrite(opt parser.CSVOptions) {
+func (m *MockCsvInterface) SetOptionsWrite(opt parser.CsvOptions) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "SetOptionsWrite", opt)
 }
 
 // SetOptionsWrite indicates an expected call of SetOptionsWrite.
-func (mr *MockCSVInterfaceMockRecorder) SetOptionsWrite(opt any) *gomock.Call {
+func (mr *MockCsvInterfaceMockRecorder) SetOptionsWrite(opt any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetOptionsWrite", reflect.TypeOf((*MockCSVInterface)(nil).SetOptionsWrite), opt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetOptionsWrite", reflect.TypeOf((*MockCsvInterface)(nil).SetOptionsWrite), opt)
 }
 
 // Unmarshal mocks base method.
-func (m *MockCSVInterface) Unmarshal(blob []byte, dest any) error {
+func (m *MockCsvInterface) Unmarshal(blob []byte, dest any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Unmarshal", blob, dest)
 	ret0, _ := ret[0].(error)
@@ -102,7 +102,7 @@ func (m *MockCSVInterface) Unmarshal(blob []byte, dest any) error {
 }
 
 // Unmarshal indicates an expected call of Unmarshal.
-func (mr *MockCSVInterfaceMockRecorder) Unmarshal(blob, dest any) *gomock.Call {
+func (mr *MockCsvInterfaceMockRecorder) Unmarshal(blob, dest any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unmarshal", reflect.TypeOf((*MockCSVInterface)(nil).Unmarshal), blob, dest)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unmarshal", reflect.TypeOf((*MockCsvInterface)(nil).Unmarshal), blob, dest)
 }

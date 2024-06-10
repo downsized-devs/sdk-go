@@ -22,7 +22,7 @@ const (
 	errJSON                      = `JSON parser error %s`
 )
 
-type JSONOptions struct {
+type JsonOptions struct {
 	Config                        jsonConfig
 	IndentionStep                 int
 	MarshalFloatWith6Digits       bool
@@ -41,7 +41,7 @@ type JSONOptions struct {
 	Schema map[string]string
 }
 
-type JSONInterface interface {
+type JsonInterface interface {
 	// Marshal go structs into bytes
 	Marshal(orig interface{}) ([]byte, error)
 	// Marshal go structs into bytes and validates returned bytes
@@ -58,7 +58,7 @@ type jsonParser struct {
 	logger logger.Interface
 }
 
-func initJSON(opt JSONOptions, log logger.Interface) JSONInterface {
+func initJson(opt JsonOptions, log logger.Interface) JsonInterface {
 	var jsonAPI jsoniter.API
 	switch opt.Config {
 	case defaultConfig:
