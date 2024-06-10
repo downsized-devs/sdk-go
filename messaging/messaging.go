@@ -51,7 +51,7 @@ type Config struct {
 	Firebase         FirebaseConf
 }
 
-func Init(cfg Config, log logger.Interface, json parser.JSONInterface, httpClient *http.Client) Interface {
+func Init(cfg Config, log logger.Interface, json parser.JsonInterface, httpClient *http.Client) Interface {
 	if cfg.SkipFirebaseInit {
 		return &messaging{
 			log: log,

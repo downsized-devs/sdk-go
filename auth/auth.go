@@ -41,7 +41,7 @@ type Interface interface {
 
 type auth struct {
 	log               logger.Interface
-	json              parser.JSONInterface
+	json              parser.JsonInterface
 	firebase          *firebase_auth.Client
 	identitytoolkitv1 *identitytoolkitv1.Service
 	identitytoolkitv3 *identitytoolkitv3.Service
@@ -72,7 +72,7 @@ type FirebaseAccountKey struct {
 	Clientx509CertURL       string `json:"client_x509_cert_url"`
 }
 
-func Init(cfg Config, log logger.Interface, json parser.JSONInterface, httpClient *http.Client) Interface {
+func Init(cfg Config, log logger.Interface, json parser.JsonInterface, httpClient *http.Client) Interface {
 	if cfg.SkipFirebaseInit {
 		return &auth{
 			log:  log,

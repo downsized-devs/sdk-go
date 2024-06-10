@@ -31,7 +31,6 @@ mock-all:
 	@make mock util=logger subutil=logger
 	@make mock util=parser subutil=parser
 	@make mock util=parser subutil=csv
-	@make mock util=parser subutil=excel
 	@make mock util=parser subutil=json
 	@make mock util=query subutil=sql_builder
 	@make mock util=sql subutil=sql

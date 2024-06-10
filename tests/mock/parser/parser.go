@@ -53,20 +53,6 @@ func (mr *MockParserMockRecorder) CsvParser() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CsvParser", reflect.TypeOf((*MockParser)(nil).CsvParser))
 }
 
-// ExcelParser mocks base method.
-func (m *MockParser) ExcelParser() parser.ExcelInterface {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExcelParser")
-	ret0, _ := ret[0].(parser.ExcelInterface)
-	return ret0
-}
-
-// ExcelParser indicates an expected call of ExcelParser.
-func (mr *MockParserMockRecorder) ExcelParser() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExcelParser", reflect.TypeOf((*MockParser)(nil).ExcelParser))
-}
-
 // JsonParser mocks base method.
 func (m *MockParser) JsonParser() parser.JsonInterface {
 	m.ctrl.T.Helper()
