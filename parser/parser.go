@@ -3,37 +3,37 @@ package parser
 import "github.com/downsized-devs/sdk-go/logger"
 
 type Parser interface {
-	JSONParser() JSONInterface
-	CSVParser() CSVInterface
+	JsonParser() JsonInterface
+	CsvParser() CsvInterface
 	ExcelParser() ExcelInterface
 }
 
 type Options struct {
-	JSONOptions  JSONOptions
-	CSVOptions   CSVOptions
+	JsonOptions  JsonOptions
+	CsvOptions   CsvOptions
 	ExcelOptions ExcelOptions
 }
 
 type parser struct {
-	json  JSONInterface
-	csv   CSVInterface
+	Json  JsonInterface
+	Csv   CsvInterface
 	excel ExcelInterface
 }
 
 func InitParser(log logger.Interface, opt Options) Parser {
 	return &parser{
-		json:  initJSON(opt.JSONOptions, log),
-		csv:   initCSV(),
+		Json:  initJson(opt.JsonOptions, log),
+		Csv:   initCsv(),
 		excel: initExcel(log),
 	}
 }
 
-func (p *parser) JSONParser() JSONInterface {
-	return p.json
+func (p *parser) JsonParser() JsonInterface {
+	return p.Json
 }
 
-func (p *parser) CSVParser() CSVInterface {
-	return p.csv
+func (p *parser) CsvParser() CsvInterface {
+	return p.Csv
 }
 
 func (p *parser) ExcelParser() ExcelInterface {

@@ -23,7 +23,7 @@ func Test_jsonParser_MarshalWithSchemaValidation(t *testing.T) {
 	logger := mock_log.NewMockInterface(ctrl)
 	logger.EXPECT().Fatal(gomock.Any(), gomock.Any()).AnyTimes()
 
-	jsonSchema := initJSON(JSONOptions{
+	jsonSchema := initJson(JsonOptions{
 		Schema: map[string]string{
 			"test_schema": "file://./files/test.schema.json",
 		},
@@ -104,7 +104,7 @@ func Test_jsonParser_UnmarshalWithSchemaValidation(t *testing.T) {
 	logger := mock_log.NewMockInterface(ctrl)
 	logger.EXPECT().Fatal(gomock.Any(), gomock.Any()).AnyTimes()
 
-	jsonSchema := initJSON(JSONOptions{
+	jsonSchema := initJson(JsonOptions{
 		Schema: map[string]string{
 			"test_schema": "file://./files/test.schema.json",
 		},

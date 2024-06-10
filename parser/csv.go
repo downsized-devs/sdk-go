@@ -8,14 +8,14 @@ import (
 	"github.com/gocarina/gocsv"
 )
 
-type CSVOptions struct {
+type CsvOptions struct {
 	Separator  rune
 	LazyQuotes bool
 }
 
-type CSVInterface interface {
-	SetOptionsRead(opt CSVOptions)
-	SetOptionsWrite(opt CSVOptions)
+type CsvInterface interface {
+	SetOptionsRead(opt CsvOptions)
+	SetOptionsWrite(opt CsvOptions)
 	Marshal(orig interface{}) ([]byte, error)
 	MarshalWithoutHeaders(orig interface{}) ([]byte, error)
 	Unmarshal(blob []byte, dest interface{}) error
@@ -23,7 +23,7 @@ type CSVInterface interface {
 
 type csvParser struct{}
 
-func initCSV() CSVInterface {
+func initCsv() CsvInterface {
 	return &csvParser{}
 }
 
@@ -43,7 +43,7 @@ func (p *csvParser) MarshalWithoutHeaders(orig interface{}) (result []byte, err 
 	return buf.Bytes(), err
 }
 
-func (p *csvParser) SetOptionsRead(opt CSVOptions) {
+func (p *csvParser) SetOptionsRead(opt CsvOptions) {
 	gocsv.TagSeparator = string(opt.Separator)
 	gocsv.SetCSVReader(func(in io.Reader) gocsv.CSVReader {
 		r := csv.NewReader(in)
@@ -53,7 +53,7 @@ func (p *csvParser) SetOptionsRead(opt CSVOptions) {
 	})
 }
 
-func (p *csvParser) SetOptionsWrite(opt CSVOptions) {
+func (p *csvParser) SetOptionsWrite(opt CsvOptions) {
 	gocsv.TagSeparator = string(opt.Separator)
 	gocsv.SetCSVWriter(func(out io.Writer) *gocsv.SafeCSVWriter {
 		w := csv.NewWriter(out)

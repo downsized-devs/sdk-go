@@ -15,31 +15,31 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockJSONInterface is a mock of JSONInterface interface.
-type MockJSONInterface struct {
+// MockJsonInterface is a mock of JsonInterface interface.
+type MockJsonInterface struct {
 	ctrl     *gomock.Controller
-	recorder *MockJSONInterfaceMockRecorder
+	recorder *MockJsonInterfaceMockRecorder
 }
 
-// MockJSONInterfaceMockRecorder is the mock recorder for MockJSONInterface.
-type MockJSONInterfaceMockRecorder struct {
-	mock *MockJSONInterface
+// MockJsonInterfaceMockRecorder is the mock recorder for MockJsonInterface.
+type MockJsonInterfaceMockRecorder struct {
+	mock *MockJsonInterface
 }
 
-// NewMockJSONInterface creates a new mock instance.
-func NewMockJSONInterface(ctrl *gomock.Controller) *MockJSONInterface {
-	mock := &MockJSONInterface{ctrl: ctrl}
-	mock.recorder = &MockJSONInterfaceMockRecorder{mock}
+// NewMockJsonInterface creates a new mock instance.
+func NewMockJsonInterface(ctrl *gomock.Controller) *MockJsonInterface {
+	mock := &MockJsonInterface{ctrl: ctrl}
+	mock.recorder = &MockJsonInterfaceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockJSONInterface) EXPECT() *MockJSONInterfaceMockRecorder {
+func (m *MockJsonInterface) EXPECT() *MockJsonInterfaceMockRecorder {
 	return m.recorder
 }
 
 // Marshal mocks base method.
-func (m *MockJSONInterface) Marshal(orig any) ([]byte, error) {
+func (m *MockJsonInterface) Marshal(orig any) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Marshal", orig)
 	ret0, _ := ret[0].([]byte)
@@ -48,13 +48,13 @@ func (m *MockJSONInterface) Marshal(orig any) ([]byte, error) {
 }
 
 // Marshal indicates an expected call of Marshal.
-func (mr *MockJSONInterfaceMockRecorder) Marshal(orig any) *gomock.Call {
+func (mr *MockJsonInterfaceMockRecorder) Marshal(orig any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Marshal", reflect.TypeOf((*MockJSONInterface)(nil).Marshal), orig)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Marshal", reflect.TypeOf((*MockJsonInterface)(nil).Marshal), orig)
 }
 
 // MarshalWithSchemaValidation mocks base method.
-func (m *MockJSONInterface) MarshalWithSchemaValidation(sch string, orig any) ([]byte, error) {
+func (m *MockJsonInterface) MarshalWithSchemaValidation(sch string, orig any) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MarshalWithSchemaValidation", sch, orig)
 	ret0, _ := ret[0].([]byte)
@@ -63,13 +63,13 @@ func (m *MockJSONInterface) MarshalWithSchemaValidation(sch string, orig any) ([
 }
 
 // MarshalWithSchemaValidation indicates an expected call of MarshalWithSchemaValidation.
-func (mr *MockJSONInterfaceMockRecorder) MarshalWithSchemaValidation(sch, orig any) *gomock.Call {
+func (mr *MockJsonInterfaceMockRecorder) MarshalWithSchemaValidation(sch, orig any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MarshalWithSchemaValidation", reflect.TypeOf((*MockJSONInterface)(nil).MarshalWithSchemaValidation), sch, orig)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MarshalWithSchemaValidation", reflect.TypeOf((*MockJsonInterface)(nil).MarshalWithSchemaValidation), sch, orig)
 }
 
 // Unmarshal mocks base method.
-func (m *MockJSONInterface) Unmarshal(blob []byte, dest any) error {
+func (m *MockJsonInterface) Unmarshal(blob []byte, dest any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Unmarshal", blob, dest)
 	ret0, _ := ret[0].(error)
@@ -77,13 +77,13 @@ func (m *MockJSONInterface) Unmarshal(blob []byte, dest any) error {
 }
 
 // Unmarshal indicates an expected call of Unmarshal.
-func (mr *MockJSONInterfaceMockRecorder) Unmarshal(blob, dest any) *gomock.Call {
+func (mr *MockJsonInterfaceMockRecorder) Unmarshal(blob, dest any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unmarshal", reflect.TypeOf((*MockJSONInterface)(nil).Unmarshal), blob, dest)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unmarshal", reflect.TypeOf((*MockJsonInterface)(nil).Unmarshal), blob, dest)
 }
 
 // UnmarshalWithSchemaValidation mocks base method.
-func (m *MockJSONInterface) UnmarshalWithSchemaValidation(sch string, blob []byte, dest any) error {
+func (m *MockJsonInterface) UnmarshalWithSchemaValidation(sch string, blob []byte, dest any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UnmarshalWithSchemaValidation", sch, blob, dest)
 	ret0, _ := ret[0].(error)
@@ -91,7 +91,7 @@ func (m *MockJSONInterface) UnmarshalWithSchemaValidation(sch string, blob []byt
 }
 
 // UnmarshalWithSchemaValidation indicates an expected call of UnmarshalWithSchemaValidation.
-func (mr *MockJSONInterfaceMockRecorder) UnmarshalWithSchemaValidation(sch, blob, dest any) *gomock.Call {
+func (mr *MockJsonInterfaceMockRecorder) UnmarshalWithSchemaValidation(sch, blob, dest any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnmarshalWithSchemaValidation", reflect.TypeOf((*MockJSONInterface)(nil).UnmarshalWithSchemaValidation), sch, blob, dest)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnmarshalWithSchemaValidation", reflect.TypeOf((*MockJsonInterface)(nil).UnmarshalWithSchemaValidation), sch, blob, dest)
 }
