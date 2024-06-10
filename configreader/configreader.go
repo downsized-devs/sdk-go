@@ -80,9 +80,12 @@ func (c *configReader) mergeEnvConfig() {
 	default:
 		svcVersion = "dev"
 	}
+
+	svcEnvironment := os.Getenv("SERVICE_ENVIRONMENT")
 	if svcEnvironment == "" {
 		svcEnvironment = "dev"
 	}
+
 	sm := c.viper.GetStringMap("meta")
 	sm["version"] = svcVersion
 	sm["environment"] = svcEnvironment

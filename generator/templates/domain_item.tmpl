@@ -28,11 +28,11 @@ type {{ .EntityName }} struct {
 	log     logger.Interface
 	db      sql.Interface
 	redis   redis.Interface
-	json    parser.JSONInterface
+	json    parser.JsonInterface
 	audit   audit.Interface
 }
 
-func Init(log logger.Interface, db sql.Interface, rd redis.Interface, jsonParser parser.JSONInterface, au audit.Interface) Interface {
+func Init(log logger.Interface, db sql.Interface, rd redis.Interface, jsonParser parser.JsonInterface, au audit.Interface) Interface {
 	d := &{{ .EntityName }}{
 		log:     log,
 		db:      db,

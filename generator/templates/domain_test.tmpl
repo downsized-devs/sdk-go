@@ -25,7 +25,7 @@ func Test_{{ .EntityName }}_Create(t *testing.T) {
 	logger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
 
 	mockRedis := mock_redis.NewMockInterface(ctrl)
-	mockJson := mock_parser.NewMockJSONInterface(ctrl)
+	mockJson := mock_parser.NewMockJsonInterface(ctrl)
 
 	audit := mock_audit.NewMockInterface(ctrl)
 	audit.EXPECT().Record(gomock.Any(), gomock.Any()).AnyTimes()
@@ -33,7 +33,7 @@ func Test_{{ .EntityName }}_Create(t *testing.T) {
 	type mockFields struct {
 		logger *mock_log.MockInterface
 		redis  *mock_redis.MockInterface
-		json   *mock_parser.MockJSONInterface
+		json   *mock_parser.MockJsonInterface
 	}
 
 	mocks := mockFields{
@@ -93,12 +93,12 @@ func Test_{{ .EntityName }}_Get(t *testing.T) {
 	logger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
 
 	mockRedis := mock_redis.NewMockInterface(ctrl)
-	mockJson := mock_parser.NewMockJSONInterface(ctrl)
+	mockJson := mock_parser.NewMockJsonInterface(ctrl)
 
 	type mockFields struct {
 		logger *mock_log.MockInterface
 		redis  *mock_redis.MockInterface
-		json   *mock_parser.MockJSONInterface
+		json   *mock_parser.MockJsonInterface
 	}
 
 	mocks := mockFields{
@@ -158,12 +158,12 @@ func Test_{{ .EntityName }}_GetList(t *testing.T) {
 	logger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
 
 	mockRedis := mock_redis.NewMockInterface(ctrl)
-	mockJson := mock_parser.NewMockJSONInterface(ctrl)
+	mockJson := mock_parser.NewMockJsonInterface(ctrl)
 
 	type mockFields struct {
 		logger *mock_log.MockInterface
 		redis  *mock_redis.MockInterface
-		json   *mock_parser.MockJSONInterface
+		json   *mock_parser.MockJsonInterface
 	}
 
 	mocks := mockFields{
