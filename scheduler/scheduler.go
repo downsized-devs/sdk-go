@@ -96,6 +96,7 @@ func (s *scheduler) Register(ctx context.Context, opt JobOption, handlerFunc any
 	if err != nil {
 		return err
 	}
+
 	nextRun, err := job.NextRun()
 	if err != nil {
 		s.log.Error(ctx, err)
