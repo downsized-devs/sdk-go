@@ -1,4 +1,4 @@
-package timelib
+package clock
 
 import (
 	"testing"

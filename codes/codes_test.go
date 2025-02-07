@@ -19,18 +19,8 @@ func TestCompile(t *testing.T) {
 		want DisplayMessage
 	}{
 		{
-			name: "uploading sow excel success in english",
-			args: args{code: CodeSuccessUploadSowExcel, lang: language.English},
-			want: DisplayMessage{StatusCode: http.StatusOK, Title: "Stocking Upload Success", Body: ""},
-		},
-		{
-			name: "farm creation success in indonesian",
-			args: args{code: CodeSuccessCreateFarm, lang: language.Indonesian},
-			want: DisplayMessage{StatusCode: http.StatusCreated, Title: "Anda Telah Berhasil Mendaftarkan Tambak Baru", Body: ""},
-		},
-		{
 			name: "default success message in english",
-			args: args{code: CodeSuccessReadUser, lang: language.English},
+			args: args{code: CodeSuccess, lang: language.English},
 			want: DisplayMessage{StatusCode: http.StatusOK, Title: "OK", Body: "Request successful"},
 		},
 	}
