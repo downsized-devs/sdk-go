@@ -27,6 +27,7 @@ mock-all:
 	@make mock util=auth subutil=auth
 	@make mock util=configbuilder subutil=configbuilder
 	@make mock util=configreader subutil=configreader
+	@make mock util=clock subutil=clock
 	@make mock util=instrument subutil=instrument
 	@make mock util=logger subutil=logger
 	@make mock util=parser subutil=parser
@@ -45,7 +46,6 @@ mock-all:
 	@make mock util=slack subutil=slack
 	@make mock util=featureflag subutil=feature_flag
 	@make mock util=ratelimiter subutil=rate_limiter
-	@make mock util=timelib subutil=timelib
 	@make mock util=security subutil=security
 	@make mock util=tracker subutil=tracker
 	@make mock util=messaging subutil=messaging

@@ -1,4 +1,4 @@
-package timelib
+package clock
 
 import (
 	"time"
@@ -26,26 +26,26 @@ type Interface interface {
 	ConvertToString(timeFormat string, timeParam time.Time) string
 }
 
-type timelib struct {
+type clock struct {
 }
 
 func Init() Interface {
-	return &timelib{}
+	return &clock{}
 }
 
-func (t *timelib) GetCurrentTime() time.Time {
+func (t *clock) GetCurrentTime() time.Time {
 	return Now()
 }
 
-func (t *timelib) SubstractTime(origin, deductor time.Time) time.Duration {
+func (t *clock) SubstractTime(origin, deductor time.Time) time.Duration {
 	return origin.Sub(deductor)
 }
 
-func (t *timelib) AddTime(origin time.Time, adder time.Duration) time.Time {
+func (t *clock) AddTime(origin time.Time, adder time.Duration) time.Time {
 	return origin.Add(adder)
 }
 
-func (t *timelib) GetTimeInLocation(locationParam Location, timeParam time.Time) (time.Time, error) {
+func (t *clock) GetTimeInLocation(locationParam Location, timeParam time.Time) (time.Time, error) {
 	location, err := time.LoadLocation(string(locationParam))
 	if err != nil {
 		return time.Time{}, err
@@ -54,19 +54,19 @@ func (t *timelib) GetTimeInLocation(locationParam Location, timeParam time.Time)
 	return timeParam.In(location), nil
 }
 
-func (t *timelib) GetFirstDayOfTheMonth(year int, month time.Month) time.Time {
+func (t *clock) GetFirstDayOfTheMonth(year int, month time.Month) time.Time {
 	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 }
 
-func (t *timelib) GetLastDayOfTheMonth(year int, month time.Month) time.Time {
+func (t *clock) GetLastDayOfTheMonth(year int, month time.Month) time.Time {
 	firstDayOfNextMonth := t.GetFirstDayOfTheMonth(year, month+1)
 	return firstDayOfNextMonth.AddDate(0, 0, -1)
 }
 
-func (t *timelib) ConvertFromString(timeFormat, timeString string) (time.Time, error) {
+func (t *clock) ConvertFromString(timeFormat, timeString string) (time.Time, error) {
 	return time.Parse(timeFormat, timeString)
 }
 
-func (t *timelib) ConvertToString(timeFormat string, timeParam time.Time) string {
+func (t *clock) ConvertToString(timeFormat string, timeParam time.Time) string {
 	return timeParam.Format(timeFormat)
 }

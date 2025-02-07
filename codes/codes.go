@@ -28,87 +28,6 @@ const (
 )
 
 const (
-	// cycle file upload codes
-	CodeSuccessUpload = Code(iota + 50)
-	CodeSuccessUploadSowExcel
-	CodeSuccessUploadDailyMonitoring
-	CodeSuccessUploadSampling
-	CodeSuccessUploadPartialHarvest
-	CodeSuccessUploadTotalHarvest
-	CodeSuccessUploadProductionPlan
-)
-
-const (
-	// cycle codes
-	CodeSuccessCreateCycle = Code(iota + 100)
-	CodeSuccessUpdateCycle
-	CodeSuccessDeleteCycle
-	CodeSuccessEndCycle
-)
-
-const (
-	// farms codes
-	CodeSuccessCreateFarm = Code(iota + 150)
-	CodeSuccessUpdateFarm
-	CodeSuccessDeleteFarm
-)
-
-const (
-	// module codes
-	CodeSuccessCreateModule = Code(iota + 200)
-	CodeSuccessUpdateModule
-	CodeSuccessDeleteModule
-)
-
-const (
-	// pond codes
-	CodeSuccessCreatePond = Code(iota + 250)
-	CodeSuccessUpdatePond
-	CodeSuccessDeletePond
-)
-
-const (
-	// ticket codes
-	CodeSuccessCreateTicket = Code(iota + 300)
-	CodeSuccessUpdateTicket
-	CodeSuccessDeleteTicket
-)
-
-const (
-	// user codes
-	CodeSuccessCreateUser = Code(iota + 350)
-	CodeSuccessUpdateUser
-	CodeSuccessDeleteUser
-	CodeSuccessReadUser
-	CodeSuccessUploadImage
-	CodeSuccessAssignRole
-)
-
-const (
-	// verif token codes
-	CodeSuccessResetPassword = Code(iota + 400)
-	CodeSuccessInputResetPassword
-)
-
-const (
-	// faq codes
-	CodeSuccessCreateFaqFeedback = Code(iota + 450)
-	CodeFailInsertFeedbackWeeklyLimit
-)
-
-const (
-	// pond disease codes
-	CodeSuccessCreatePondDisease = Code(iota + 500)
-	CodeSuccessUpdatePondDisease
-	CodeSuccessDeletePondDisease
-)
-
-const (
-	// bulk upload order
-	CodeSuccessUploadBulkOrder = Code(iota + 550)
-)
-
-const (
 	// common errors
 	CodeInvalidValue = Code(iota + 1000)
 	CodeContextDeadlineExceeded
@@ -141,6 +60,16 @@ const (
 	CodeSQLUniqueConstraint
 	CodeSQLConflict
 	CodeSQLNoRowsAffected
+)
+
+const (
+	// NoSQL errors
+	CodeNoSQL = Code(iota + 1400)
+	CodeNoSQLClose
+	CodeNoSQLRead
+	CodeNoSQLDecode
+	CodeNoSQLInsert
+	CodeNoSQLUpdate
 )
 
 const (
@@ -208,39 +137,6 @@ const (
 	// data conversion error
 	CodeConvert = Code(iota + 2200)
 	CodeConvertTime
-)
-
-const (
-	// File Upload Errors
-	CodeFileUploadWrongFile = Code(iota + 3000)
-	CodeFileUploadSowWrongFile
-	CodeFileUploadDailyWrongFile
-	CodeFileUploadHarvestWrongFile
-	CodeFileUploadSamplingWrongFile
-	CodeFileUploadTreatmentWrongFile
-	CodeFileUploadProductionPlanWrongFile
-	CodeFileUploadSowBackdate
-	CodeFileUploadDailyBackdate
-	CodeFileUploadHarvestBackdate
-	CodeFileUploadSamplingBackdate
-	CodeFileUploadTreatmentBackdate
-	CodeFileUploadBackdate
-	CodeFileProductionPlanNotUploaded
-	CodeFileSowNotUploaded
-	CodeFileUploadInvalidExtension
-	CodeFileUploadSowForwardDate
-	CodeFileUploadDailyForwardDate
-	CodeFileUploadHarvestForwardDate
-	CodeFileUploadSamplingForwardDate
-	CodeFileUploadTreatmentForwardDate
-	CodeFileUploadForwardDate
-	CodeFileInvalidateDateColumn
-	CodeFileInvalidPondIsNotRegister
-	CodeFileUploadBulkOrderWrongFile
-	CodeFileUploadWrongDateFormat
-	CodeFileUploadUnregisteredPond
-	CodeFileUploadIncorrectDataFormat
-	CodeFileUploadDocDopMiscalculation
 )
 
 const (
@@ -342,27 +238,6 @@ const (
 )
 
 const (
-	// Assigining Role Error
-	CodeErrorUserAssignRole = Code(iota + 4300)
-	CodeErrorWrongAssigneeRole
-	CodeErrorWrongUser
-)
-
-const (
-	// Deleting User Error
-	CodeErrorDeleteUser = Code(iota + 4400)
-	CodeErrorWrongUserToDelete
-)
-
-const (
-	// Farm Recommendation
-	CodeErrorHarvestPlanMinBigger = Code(iota + 4500)
-	CodeErrorHarvestPlanDayIntervalLower
-	CodeErrorHarvestPlanMinMaxInterval
-	CodeErrorABWSizeError
-)
-
-const (
 	// Slack Alert Error
 	CodeErrorSlackAlert = Code(iota + 4600)
 )
@@ -450,44 +325,6 @@ var ErrorMessages = AppMessage{
 	CodeConvert:     ErrMsgInternalServerError,
 	CodeConvertTime: ErrMsgInternalServerError,
 
-	CodeFileUploadSowBackdate:          ErrMsgFileUploadSowBackdate,
-	CodeFileUploadDailyBackdate:        ErrMsgFileUploadDailyBackdate,
-	CodeFileUploadHarvestBackdate:      ErrMsgFileUploadHarvestBackdate,
-	CodeFileUploadSamplingBackdate:     ErrMsgFileUploadSamplingBackdate,
-	CodeFileUploadTreatmentBackdate:    ErrMsgFileUploadTreatmentBackdate,
-	CodeFileUploadBackdate:             ErrMsgFileUploadBackdate,
-	CodeFileSowNotUploaded:             ErrMsgFileUploadSowNotUploaded,
-	CodeFileProductionPlanNotUploaded:  ErrMsgFileUploadProductionPlanNotUploaded,
-	CodeFileUploadInvalidExtension:     ErrMsgFileUploadInvalidExtension,
-	CodeFileUploadSowForwardDate:       ErrMsgFileUploadSowBackdate,
-	CodeFileUploadDailyForwardDate:     ErrMsgFileUploadDailyBackdate,
-	CodeFileUploadHarvestForwardDate:   ErrMsgFileUploadHarvestBackdate,
-	CodeFileUploadSamplingForwardDate:  ErrMsgFileUploadSamplingBackdate,
-	CodeFileUploadTreatmentForwardDate: ErrMsgFileUploadTreatmentBackdate,
-	CodeFileUploadForwardDate:          ErrMsgFileUploadBackdate,
-	CodeFileInvalidateDateColumn:       ErrMsgFileInvalidDate,
-	CodeFileInvalidPondIsNotRegister:   ErrMsgFileInvalidPondIsNotRegister,
-	CodeFileUploadWrongDateFormat:      ErrMsgFileUploadWrongDate,
-	CodeFileUploadUnregisteredPond:     ErrMsgFileUploadUnregisteredPond,
-	CodeFileUploadIncorrectDataFormat:  ErrMsgFileUploadIncorrectDataFormat,
-
-	CodeFileUploadWrongFile:               ErrMsgFileUploadWrongFile,
-	CodeFileUploadSowWrongFile:            ErrMsgFileUploadSowWrongFile,
-	CodeFileUploadDailyWrongFile:          ErrMsgFileUploadDailyWrongFile,
-	CodeFileUploadHarvestWrongFile:        ErrMsgFileUploadHarvestWrongFile,
-	CodeFileUploadSamplingWrongFile:       ErrMsgFileUploadSamplingWrongFile,
-	CodeFileUploadTreatmentWrongFile:      ErrMsgFileUploadTreatmentWrongFile,
-	CodeFileUploadProductionPlanWrongFile: ErrMsgFileUploadProductionPlanWrongFile,
-	CodeFileUploadBulkOrderWrongFile:      ErrMsgFileUploadBulkOrderWrongFile,
-
-	CodeCycleEndFailedNoActivePond:   ErrMsgCycleEndFailedNoActivePond,
-	CodeCycleEndFailedNoSelectedPond: ErrMsgCycleEndFailedNoSelectedPond,
-	CodeCycleStartFailedNameTooLong:  ErrMsgCodeCycleStartFailedNameTooLong,
-	CodeCycleNotFound:                ErrMsgCycleNotFound,
-	CodeCycleStartFailedOngoingCycle: ErrMsgCycleStartFailedOngoingCycle,
-
-	CodeMetricsProductivityNoDaily: ErrMsgMetricsProductivityNoDaily,
-
 	CodeFailedResetPassword:       ErrMsgResetPassword,
 	CodePasswordDoesNotMatch:      ErrMsgPasswordDoesNotMatch,
 	CodeResetPasswordTokenExpired: ErrMsgResetTokenExpired,
@@ -517,8 +354,6 @@ var ErrorMessages = AppMessage{
 	CodeCacheInvalidCastType: ErrMsgInternalServerError,
 	CodeCacheNotFound:        ErrMsgInternalServerError,
 
-	CodeFailInsertFeedbackWeeklyLimit: ErrMsgInsertFeedbackWeeklyLimit,
-
 	CodeErrorHttpNewRequest: ErrMsgInternalServerError,
 	CodeErrorHttpDo:         ErrMsgInternalServerError,
 	CodeErrorIoutilReadAll:  ErrMsgInternalServerError,
@@ -535,31 +370,8 @@ var ErrorMessages = AppMessage{
 	CodeGeneratePDFFailed:          ErrMsgGenerateToPDFFailed,
 	CodeParseHTMlTemplateFailed:    ErrMsgCodeParseHTMlTemplateFailed,
 
-	// User Error
-	CodeErrorUserAssignRole:    ErrMsgAssignRole,
-	CodeErrorWrongAssigneeRole: ErrMsgWrongAssigneeRole,
-	CodeErrorWrongUser:         ErrMsgWrongUser,
-	CodeErrorDeleteUser:        ErrMsgDeleteUser,
-	CodeErrorWrongUserToDelete: ErrMsgDeleteUser,
-
-	// Farm Recommendation Error
-	CodeErrorHarvestPlanMinBigger:        ErrMsgHarvestPlanMinBigger,
-	CodeErrorHarvestPlanDayIntervalLower: ErrMsgHarvestPlanIntervalLower,
-	CodeErrorHarvestPlanMinMaxInterval:   ErrMsgHarvestPlanMinMaxInterval,
-
 	// Slack Error
 	CodeErrorSlackAlert: ErrMsgSlackAlert,
-
-	// Timelib Error
-	CodeErrorTimelib: ErrMsgTimelib,
-
-	CodeFarmNoActivePond: ErrMsgFarmNoActivePond,
-
-	CodeModuleError: ErrMsgModule,
-
-	CodePondError: ErrMsgPond,
-
-	CodePondDiseaseError: ErrMsgPondDisease,
 
 	// File I/O error
 	CodeFile:               ErrMsgInternalServerError,
@@ -577,60 +389,6 @@ var ErrorMessages = AppMessage{
 var ApplicationMessages = AppMessage{
 	// Other
 	CodeAccepted: SuccessAccepted,
-
-	// Files upload
-	CodeSuccessUploadSowExcel:        SuccessUploadSow,
-	CodeSuccessUploadDailyMonitoring: SuccessUploadDailyMonitoring,
-	CodeSuccessUploadSampling:        SuccessUploadSampling,
-	CodeSuccessUploadPartialHarvest:  SuccessUploadPartialHarvest,
-	CodeSuccessUploadTotalHarvest:    SuccessUploadTotalHarvest,
-	CodeSuccessUploadProductionPlan:  SuccessUploadProductionPlan,
-
-	// Cycles
-	CodeSuccessCreateCycle: SuccessCreateCycle,
-	CodeSuccessUpdateCycle: SuccessUpdateCycle,
-	CodeSuccessDeleteCycle: SuccessDeleteCycle,
-	CodeSuccessEndCycle:    SuccessEndCycle,
-
-	// Farm
-	CodeSuccessCreateFarm: SuccessCreateFarm,
-	CodeSuccessUpdateFarm: SuccessUpdateFarm,
-	CodeSuccessDeleteFarm: SuccessDeleteFarm,
-
-	// Module
-	CodeSuccessCreateModule: SuccessCreateModule,
-	CodeSuccessUpdateModule: SuccessUpdateModule,
-	CodeSuccessDeleteModule: SuccessDeleteModule,
-
-	// Pond
-	CodeSuccessCreatePond: SuccessCreatePond,
-	CodeSuccessUpdatePond: SuccessUpdatePond,
-	CodeSuccessDeletePond: SuccessDeletePond,
-
-	// Ticket
-	CodeSuccessCreateTicket: SuccessCreateTicket,
-	CodeSuccessUpdateTicket: SuccessUpdateTicket,
-	CodeSuccessDeleteTicket: SuccessDeleteTicket,
-
-	// User
-	CodeSuccessCreateUser: SuccessCreateUser,
-	CodeSuccessUpdateUser: SuccessUpdateUser,
-	CodeSuccessDeleteUser: SuccessDeleteUser,
-
-	// Verif token
-	CodeSuccessResetPassword:      SuccesResetPassword,
-	CodeSuccessInputResetPassword: SuccessInputResetPassword,
-
-	// Faq
-	CodeSuccessCreateFaqFeedback: SuccesCreateFaqFeedback,
-
-	// Pond Disease
-	CodeSuccessCreatePondDisease: SuccessCreatePondDisease,
-	CodeSuccessUpdatePondDisease: SuccessUpdatePondDisease,
-	CodeSuccessDeletePondDisease: SuccessDeletePondDisease,
-
-	// Bulk Upload Order
-	CodeSuccessUploadBulkOrder: SuccessBulkUploadOrder,
 }
 
 func Compile(code Code, lang string) DisplayMessage {
