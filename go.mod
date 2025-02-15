@@ -7,6 +7,7 @@ require (
 	github.com/Boostport/mjml-go v0.7.0
 	github.com/aws/aws-sdk-go v1.44.109
 	github.com/bsm/redislock v0.7.2
+	github.com/cbroglie/mustache v1.4.0
 	github.com/cstockton/go-conv v1.0.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-co-op/gocron/v2 v2.11.0
@@ -15,16 +16,19 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gocarina/gocsv v0.0.0-20211203214250-4735fba0c1d9
+	github.com/hlubek/readercomp v0.0.0-20210927065201-8f5e69adbe1c
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.6
 	github.com/matryer/is v1.4.0
+	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pdfcpu/pdfcpu v0.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.12.2
 	github.com/prometheus/common v0.32.1
 	github.com/rs/zerolog v1.26.1
 	github.com/slack-go/slack v0.11.2
+	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.9.0
 	github.com/thomaspoignant/go-feature-flag v0.28.1
 	github.com/ulule/limiter/v3 v3.10.0
@@ -52,12 +56,18 @@ require (
 	github.com/couchbase/vellum v1.0.2 // indirect
 	github.com/glycerine/go-unsnap-stream v0.0.0-20181221182339-f9677308dec2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jonboulle/clockwork v0.4.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
+	github.com/magiconair/properties v1.8.0 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/philhofer/fwd v1.0.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
+	github.com/spf13/afero v1.1.2 // indirect
+	github.com/spf13/cast v1.3.0 // indirect
+	github.com/spf13/jwalterweatherman v1.0.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/steveyen/gtreap v0.1.0 // indirect
 	github.com/tinylib/msgp v1.1.0 // indirect
 	github.com/willf/bitset v1.1.10 // indirect
