@@ -228,7 +228,8 @@ func Test_configReader_AllSettings(t *testing.T) {
 					"duration": "1m",
 				},
 				"meta": map[string]interface{}{
-					"version": "dev",
+					"version":     "dev",
+					"environment": "dev",
 				},
 				"addconfig": map[string]interface{}{
 					"duration": "1s",
@@ -266,7 +267,8 @@ func Test_configReader_AllSettings(t *testing.T) {
 					"duration": "1m",
 				},
 				"meta": map[string]interface{}{
-					"version": "v1.0.0",
+					"version":     "v1.0.0",
+					"environment": "dev",
 				},
 				"addconfig": map[string]interface{}{
 					"duration": "1s",

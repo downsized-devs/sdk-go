@@ -200,7 +200,7 @@ func Test_security_ScryptPassword(t *testing.T) {
 				salt:     "ekr/rlgB6tovww==",
 				password: "D0wn5izeDd3v5",
 			},
-			want: "8bVI07w7zmyTgnSU8fE2C6Nn/pzEiukZJEFkWSFch5zOxypmjRt67C0aikpfQ/3z5T2XF9vmJF5PkaskD9D1sw==",
+			want: "8WTYvjqmK1naiAZnAFthrXzvdiW2SKFW6RWCsFe8bhhCr7PZ9EUr9WgZOQSYNMoSRujIlaNluzLl7u268P1FJQ==",
 		},
 	}
 	for _, tt := range tests {
@@ -247,7 +247,7 @@ func Test_security_CompareScryptPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:          context.Background(),
-				passwordHash: "8bVI07w7zmyTgnSU8fE2C6Nn/pzEiukZJEFkWSFch5zOxypmjRt67C0aikpfQ/3z5T2XF9vmJF5PkaskD9D1sw==",
+				passwordHash: "8WTYvjqmK1naiAZnAFthrXzvdiW2SKFW6RWCsFe8bhhCr7PZ9EUr9WgZOQSYNMoSRujIlaNluzLl7u268P1FJQ==",
 				salt:         "ekr/rlgB6tovww==",
 				password:     "D0wn5izeDd3v5",
 			},
