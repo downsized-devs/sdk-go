@@ -36,7 +36,7 @@ jobs:
       run: make run-tests
 
     - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@v7.0.0
       with:
         version: v2.0.2
         skip-cache: true
