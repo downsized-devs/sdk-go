@@ -35,7 +35,7 @@ func (a *auth) exchangeRefreshToken(ctx context.Context, payLoad RefreshTokenReq
 
 	resp, err := a.httpClient.Do(req)
 	if err != nil {
-		return result, errors.NewWithCode(codes.CodeErrorHttpDo,  "%s", err.Error())
+		return result, errors.NewWithCode(codes.CodeErrorHttpDo, "%s", err.Error())
 	}
 
 	body, err := io.ReadAll(resp.Body)

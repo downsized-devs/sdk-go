@@ -1,3 +1,7 @@
+.PHONY: build
+build:
+	@go build -v ./...
+
 .PHONY: run-tests
 run-tests:
 	@go test -v -failfast `go list ./...` -cover
