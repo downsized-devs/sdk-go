@@ -18,6 +18,14 @@ run-integ-tests:
 run-integ-tests-report:
 	@go test -v -failfast `go list ./...` -cover  -tags=integration -coverprofile=coverage.out -json > test-report.out
 
+.PHONY: lint
+lint:
+	@`go env GOPATH`/bin/golangci-lint run
+
+.PHONY: lint-install
+lint-install:
+	@go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.0.2
+
 .PHONY:
 mock-install:
 	@go install go.uber.org/mock/mockgen@v0.4.0

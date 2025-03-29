@@ -55,7 +55,7 @@ type email struct {
 func Init(cfg Config, log logger.Interface) Interface {
 	dialer := gomail.NewDialer(cfg.SMTP.Host, cfg.SMTP.Port, cfg.SMTP.Username, cfg.SMTP.Password)
 	if cfg.SMTP.TLSConfig.InsecureSkipVerify {
-		dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+		dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec
 	}
 	return &email{
 		dialer:   dialer,

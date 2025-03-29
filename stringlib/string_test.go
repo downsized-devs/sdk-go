@@ -37,10 +37,10 @@ func TestRandStringBytesRepeatability(t *testing.T) {
 	length := 10
 	seed := time.Now().UnixNano()
 
-	rand.Seed(seed)
+	rand.New(rand.NewSource(seed))
 	str1 := RandStringBytes(length)
 
-	rand.Seed(seed)
+	rand.New(rand.NewSource(seed))
 	str2 := RandStringBytes(length)
 
 	if str1 != str2 {

@@ -18,8 +18,6 @@ import (
 var once = sync.Once{}
 var now = time.Now
 
-type contextKey string
-
 type Interface interface {
 	// TODO add Debugf
 	Trace(ctx context.Context, obj any)
@@ -44,7 +42,7 @@ func DefaultLogger() Interface {
 		log: zerolog.New(os.Stdout).
 			With().
 			Timestamp().
-			CallerWithSkipFrameCount(3). //Hard code to 3 for now.
+			CallerWithSkipFrameCount(3). // Hard code to 3 for now.
 			Logger().
 			Level(zerolog.DebugLevel),
 	}
@@ -61,7 +59,7 @@ func Init(cfg Config) Interface {
 		zeroLogging = zerolog.New(os.Stdout).
 			With().
 			Timestamp().
-			CallerWithSkipFrameCount(3). //Hard code to 3 for now.
+			CallerWithSkipFrameCount(3). // Hard code to 3 for now.
 			Logger().
 			Level(level)
 	})

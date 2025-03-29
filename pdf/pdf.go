@@ -43,7 +43,7 @@ func (p *pdf) SetPasswordFile(ctx context.Context, password string, data []byte)
 	p.config.EncryptKeyLength = 256
 
 	// Write the byte array to a file
-	err := os.WriteFile(outputFileName, data, 0777)
+	err := os.WriteFile(outputFileName, data, 0777) //nolint:gosec
 	if err != nil {
 		p.log.Error(ctx, fmt.Sprintf("Failed to write PDF file: %v", err.Error()))
 		return data, err

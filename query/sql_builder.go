@@ -140,7 +140,7 @@ func (s *sqlClausebuilder) Build(param interface{}) (string, []interface{}, stri
 		return "", nil, "", nil, errors.NewWithCode(codes.CodeInvalidValue, "passed param should be a pointer and cannot be nil")
 	}
 
-	//copy param to struct
+	// copy param to struct
 	s.param = p
 
 	traverseOnParam(s.paramTag, s.dbTag, s.fieldTag, "$", "", "", s.aliasMap, s.param, s.buildSQLQueryString)
@@ -193,7 +193,7 @@ func (s *sqlClausebuilder) BuildUpdate(update interface{}, where interface{}) (s
 		return "", nil, errors.NewWithCode(codes.CodeInvalidValue, "passed update or where param should be a pointer and cannot be nil")
 	}
 
-	//copy update and where param to struct
+	// copy update and where param to struct
 	s.param = w
 	s.updateParam = u
 
@@ -212,10 +212,10 @@ func (s *sqlClausebuilder) BuildUpdate(update interface{}, where interface{}) (s
 		return "", nil, errors.NewWithCode(codes.CodeInvalidValue, "generated update or where query clause cannot be ampty")
 	}
 
-	//combine all query
+	// combine all query
 	allQuery := s.rawUpdate.String() + whereQuery
 
-	//combine all args
+	// combine all args
 	var allArgs []interface{}
 	allArgs = append(allArgs, s.updateArgs...)
 	allArgs = append(allArgs, whereArgs...)
@@ -264,7 +264,7 @@ func (s *sqlClausebuilder) pagePagination() {
 }
 
 func (s *sqlClausebuilder) buildSQLQueryString(primitiveType int8, isLike, isMany, isSqlNull bool, fieldName, paramTag, dbTag string, args interface{}) {
-	//map param to field name
+	// map param to field name
 	s.paramToFieldMap[paramTag] = fieldName
 	// map param to db column name
 	s.paramToDBMap[paramTag] = dbTag
@@ -309,27 +309,29 @@ func (s *sqlClausebuilder) buildSQLQueryString(primitiveType int8, isLike, isMan
 			s.args = append(s.args, args)
 			return
 		}
-		if strings.Contains(paramTag, "__gte") {
+
+		switch {
+		case strings.Contains(paramTag, "__gte"):
 			_, _ = s.rawQuery.WriteString(" AND " + dbTag + ">=" + s.getBindVar())
 			s.args = append(s.args, args)
 			return
-		} else if strings.Contains(paramTag, "__lte") {
+		case strings.Contains(paramTag, "__lte"):
 			_, _ = s.rawQuery.WriteString(" AND " + dbTag + "<=" + s.getBindVar())
 			s.args = append(s.args, args)
 			return
-		} else if strings.Contains(paramTag, "__lt") {
+		case strings.Contains(paramTag, "__lt"):
 			_, _ = s.rawQuery.WriteString(" AND " + dbTag + "<" + s.getBindVar())
 			s.args = append(s.args, args)
 			return
-		} else if strings.Contains(paramTag, "__gt") {
+		case strings.Contains(paramTag, "__gt"):
 			_, _ = s.rawQuery.WriteString(" AND " + dbTag + ">" + s.getBindVar())
 			s.args = append(s.args, args)
 			return
-		} else if strings.Contains(paramTag, "__ne") {
+		case strings.Contains(paramTag, "__ne"):
 			_, _ = s.rawQuery.WriteString(" AND " + dbTag + "<>" + s.getBindVar())
 			s.args = append(s.args, args)
 			return
-		} else if strings.Contains(paramTag, "__opt") {
+		case strings.Contains(paramTag, "__opt"):
 			_, _ = s.rawQuery.WriteString(" OR " + dbTag + "=" + s.getBindVar())
 			s.args = append(s.args, args)
 			return

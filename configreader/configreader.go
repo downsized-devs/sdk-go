@@ -94,7 +94,8 @@ func (c *configReader) mergeEnvConfig() {
 
 func (c *configReader) resolveJSONRef() {
 	refmap := make(map[string]interface{})
-	refregxp := regexp.MustCompile("^\\$ref:#\\/(.*)$")
+	refregxpstr := "^\\$ref:#\\/(.*)$"
+	refregxp := regexp.MustCompile(refregxpstr)
 	for _, k := range c.viper.AllKeys() {
 		refpath := c.viper.GetString(k)
 		if refregxp.MatchString(refpath) {
