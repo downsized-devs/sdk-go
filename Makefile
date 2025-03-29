@@ -1,3 +1,7 @@
+.PHONY: build
+build:
+	@go build -v ./...
+
 .PHONY: run-tests
 run-tests:
 	@go test -v -failfast `go list ./...` -cover
@@ -13,6 +17,14 @@ run-integ-tests:
 .PHONY: run-integ-tests-report
 run-integ-tests-report:
 	@go test -v -failfast `go list ./...` -cover  -tags=integration -coverprofile=coverage.out -json > test-report.out
+
+.PHONY: lint
+lint:
+	@`go env GOPATH`/bin/golangci-lint run
+
+.PHONY: lint-install
+lint-install:
+	@go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.0.2
 
 .PHONY:
 mock-install:

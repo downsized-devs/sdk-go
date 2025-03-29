@@ -12,7 +12,7 @@ import (
 	"github.com/downsized-devs/sdk-go/operator"
 )
 
-type App struct {
+type App struct { //nolint: errname
 	Code  codes.Code `json:"code"`
 	Title string     `json:"title"`
 	Body  string     `json:"body"`
@@ -61,7 +61,7 @@ func As(err error, target any) bool {
 }
 
 func GetCaller(err error) (string, int, string, error) {
-	st, ok := err.(*stacktrace)
+	st, ok := err.(*stacktrace) //nolint: errorlint
 	if !ok {
 		return "", 0, "", create(nil, codes.NoCode, "failed to cast to stacktrace")
 	}
@@ -114,7 +114,7 @@ func shortFuncName(f *runtime.Func) string {
 }
 
 func GetCode(err error) codes.Code {
-	if err, ok := err.(*stacktrace); ok {
+	if err, ok := err.(*stacktrace); ok { //nolint: errorlint
 		return err.code
 	}
 	return codes.NoCode

@@ -80,15 +80,15 @@ func (s *scheduler) Register(ctx context.Context, opt JobOption, handlerFunc any
 		jobOption = gocron.DurationRandomJob(opt.Duration-opt.Jitter, opt.Duration+opt.Jitter)
 	case Daily:
 		jobOption = gocron.DailyJob(1, gocron.NewAtTimes(
-			gocron.NewAtTime(uint(opt.RunningTime.Hour()), uint(opt.RunningTime.Minute()), uint(opt.RunningTime.Second())),
+			gocron.NewAtTime(uint(opt.RunningTime.Hour()), uint(opt.RunningTime.Minute()), uint(opt.RunningTime.Second())), //nolint:gosec
 		))
 	case Weekly:
 		jobOption = gocron.WeeklyJob(1, gocron.NewWeekdays(opt.RunningDay), gocron.NewAtTimes(
-			gocron.NewAtTime(uint(opt.RunningTime.Hour()), uint(opt.RunningTime.Minute()), uint(opt.RunningTime.Second())),
+			gocron.NewAtTime(uint(opt.RunningTime.Hour()), uint(opt.RunningTime.Minute()), uint(opt.RunningTime.Second())), //nolint:gosec
 		))
 	case Monthly:
 		jobOption = gocron.MonthlyJob(1, gocron.NewDaysOfTheMonth(opt.RunningDate), gocron.NewAtTimes(
-			gocron.NewAtTime(uint(opt.RunningTime.Hour()), uint(opt.RunningTime.Minute()), uint(opt.RunningTime.Second())),
+			gocron.NewAtTime(uint(opt.RunningTime.Hour()), uint(opt.RunningTime.Minute()), uint(opt.RunningTime.Second())), //nolint:gosec
 		))
 	}
 

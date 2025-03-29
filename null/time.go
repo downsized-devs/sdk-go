@@ -68,7 +68,7 @@ func (nt *Time) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 	s := string(b)
-	s = strings.Replace(s, "\"", "", -1)
+	s = strings.ReplaceAll(s, "\"", "")
 
 	x, err := time.Parse(time.RFC3339, s)
 	if err != nil {
@@ -98,12 +98,12 @@ func (t Time) Is(other time.Time) bool {
 
 // return true if valid and the argument is before the origin
 func (t Time) IsBefore(other time.Time) bool {
-	return t.Valid == true && other.Before(t.Time)
+	return t.Valid && other.Before(t.Time)
 }
 
 // return true if valid and the argument is after the origin
 func (t Time) IsAfter(other time.Time) bool {
-	return t.Valid == true && other.After(t.Time)
+	return t.Valid && other.After(t.Time)
 }
 
 // Date is nullable time.Time for parsing DATE type in SQL to golang time.Time.
@@ -174,7 +174,7 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 	s := string(b)
-	s = strings.Replace(s, "\"", "", -1)
+	s = strings.ReplaceAll(s, "\"", "")
 
 	x, err := time.Parse(time.RFC3339, s)
 	if err != nil {
@@ -206,12 +206,12 @@ func (d Date) Is(other time.Time) bool {
 
 // return true if valid and the argument is before the origin
 func (d Date) IsBefore(other time.Time) bool {
-	return d.Valid == true && other.Before(d.Time)
+	return d.Valid && other.Before(d.Time)
 }
 
 // return true if valid and the argument is after the origin
 func (d Date) IsAfter(other time.Time) bool {
-	return d.Valid == true && other.After(d.Time)
+	return d.Valid && other.After(d.Time)
 }
 
 func convertTimeToZero(t time.Time) time.Time {

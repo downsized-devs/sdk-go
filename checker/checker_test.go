@@ -128,25 +128,21 @@ func TestArrayContains(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		if i < 2 {
-			t.Run(tt.name, func(t *testing.T) {
-				if got := ArrayContains(tt.args.argsInt64.slice, tt.args.argsInt64.x); got != tt.want {
-					t.Errorf("ArrayContains() = %v, want %v", got, tt.want)
-				}
-			})
-		} else if i < 4 {
-			t.Run(tt.name, func(t *testing.T) {
-				if got := ArrayContains(tt.args.argsString.slice, tt.args.argsString.x); got != tt.want {
-					t.Errorf("ArrayContains() = %v, want %v", got, tt.want)
-				}
-			})
-		} else {
-			t.Run(tt.name, func(t *testing.T) {
-				if got := ArrayContains(tt.args.argsFloat64.slice, tt.args.argsFloat64.x); got != tt.want {
-					t.Errorf("ArrayContains() = %v, want %v", got, tt.want)
-				}
-			})
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			var got bool
+			switch {
+			case i < 2:
+				got = ArrayContains(tt.args.argsInt64.slice, tt.args.argsInt64.x)
+			case i < 4:
+				got = ArrayContains(tt.args.argsString.slice, tt.args.argsString.x)
+			default:
+				got = ArrayContains(tt.args.argsFloat64.slice, tt.args.argsFloat64.x)
+			}
+
+			if got != tt.want {
+				t.Errorf("ArrayContains() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
@@ -230,28 +226,25 @@ func TestArrayDeduplicate(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		if i < 2 {
-			t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
+			switch {
+			case i < 2:
 				got := ArrayDeduplicate(tt.args.argsInt64.slice)
 				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("ArrayDumpDuplicate() = %v, want %v", got, tt.want)
+					t.Errorf("ArrayDeduplicate() = %v, want %v", got, tt.want)
 				}
-			})
-		} else if i < 4 {
-			t.Run(tt.name, func(t *testing.T) {
+			case i < 4:
 				got := ArrayDeduplicate(tt.args.argsString.slice)
 				if !reflect.DeepEqual(got, tt.want2) {
-					t.Errorf("ArrayDumpDuplicate() = %v, want %v", got, tt.want2)
+					t.Errorf("ArrayDeduplicate() = %v, want %v", got, tt.want2)
 				}
-			})
-		} else {
-			t.Run(tt.name, func(t *testing.T) {
+			default:
 				got := ArrayDeduplicate(tt.args.argsFloat64.slice)
 				if !reflect.DeepEqual(got, tt.want3) {
-					t.Errorf("ArrayDumpDuplicate() = %v, want %v", got, tt.want3)
+					t.Errorf("ArrayDeduplicate() = %v, want %v", got, tt.want3)
 				}
-			})
-		}
+			}
+		})
 	}
 }
 

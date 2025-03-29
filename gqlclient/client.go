@@ -255,7 +255,7 @@ func ImmediatelyCloseReqBody() ClientOption {
 // modify the behaviour of the Client.
 type ClientOption func(*Client)
 
-type graphErr struct {
+type graphErr struct { //nolint: errname
 	Message string
 }
 

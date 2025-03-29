@@ -593,7 +593,7 @@ var (
 	}
 	SuccessUploadDailyMonitoring = Message{
 		StatusCode: http.StatusOK,
-		TitleEN:    "Daily Monitoring Upload Successs",
+		TitleEN:    "Daily Monitoring Upload Success",
 		TitleID:    "Data Monitoring Harian Berhasil Diunggah",
 		BodyEN:     "",
 		BodyID:     "",
@@ -726,7 +726,7 @@ var (
 		BodyID:     "",
 	}
 
-	//Pond Diseases
+	// Pond Diseases
 	SuccessCreatePondDisease = Message{
 		StatusCode: http.StatusCreated,
 		TitleEN:    "You have Successfully Created A New Pond Disease",

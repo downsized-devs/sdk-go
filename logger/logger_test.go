@@ -249,7 +249,7 @@ func Test_getCaller(t *testing.T) {
 			args: args{
 				obj: errors.NewWithCode(codes.CodeBadRequest, "test"),
 			},
-			want: pwd + "/log_test.go:250 --- test",
+			want: pwd + "/logger_test.go:250 --- test",
 		},
 	}
 	for _, tt := range tests {

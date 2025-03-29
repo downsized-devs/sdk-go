@@ -113,7 +113,7 @@ func (m *mongoDB) UpdateMany(ctx context.Context, collection string, filter inte
 }
 
 // Replace query bindvars with args value
-func replaceBindvarsWithArgs(str string, args ...interface{}) string {
+func replaceBindvarsWithArgs(str string, args ...interface{}) string { //nolint:unused
 	str = strings.Join(strings.Fields(str), " ")
 
 	for _, arg := range args {
