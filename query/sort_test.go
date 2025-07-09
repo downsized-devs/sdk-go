@@ -149,7 +149,21 @@ func Test_validatePage(t *testing.T) {
 		args args
 		want int64
 	}{
-		// TODO: Add test cases.
+		{
+			name: "p <= 0",
+			args: args{p: 0},
+			want: 1,
+		},
+		{
+			name: "p = 1",
+			args: args{p: 1},
+			want: 1,
+		},
+		{
+			name: "p > 1",
+			args: args{p: 2},
+			want: 2,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
