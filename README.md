@@ -6,11 +6,7 @@
 ![Version](https://img.shields.io/github/v/release/downsized-devs/sdk-go)
 
 ## 📖 Overview
-`sdk-go` is a monorepo of Go libraries maintained by Downsized Devs.  Each
-top-level directory exposes a focused package that can be imported on its own or
-pulled in as part of the complete toolkit.  The project aims to streamline Go
-development with well-tested utilities ranging from logging and scheduled jobs
-to data storage helpers.
+`sdk-go` is a monorepo of Go libraries maintained by Downsized Devs.  Each top-level directory exposes a focused package that can be imported on its own or pulled in as part of the complete toolkit.  The project aims to streamline Go development with well-tested utilities ranging from logging and scheduled jobs to data storage helpers.
 
 ## ✨ Features
 - 🔧 Modular library architecture
