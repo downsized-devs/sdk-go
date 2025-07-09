@@ -6,7 +6,11 @@
 ![Version](https://img.shields.io/github/v/release/downsized-devs/sdk-go)
 
 ## 📖 Overview
-`sdk-go` is a comprehensive collection of Go libraries developed by Downsized Devs, designed to supercharge your Go development workflow. Our modular approach provides flexible, efficient, and high-performance solutions for various programming challenges.
+`sdk-go` is a monorepo of Go libraries maintained by Downsized Devs.  Each
+top-level directory exposes a focused package that can be imported on its own or
+pulled in as part of the complete toolkit.  The project aims to streamline Go
+development with well-tested utilities ranging from logging and scheduled jobs
+to data storage helpers.
 
 ## ✨ Features
 - 🔧 Modular library architecture
@@ -28,22 +32,44 @@ go get -u github.com/downsized-devs/sdk-go
 go get -u github.com/downsized-devs/sdk-go/<package-name>
 ```
 
-## 💻 Usage Examples
+## 💻 Usage Example
 
-### Basic Import
 ```go
 import "github.com/downsized-devs/sdk-go/<package-name>"
 ```
 
-### Run Package Build
+## 📂 Repository Structure
+Each top-level directory houses a standalone Go package. A few notable examples
+include:
+
+- `appcontext` – request-scoped context helpers
+- `logger` – structured logging based on Zerolog
+- `scheduler` – wrappers around `gocron` for background jobs
+- `redis` – thin client with distributed locking support
+- `translator` – i18n solution using `universal-translator`
+
+Packages can be imported individually or as part of the entire toolkit.
+
+## 🛠 Code Generator
+The `generator/` folder contains a scaffolding tool for creating boilerplate in
+other projects. Run it with:
+
 ```bash
-make build
+go run ./generator --name <EntityName> --path <output-path> --api
 ```
 
-### Run Tests
-```bash
-make run-tests
-```
+## 🔧 Testing & Tooling
+Use the provided `Makefile` for common tasks:
+
+- `make build` – compile all packages
+- `make run-tests` – execute the unit test suite
+- `make mock-all` – generate GoMock stubs
+
+## 🌱 Explore Further
+- Dive into packages such as `auth`, `storage`, or `messaging` to see available
+  APIs.
+- Review `errors/` and `codes/` to understand custom error handling.
+- Check `instrument/` for Prometheus instrumentation examples.
 
 ## 📜 License
 Distributed under the MIT License. See `LICENSE` for more information.
