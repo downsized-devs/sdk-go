@@ -170,7 +170,7 @@ func Test_security_CompareHashPassword(t *testing.T) {
 func Test_security_ScryptPassword(t *testing.T) {
 	config := ScryptConfig{
 		Base64SignerKey:     "MoaHZJjRSE9Ktj6HnIkoldV+BmXpD7YVboHgJOY4SDnUNiNMTUILxlsY4igO3Uzx/n/VwFju9IC4fQfgDy7LwQ==",
-		Base64SaltSeperator: "Bw==",
+		Base64SaltSeparator: "Bw==",
 		Rounds:              8,
 		MemoryCost:          14,
 	}
@@ -219,7 +219,7 @@ func Test_security_ScryptPassword(t *testing.T) {
 func Test_security_CompareScryptPassword(t *testing.T) {
 	config := ScryptConfig{
 		Base64SignerKey:     "MoaHZJjRSE9Ktj6HnIkoldV+BmXpD7YVboHgJOY4SDnUNiNMTUILxlsY4igO3Uzx/n/VwFju9IC4fQfgDy7LwQ==",
-		Base64SaltSeperator: "Bw==",
+		Base64SaltSeparator: "Bw==",
 		Rounds:              8,
 		MemoryCost:          14,
 	}

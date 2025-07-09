@@ -40,7 +40,7 @@ type security struct {
 
 type ScryptConfig struct {
 	Base64SignerKey     string
-	Base64SaltSeperator string
+	Base64SaltSeparator string
 	Rounds              int
 	MemoryCost          int
 }
@@ -165,7 +165,7 @@ func (s *security) ScryptPassword(ctx context.Context, salt string, password str
 	N := 1 << s.scrypt.MemoryCost // CPU/memory cost parameter (must be a power of 2)
 	r := s.scrypt.Rounds          // block size parameter
 	p := 1                        // parallelization parameter
-	saltConcat := append(s.b64Stddecode(ctx, salt), s.b64Stddecode(ctx, s.scrypt.Base64SaltSeperator)...)
+	saltConcat := append(s.b64Stddecode(ctx, salt), s.b64Stddecode(ctx, s.scrypt.Base64SaltSeparator)...)
 	derivedKey, err := scrypt.Key([]byte(password), saltConcat, N, r, p, keyLen)
 	if err != nil {
 		s.log.Error(ctx, fmt.Sprintf("Error generating derived key: %v", err))
