@@ -156,7 +156,7 @@ func (s *security) HashPassword(ctx context.Context, secretKey, password string)
 	return hex.EncodeToString(computedHash.Sum(nil))
 }
 
-func (s *security) CompareHashPassword(ctx context.Context, hashPassword, secretKey, password string) bool {
+func (s *security) CompareHashPassword(ctx context.Context, secretKey, hashPassword, password string) bool {
 	return hashPassword == s.HashPassword(ctx, secretKey, password)
 }
 

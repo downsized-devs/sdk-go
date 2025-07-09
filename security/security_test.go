@@ -118,8 +118,8 @@ func Test_security_CompareHashPassword(t *testing.T) {
 	}
 	type args struct {
 		ctx          context.Context
-		hashPassword string
 		secretKey    string
+		hashPassword string
 		password     string
 	}
 	tests := []struct {
@@ -135,8 +135,8 @@ func Test_security_CompareHashPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:          context.Background(),
-				hashPassword: "93435c1a22a97eb31d56ee721b650d90cb17daf535b8f8d4727035e1cbf6821c",
 				secretKey:    "secret-key",
+				hashPassword: "93435c1a22a97eb31d56ee721b650d90cb17daf535b8f8d4727035e1cbf6821c",
 				password:     "password",
 			},
 			want: true,
@@ -148,8 +148,8 @@ func Test_security_CompareHashPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:          context.Background(),
-				hashPassword: "93435c1a22a97eb31d56ee721b650d90cb17daf535b8f8d4727035e1cbf6821c-failed",
 				secretKey:    "secret-key",
+				hashPassword: "93435c1a22a97eb31d56ee721b650d90cb17daf535b8f8d4727035e1cbf6821c-failed",
 				password:     "password",
 			},
 			want: false,
@@ -160,7 +160,7 @@ func Test_security_CompareHashPassword(t *testing.T) {
 			s := &security{
 				log: tt.fields.log,
 			}
-			if got := s.CompareHashPassword(tt.args.ctx, tt.args.hashPassword, tt.args.secretKey, tt.args.password); got != tt.want {
+			if got := s.CompareHashPassword(tt.args.ctx, tt.args.secretKey, tt.args.hashPassword, tt.args.password); got != tt.want {
 				t.Errorf("security.CompareHashPassword() = %v, want %v", got, tt.want)
 			}
 		})
