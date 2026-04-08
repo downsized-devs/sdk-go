@@ -200,7 +200,7 @@ func (s *sqlDB) getURI(conf ConnConfig) (string, error) {
 			ssl = `true`
 		}
 		return fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?tls=%s&parseTime=true", conf.User, conf.Password, conf.Host, conf.Port, conf.DB, ssl), nil
-		case "sqlite3":
+	case "sqlite3":
 		return conf.DB, nil
 	default:
 		return "", fmt.Errorf(`DB Driver [%s] is not supported`, s.cfg.Driver)
