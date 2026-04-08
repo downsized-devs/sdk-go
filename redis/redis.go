@@ -110,7 +110,7 @@ func (c *cache) SetEX(ctx context.Context, key string, val string, expTime time.
 
 	err := c.rdb.SetEX(ctx, key, val, expTime).Err()
 	if err != nil {
-		return errors.NewWithCode(codes.CodeRedisSetex, err.Error())
+		return errors.NewWithCode(codes.CodeRedisSetex, "%s", err.Error())
 	}
 
 	return nil
@@ -122,7 +122,7 @@ func (c *cache) Lock(ctx context.Context, key string, expTime time.Duration) (*r
 	if goerr.Is(err, redislock.ErrNotObtained) {
 		return nil, err
 	} else if err != nil {
-		return nil, errors.NewWithCode(codes.CodeFailedLock, err.Error())
+		return nil, errors.NewWithCode(codes.CodeFailedLock, "%s", err.Error())
 	}
 
 	return lock, nil
@@ -134,7 +134,7 @@ func (c *cache) LockRelease(ctx context.Context, lock *redislock.Lock) error {
 		if goerr.Is(err, redislock.ErrLockNotHeld) {
 			return err
 		} else if err != nil {
-			return errors.NewWithCode(codes.CodeFailedReleaseLock, err.Error())
+			return errors.NewWithCode(codes.CodeFailedReleaseLock, "%s", err.Error())
 		}
 	}
 

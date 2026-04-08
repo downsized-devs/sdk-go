@@ -355,7 +355,7 @@ func (a *auth) RevokeUserRefreshToken(ctx context.Context, uid string) error {
 
 	err := a.firebase.RevokeRefreshTokens(ctx, uid)
 	if err != nil {
-		return errors.NewWithCode(codes.CodeAuthRevokeRefreshTokenFailed, err.Error())
+		return errors.NewWithCode(codes.CodeAuthRevokeRefreshTokenFailed, "%s", err.Error())
 	}
 	return nil
 }

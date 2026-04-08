@@ -56,7 +56,7 @@ func Init(cfg Config, log logger.Interface) Interface {
 func (m *mongoDB) Close(ctx context.Context) error {
 	err := m.client.Disconnect(ctx)
 	if err != nil {
-		return errors.NewWithCode(codes.CodeNoSQLClose, err.Error())
+		return errors.NewWithCode(codes.CodeNoSQLClose, "%s", err.Error())
 	}
 	m.log.Info(ctx, "Connection to MongoDB closed...")
 
@@ -66,11 +66,11 @@ func (m *mongoDB) Close(ctx context.Context) error {
 func (m *mongoDB) Find(ctx context.Context, collection string, dest interface{}, filter interface{}, opts ...*options.FindOptions) error {
 	cursor, err := m.client.Database(m.cfg.DB).Collection(collection).Find(ctx, filter, opts...)
 	if err != nil {
-		return errors.NewWithCode(codes.CodeNoSQLRead, err.Error())
+		return errors.NewWithCode(codes.CodeNoSQLRead, "%s", err.Error())
 	}
 
 	if err := cursor.All(ctx, dest); err != nil {
-		return errors.NewWithCode(codes.CodeNoSQLDecode, err.Error())
+		return errors.NewWithCode(codes.CodeNoSQLDecode, "%s", err.Error())
 	}
 
 	return nil
@@ -79,7 +79,7 @@ func (m *mongoDB) Find(ctx context.Context, collection string, dest interface{},
 func (m *mongoDB) FindOne(ctx context.Context, collection string, dest interface{}, filter interface{}, opts ...*options.FindOneOptions) error {
 	err := m.client.Database(m.cfg.DB).Collection(collection).FindOne(ctx, filter, opts...).Decode(dest)
 	if err != nil {
-		return errors.NewWithCode(codes.CodeNoSQLDecode, err.Error())
+		return errors.NewWithCode(codes.CodeNoSQLDecode, "%s", err.Error())
 	}
 
 	return nil
@@ -88,7 +88,7 @@ func (m *mongoDB) FindOne(ctx context.Context, collection string, dest interface
 func (m *mongoDB) InsertOne(ctx context.Context, collection string, data interface{}) (*mongo.InsertOneResult, error) {
 	insertResult, err := m.client.Database(m.cfg.DB).Collection(collection).InsertOne(ctx, data)
 	if err != nil {
-		return nil, errors.NewWithCode(codes.CodeNoSQLInsert, err.Error())
+		return nil, errors.NewWithCode(codes.CodeNoSQLInsert, "%s", err.Error())
 	}
 
 	return insertResult, nil
@@ -97,7 +97,7 @@ func (m *mongoDB) InsertOne(ctx context.Context, collection string, data interfa
 func (m *mongoDB) UpdateOne(ctx context.Context, collection string, filter interface{}, update interface{}, opts ...*options.UpdateOptions) (*mongo.UpdateResult, error) {
 	updateResult, err := m.client.Database(m.cfg.DB).Collection(collection).UpdateOne(ctx, filter, update, opts...)
 	if err != nil {
-		return nil, errors.NewWithCode(codes.CodeNoSQLUpdate, err.Error())
+		return nil, errors.NewWithCode(codes.CodeNoSQLUpdate, "%s", err.Error())
 	}
 
 	return updateResult, nil
@@ -106,7 +106,7 @@ func (m *mongoDB) UpdateOne(ctx context.Context, collection string, filter inter
 func (m *mongoDB) UpdateMany(ctx context.Context, collection string, filter interface{}, update interface{}, opts ...*options.UpdateOptions) (*mongo.UpdateResult, error) {
 	updateResult, err := m.client.Database(m.cfg.DB).Collection(collection).UpdateMany(ctx, filter, update, opts...)
 	if err != nil {
-		return nil, errors.NewWithCode(codes.CodeNoSQLUpdate, err.Error())
+		return nil, errors.NewWithCode(codes.CodeNoSQLUpdate, "%s", err.Error())
 	}
 
 	return updateResult, nil

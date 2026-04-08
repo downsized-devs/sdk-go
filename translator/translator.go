@@ -69,7 +69,7 @@ func parseLanguageId(conf Config) (locales.Translator, []locales.Translator, err
 		case language.Indonesian:
 			locales = append(locales, id.New())
 		default:
-			return nil, nil, errors.NewWithCode(codes.CodeTranslatorError, fmt.Sprintf("unsupported languages ID %s", v))
+			return nil, nil, errors.NewWithCode(codes.CodeTranslatorError, "unsupported languages ID %s", v)
 		}
 	}
 
