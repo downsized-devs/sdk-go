@@ -14,6 +14,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var ErrNotFound = sql.ErrNoRows
@@ -199,6 +200,8 @@ func (s *sqlDB) getURI(conf ConnConfig) (string, error) {
 			ssl = `true`
 		}
 		return fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?tls=%s&parseTime=true", conf.User, conf.Password, conf.Host, conf.Port, conf.DB, ssl), nil
+		case "sqlite3":
+		return conf.DB, nil
 	default:
 		return "", fmt.Errorf(`DB Driver [%s] is not supported`, s.cfg.Driver)
 	}
