@@ -14,7 +14,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 var ErrNotFound = sql.ErrNoRows
@@ -157,7 +157,7 @@ func (s *sqlDB) connect(toLeader bool) (*sqlx.DB, error) {
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, errors.NewWithCode(codes.CodeSQLInit, err.Error())
+		return nil, errors.NewWithCode(codes.CodeSQLInit, "%s", err.Error())
 	}
 
 	sqlxDB := sqlx.NewDb(db, s.cfg.Driver)

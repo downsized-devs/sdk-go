@@ -49,7 +49,7 @@ func (t *emailtemplate) FromHTML(params BodyFromHTMLParams) (string, error) {
 	if !ok {
 		tmpl, err = template.New(params.Filename).Funcs(template.FuncMap(params.FuncMap)).ParseFiles(filePath)
 		if err != nil {
-			return "", errors.NewWithCode(codes.CodeParseHTMlTemplateFailed, err.Error())
+			return "", errors.NewWithCode(codes.CodeParseHTMlTemplateFailed, "%s", err.Error())
 		}
 
 		t.template[filePath] = tmpl
@@ -57,7 +57,7 @@ func (t *emailtemplate) FromHTML(params BodyFromHTMLParams) (string, error) {
 
 	body := new(bytes.Buffer)
 	if err := tmpl.Execute(body, params.Data); err != nil {
-		return "", errors.NewWithCode(codes.CodeParseHTMlTemplateFailed, err.Error())
+		return "", errors.NewWithCode(codes.CodeParseHTMlTemplateFailed, "%s", err.Error())
 	}
 
 	return body.String(), nil
@@ -77,7 +77,7 @@ func (t *emailtemplate) FromMJML(ctx context.Context, params BodyFromMJMLParams)
 	if !ok {
 		tmpl, err = template.New(params.Filename).Funcs(template.FuncMap(params.FuncMap)).ParseFiles(filePath)
 		if err != nil {
-			return "", errors.NewWithCode(codes.CodeParseHTMlTemplateFailed, err.Error())
+			return "", errors.NewWithCode(codes.CodeParseHTMlTemplateFailed, "%s", err.Error())
 		}
 
 		t.template[filePath] = tmpl
@@ -85,7 +85,7 @@ func (t *emailtemplate) FromMJML(ctx context.Context, params BodyFromMJMLParams)
 
 	bodyMjml := new(bytes.Buffer)
 	if err := tmpl.Execute(bodyMjml, params.Data); err != nil {
-		return "", errors.NewWithCode(codes.CodeConvertMJMLToHTMLFailed, err.Error())
+		return "", errors.NewWithCode(codes.CodeConvertMJMLToHTMLFailed, "%s", err.Error())
 	}
 
 	var mjmlErr mjml.Error
@@ -95,7 +95,7 @@ func (t *emailtemplate) FromMJML(ctx context.Context, params BodyFromMJMLParams)
 			t.log.Error(ctx, mjmlErr.Message)
 			t.log.Error(ctx, mjmlErr.Details)
 		}
-		return "", errors.NewWithCode(codes.CodeConvertMJMLToHTMLFailed, err.Error())
+		return "", errors.NewWithCode(codes.CodeConvertMJMLToHTMLFailed, "%s", err.Error())
 	}
 
 	return body, nil
