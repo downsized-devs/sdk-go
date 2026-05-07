@@ -130,37 +130,61 @@ func (i *instrument) IsEnabled() bool {
 }
 
 func (i *instrument) MetricsHandler() http.Handler {
+	if !i.cfg.Metrics.Enabled {
+		return http.NotFoundHandler()
+	}
 	return promhttp.InstrumentMetricHandler(
 		i.prome.registerer, promhttp.HandlerFor(i.prome.gatherer, promhttp.HandlerOpts{}),
 	)
 }
 
 func (i *instrument) HTTPRequestTimer(path, method string) *prometheus.Timer {
+	if !i.cfg.Metrics.Enabled {
+		return prometheus.NewTimer(prometheus.ObserverFunc(func(float64) {}))
+	}
 	return prometheus.NewTimer(i.requestDuration.WithLabelValues(path, method))
 }
 
 func (i *instrument) HTTPRequestCounter(path, method string) {
+	if !i.cfg.Metrics.Enabled {
+		return
+	}
 	i.requestTotal.WithLabelValues(path, method).Inc()
 }
 
 func (i *instrument) HTTPResponseStatusCounter(code int) {
+	if !i.cfg.Metrics.Enabled {
+		return
+	}
 	i.responseStatus.WithLabelValues(strconv.Itoa(code)).Inc()
 }
 
 func (i *instrument) DatabaseQueryTimer(dbname, conntype, queryname string) *prometheus.Timer {
+	if !i.cfg.Metrics.Enabled {
+		return prometheus.NewTimer(prometheus.ObserverFunc(func(float64) {}))
+	}
 	return prometheus.NewTimer(i.dbQueryDuration.WithLabelValues(dbname, conntype, queryname))
 }
 
 func (i *instrument) RegisterDBStats(db *sql.DB, dbname string) {
+	if !i.cfg.Metrics.Enabled {
+		return
+	}
 	i.prome.registerer.MustRegister(collectors.NewDBStatsCollector(db, dbname))
 }
 
 // SchedulerRunningCounter increments the running-scheduler counter.
 func (i *instrument) SchedulerRunningCounter(schedulername string) {
+	if !i.cfg.Metrics.Enabled {
+		return
+	}
 	i.schedulerTotal.WithLabelValues(schedulername).Inc()
 }
 
 // SchedulerRunningTimer returns a duration timer for the named scheduler.
 func (i *instrument) SchedulerRunningTimer(schedulername string) *prometheus.Timer {
+	if !i.cfg.Metrics.Enabled {
+		return prometheus.NewTimer(prometheus.ObserverFunc(func(float64) {}))
+	}
 	return prometheus.NewTimer(i.schedulerDuration.WithLabelValues(schedulername))
 }

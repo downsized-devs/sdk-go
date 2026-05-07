@@ -22,15 +22,14 @@ func Test_instrument_HTTPRequestTimer(t *testing.T) {
 	}
 	tests := []struct {
 		name     string
-		mockFunc func(c Config, a args)
+		mockFunc func(i *instrument, a args)
 		config   Config
 		args     args
 		want     want
 	}{
 		{
 			name: "ok",
-			mockFunc: func(c Config, a args) {
-				i := Init(c).(*instrument)
+			mockFunc: func(i *instrument, a args) {
 				timer := i.HTTPRequestTimer(a.path, a.method)
 				timer.ObserveDuration()
 			},
@@ -51,7 +50,7 @@ func Test_instrument_HTTPRequestTimer(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			instr := Init(tt.config).(*instrument)
-			tt.mockFunc(tt.config, tt.args)
+			tt.mockFunc(instr, tt.args)
 			assert.Equal(t, tt.want.labelCount, testutil.CollectAndCount(instr.requestDuration))
 		})
 	}
