@@ -36,13 +36,13 @@ type Interface interface {
 }
 
 type instrument struct {
-	cfg              Config
-	prome            promeRegistry
-	requestTotal     *prometheus.CounterVec
-	responseStatus   *prometheus.CounterVec
-	requestDuration  *prometheus.HistogramVec
-	dbQueryDuration  *prometheus.HistogramVec
-	schedulerTotal   *prometheus.CounterVec
+	cfg               Config
+	prome             promeRegistry
+	requestTotal      *prometheus.CounterVec
+	responseStatus    *prometheus.CounterVec
+	requestDuration   *prometheus.HistogramVec
+	dbQueryDuration   *prometheus.HistogramVec
+	schedulerTotal    *prometheus.CounterVec
 	schedulerDuration *prometheus.HistogramVec
 }
 
