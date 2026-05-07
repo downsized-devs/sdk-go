@@ -5,9 +5,9 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/hmac"
-	"crypto/md5" //nolint:gosec
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
@@ -204,5 +204,5 @@ func (s *security) b64Stddecode(ctx context.Context, str string) []byte {
 }
 
 func (s *security) areBytesEqual(a, b []byte) bool {
-	return md5.Sum(a) == md5.Sum(b) //nolint:gosec
+	return subtle.ConstantTimeCompare(a, b) == 1
 }

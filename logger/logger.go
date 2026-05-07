@@ -6,7 +6,6 @@ import (
 	"os"
 	"runtime/debug"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/downsized-devs/sdk-go/appcontext"
@@ -15,13 +14,17 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var once = sync.Once{}
 var now = time.Now
 
+// defaultCallerSkipFrameCount is the default number of stack frames to skip
+// when reporting the caller location in log entries.
+const defaultCallerSkipFrameCount = 3
+
 type Interface interface {
-	// TODO add Debugf
 	Trace(ctx context.Context, obj any)
 	Debug(ctx context.Context, obj any)
+	// Debugf logs a formatted debug message.
+	Debugf(ctx context.Context, format string, args ...any)
 	Info(ctx context.Context, obj any)
 	Warn(ctx context.Context, obj any)
 	Error(ctx context.Context, obj any)
@@ -31,6 +34,9 @@ type Interface interface {
 
 type Config struct {
 	Level string
+	// CallerSkipFrameCount controls how many additional stack frames are
+	// skipped when reporting the caller.  A value of 0 uses the default (3).
+	CallerSkipFrameCount int
 }
 
 type logger struct {
@@ -42,29 +48,33 @@ func DefaultLogger() Interface {
 		log: zerolog.New(os.Stdout).
 			With().
 			Timestamp().
-			CallerWithSkipFrameCount(3). // Hard code to 3 for now.
+			CallerWithSkipFrameCount(defaultCallerSkipFrameCount).
 			Logger().
 			Level(zerolog.DebugLevel),
 	}
 }
 
+// Init creates a new logger configured according to cfg.  Each call returns an
+// independent logger instance; there is no global singleton.
 func Init(cfg Config) Interface {
-	var zeroLogging zerolog.Logger
-	once.Do(func() {
-		level, err := zerolog.ParseLevel(cfg.Level)
-		if err != nil {
-			log.Fatal().Msg(fmt.Sprintf("failed to parse error level with err: %v", err))
-		}
+	level, err := zerolog.ParseLevel(cfg.Level)
+	if err != nil {
+		log.Fatal().Msg(fmt.Sprintf("failed to parse log level %q: %v", cfg.Level, err))
+	}
 
-		zeroLogging = zerolog.New(os.Stdout).
-			With().
-			Timestamp().
-			CallerWithSkipFrameCount(3). // Hard code to 3 for now.
-			Logger().
-			Level(level)
-	})
+	skipFrames := defaultCallerSkipFrameCount
+	if cfg.CallerSkipFrameCount > 0 {
+		skipFrames = cfg.CallerSkipFrameCount
+	}
 
-	return &logger{log: zeroLogging}
+	zl := zerolog.New(os.Stdout).
+		With().
+		Timestamp().
+		CallerWithSkipFrameCount(skipFrames).
+		Logger().
+		Level(level)
+
+	return &logger{log: zl}
 }
 
 func (l *logger) Trace(ctx context.Context, obj any) {
@@ -77,6 +87,12 @@ func (l *logger) Debug(ctx context.Context, obj any) {
 	l.log.Debug().
 		Fields(getContextFields(ctx)).
 		Msg(fmt.Sprint(getCaller(obj)))
+}
+
+func (l *logger) Debugf(ctx context.Context, format string, args ...any) {
+	l.log.Debug().
+		Fields(getContextFields(ctx)).
+		Msg(fmt.Sprintf(format, args...))
 }
 
 func (l *logger) Info(ctx context.Context, obj any) {
@@ -113,7 +129,7 @@ func (l *logger) Panic(obj any) {
 func getPanicStacktrace() map[string]any {
 	errStack := strings.Split(strings.ReplaceAll(string(debug.Stack()), "\t", ""), "\n")
 	return map[string]any{
-		"stracktrace": errStack,
+		"stacktrace": errStack,
 	}
 }
 

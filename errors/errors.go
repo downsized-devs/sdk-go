@@ -23,6 +23,12 @@ func (e *App) Error() string {
 	return e.sys.Error()
 }
 
+// Unwrap returns the underlying error so that errors.Is and errors.As can
+// traverse the chain through an App value.
+func (e *App) Unwrap() error {
+	return e.sys
+}
+
 // Compile returns an error and creates new App errors
 func Compile(err error, lang string) (int, App) {
 	code := GetCode(err)
@@ -47,6 +53,13 @@ func Compile(err error, lang string) (int, App) {
 
 func NewWithCode(code codes.Code, msg string, val ...interface{}) error {
 	return create(nil, code, msg, val...)
+}
+
+// WrapWithCode wraps an existing error with a new message and error code,
+// preserving the original error as the cause so that errors.Is / errors.As
+// continue to work across the chain.
+func WrapWithCode(err error, code codes.Code, msg string, val ...interface{}) error {
+	return create(err, code, msg, val...)
 }
 
 // Implement golang errors.Is, reports whether any error in err's chain matches target.

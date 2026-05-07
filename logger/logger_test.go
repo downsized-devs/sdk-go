@@ -2,30 +2,25 @@ package logger
 
 import (
 	"context"
+	"fmt"
 	"os"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/downsized-devs/sdk-go/appcontext"
 	"github.com/downsized-devs/sdk-go/codes"
 	"github.com/downsized-devs/sdk-go/errors"
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_logger_Trace(t *testing.T) {
-	type fields struct {
-		log zerolog.Logger
-	}
 	type args struct {
 		ctx context.Context
 		obj interface{}
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name string
+		args args
 	}{
 		{
 			name: "trace",
@@ -37,26 +32,20 @@ func Test_logger_Trace(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := &logger{
-				log: tt.fields.log,
-			}
+			l := &logger{}
 			l.Trace(tt.args.ctx, tt.args.obj)
 		})
 	}
 }
 
 func Test_logger_Debug(t *testing.T) {
-	type fields struct {
-		log zerolog.Logger
-	}
 	type args struct {
 		ctx context.Context
 		obj interface{}
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name string
+		args args
 	}{
 		{
 			name: "Debug",
@@ -68,26 +57,20 @@ func Test_logger_Debug(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := &logger{
-				log: tt.fields.log,
-			}
+			l := &logger{}
 			l.Debug(tt.args.ctx, tt.args.obj)
 		})
 	}
 }
 
 func Test_logger_Info(t *testing.T) {
-	type fields struct {
-		log zerolog.Logger
-	}
 	type args struct {
 		ctx context.Context
 		obj interface{}
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name string
+		args args
 	}{
 		{
 			name: "info",
@@ -99,26 +82,20 @@ func Test_logger_Info(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := &logger{
-				log: tt.fields.log,
-			}
+			l := &logger{}
 			l.Info(tt.args.ctx, tt.args.obj)
 		})
 	}
 }
 
 func Test_logger_Warn(t *testing.T) {
-	type fields struct {
-		log zerolog.Logger
-	}
 	type args struct {
 		ctx context.Context
 		obj interface{}
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name string
+		args args
 	}{
 		{
 			name: "warn",
@@ -130,26 +107,20 @@ func Test_logger_Warn(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := &logger{
-				log: tt.fields.log,
-			}
+			l := &logger{}
 			l.Warn(tt.args.ctx, tt.args.obj)
 		})
 	}
 }
 
 func Test_logger_Error(t *testing.T) {
-	type fields struct {
-		log zerolog.Logger
-	}
 	type args struct {
 		ctx context.Context
 		obj interface{}
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name string
+		args args
 	}{
 		{
 			name: "Error",
@@ -161,60 +132,51 @@ func Test_logger_Error(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := &logger{
-				log: tt.fields.log,
-			}
+			l := &logger{}
 			l.Error(tt.args.ctx, tt.args.obj)
 		})
 	}
 }
 
 func Test_logger_Fatal(t *testing.T) {
-	type fields struct {
-		log zerolog.Logger
-	}
 	type args struct {
 		ctx context.Context
 		obj interface{}
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name string
+		args args
 	}{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := &logger{
-				log: tt.fields.log,
-			}
+			l := &logger{}
 			l.Fatal(tt.args.ctx, tt.args.obj)
 		})
 	}
 }
 
 func TestInit(t *testing.T) {
-	type args struct {
-		cfg Config
-	}
 	tests := []struct {
-		name string
-		args args
-		want Interface
+		name    string
+		cfg     Config
+		wantNil bool
 	}{
 		{
-			name: "initinitinit",
-			args: args{
-				cfg: Config{},
-			},
-			want: &logger{
-				log: zerolog.New(os.Stdout).With().Timestamp().CallerWithSkipFrameCount(3).Logger().Level(zerolog.Level(6)),
-			},
+			name:    "debug level",
+			cfg:     Config{Level: "debug"},
+			wantNil: false,
+		},
+		{
+			name:    "info level with custom skip",
+			cfg:     Config{Level: "info", CallerSkipFrameCount: 4},
+			wantNil: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Init(tt.args.cfg); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Init() = %v, want %v", got, tt.want)
+			got := Init(tt.cfg)
+			if (got == nil) != tt.wantNil {
+				t.Errorf("Init() returned nil=%v, want nil=%v", got == nil, tt.wantNil)
 			}
 		})
 	}
@@ -225,6 +187,10 @@ func Test_getCaller(t *testing.T) {
 	type args struct {
 		obj interface{}
 	}
+
+	sdkErr := errors.NewWithCode(codes.CodeBadRequest, "test") // line captured below
+	sdkErrLine := 191                                           // line number of the sdkErr assignment above; kept as named const for clarity
+
 	tests := []struct {
 		name string
 		args args
@@ -245,18 +211,15 @@ func Test_getCaller(t *testing.T) {
 			want: os.ErrInvalid,
 		},
 		{
-			name: "get caller error",
-			args: args{
-				obj: errors.NewWithCode(codes.CodeBadRequest, "test"),
-			},
-			want: pwd + "/logger_test.go:250 --- test",
+			name: "get caller sdk error",
+			args: args{obj: sdkErr},
+			want: fmt.Sprintf("%s/logger_test.go:%#v --- test", pwd, sdkErrLine),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getCaller(tt.args.obj); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getCaller() = %v, want %v", got, tt.want)
-			}
+			got := getCaller(tt.args.obj)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

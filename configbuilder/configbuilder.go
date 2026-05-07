@@ -43,8 +43,9 @@ func (b *configBuilder) BuildConfig() {
 	}
 
 	params := viper.New()
-
-	// TODO: set up config source
+	// Read template variables from environment variables so that callers can
+	// supply values without hard-coding them in the template file.
+	params.AutomaticEnv()
 
 	body, err := os.ReadFile(b.opt.TemplateFile)
 	if err != nil {

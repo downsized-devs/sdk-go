@@ -17,12 +17,41 @@ type DisplayMessage struct {
 	Body       string `json:"body"`
 }
 
-// * Important: For new codes, please add them to the bottom of corresponding list to avoid changing existing codes and potentially breaking existing flow
+// Reserved code ranges — add new SDK groups at the bottom and keep each
+// group within its allocated block to avoid accidental overlap.
+//
+//	10   – 99    Success codes
+//	1000 – 1299  Common / generic errors
+//	1300 – 1399  SQL errors
+//	1400 – 1499  NoSQL errors
+//	1500 – 1599  Third-party / client errors
+//	1600 – 1699  File I/O errors
+//	1700 – 1799  Auth errors
+//	1800 – 1899  (reserved)
+//	1900 – 1949  JSON encoding errors
+//	1950 – 1999  XML encoding errors
+//	2000 – 2099  Excel errors
+//	2100 – 2199  Storage errors
+//	2200 – 2299  Data-conversion errors
+//	3700 – 3799  Email / SES errors
+//	3800 – 3899  Password-reset errors
+//	3900 – 3999  Redis / cache errors
+//	4000 – 4099  HTTP client errors
+//	4100 – 4199  Feature-flag errors
+//	4200 – 4599  Template / PDF errors
+//	4600 – 4699  Slack alert errors
+//	4700 – 4799  Security errors
+//	4800 – 4899  Time-lib errors
+//	5000 – 5099  Translator errors
+//	5100 – 5199  Image-upload errors
+
+// * Important: For new codes, please add them to the bottom of the corresponding
+// * list to avoid changing existing codes and potentially breaking existing flows.
 
 const NoCode Code = math.MaxUint32
 
 const (
-	// Success code
+	// Success codes
 	CodeSuccess = Code(iota + 10)
 	CodeAccepted
 )
@@ -140,41 +169,6 @@ const (
 )
 
 const (
-	// Farm Errors
-	CodeFarmError = Code(iota + 3100)
-	CodeFarmNotFound
-	CodeFarmNoActivePond
-)
-
-const (
-	// Module Errors
-	CodeModuleError = Code(iota + 3200)
-	CodeModuleNotFound
-)
-
-const (
-	// Pond Errors
-	CodePondError = Code(iota + 3300)
-	CodePondNotFound
-)
-
-const (
-	// Cycle Errors
-	CodeCycleError = Code(iota + 3400)
-	CodeCycleNotFound
-	CodeCycleEndFailedNoActivePond
-	CodeCycleEndFailedNoSelectedPond
-	CodeCycleStartFailedNameTooLong
-	CodeCycleStartFailedOngoingCycle
-)
-
-const (
-	// Metrics Errors
-	CodeMetricsError = Code(iota + 3500)
-	CodeMetricsProductivityNoDaily
-)
-
-const (
 	// SES Errors
 	CodeSendEmailFailed = Code(iota + 3700)
 )
@@ -250,12 +244,6 @@ const (
 const (
 	// Timelib error
 	CodeErrorTimelib = Code(iota + 4800)
-)
-
-const (
-	// Pond Disease Errors
-	CodePondDiseaseError = Code(iota + 4900)
-	CodePondDiseaseNotFound
 )
 
 const (
