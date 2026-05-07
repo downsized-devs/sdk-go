@@ -34,8 +34,8 @@ type Interface interface {
 
 type Config struct {
 	Level string
-	// CallerSkipFrameCount controls how many additional stack frames are
-	// skipped when reporting the caller.  A value of 0 uses the default (3).
+	// CallerSkipFrameCount controls the total number of stack frames skipped
+	// when reporting the caller. A value of 0 uses the default (3).
 	CallerSkipFrameCount int
 }
 
