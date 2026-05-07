@@ -74,8 +74,8 @@ func As(err error, target any) bool {
 }
 
 func GetCaller(err error) (string, int, string, error) {
-	st, ok := err.(*stacktrace) //nolint: errorlint
-	if !ok {
+	var st *stacktrace
+	if !goerr.As(err, &st) {
 		return "", 0, "", create(nil, codes.NoCode, "failed to cast to stacktrace")
 	}
 
@@ -127,8 +127,9 @@ func shortFuncName(f *runtime.Func) string {
 }
 
 func GetCode(err error) codes.Code {
-	if err, ok := err.(*stacktrace); ok { //nolint: errorlint
-		return err.code
+	var st *stacktrace
+	if goerr.As(err, &st) {
+		return st.code
 	}
 	return codes.NoCode
 }

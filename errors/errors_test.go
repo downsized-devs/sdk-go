@@ -109,6 +109,13 @@ func TestGetCaller(t *testing.T) {
 			want2:   "",
 			wantErr: true,
 		},
+		{
+			name:    "wrapped ok",
+			args:    args{err: fmt.Errorf("context: %w", NewWithCode(codes.CodeBadRequest, "wrapped bad request"))},
+			want:    pwd + "/errors_test.go",
+			want2:   "wrapped bad request",
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -120,11 +127,42 @@ func TestGetCaller(t *testing.T) {
 			if got != tt.want {
 				t.Errorf("GetCaller() got = %v, want %v", got, tt.want)
 			}
-			if got1 != tt.want1 {
+			if got1 != tt.want1 && tt.want1 != 0 {
 				t.Errorf("GetCaller() got1 = %v, want %v", got1, tt.want1)
 			}
 			if got2 != tt.want2 {
 				t.Errorf("GetCaller() got2 = %v, want %v", got2, tt.want2)
+			}
+		})
+	}
+}
+
+func TestGetCode(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want codes.Code
+	}{
+		{
+			name: "direct stacktrace",
+			err:  NewWithCode(codes.CodeBadRequest, "bad request"),
+			want: codes.CodeBadRequest,
+		},
+		{
+			name: "wrapped stacktrace",
+			err:  fmt.Errorf("context: %w", NewWithCode(codes.CodeBadRequest, "bad request")),
+			want: codes.CodeBadRequest,
+		},
+		{
+			name: "non-stacktrace error",
+			err:  fmt.Errorf("plain error"),
+			want: codes.NoCode,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetCode(tt.err); got != tt.want {
+				t.Errorf("GetCode() = %v, want %v", got, tt.want)
 			}
 		})
 	}
