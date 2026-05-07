@@ -86,20 +86,22 @@ func TestGetCaller(t *testing.T) {
 		err error
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    string
-		want1   int
-		want2   string
-		wantErr bool
+		name            string
+		args            args
+		want            string
+		want1           int
+		checkLineNumber bool
+		want2           string
+		wantErr         bool
 	}{
 		{
-			name:    "ok",
-			args:    args{err: NewWithCode(codes.CodeBadRequest, "bad request")},
-			want:    pwd + "/errors_test.go",
-			want1:   98,
-			want2:   "bad request",
-			wantErr: false,
+			name:            "ok",
+			args:            args{err: NewWithCode(codes.CodeBadRequest, "bad request")},
+			want:            pwd + "/errors_test.go",
+			want1:           99,
+			checkLineNumber: true,
+			want2:           "bad request",
+			wantErr:         false,
 		},
 		{
 			name:    "not ok",
@@ -127,7 +129,7 @@ func TestGetCaller(t *testing.T) {
 			if got != tt.want {
 				t.Errorf("GetCaller() got = %v, want %v", got, tt.want)
 			}
-			if got1 != tt.want1 && tt.want1 != 0 {
+			if tt.checkLineNumber && got1 != tt.want1 {
 				t.Errorf("GetCaller() got1 = %v, want %v", got1, tt.want1)
 			}
 			if got2 != tt.want2 {
