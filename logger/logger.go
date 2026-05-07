@@ -92,7 +92,7 @@ func (l *logger) Debug(ctx context.Context, obj any) {
 func (l *logger) Debugf(ctx context.Context, format string, args ...any) {
 	l.log.Debug().
 		Fields(getContextFields(ctx)).
-		Msg(fmt.Sprintf(format, args...))
+		Msgf(format, args...)
 }
 
 func (l *logger) Info(ctx context.Context, obj any) {
