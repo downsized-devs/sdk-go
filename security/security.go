@@ -204,5 +204,11 @@ func (s *security) b64Stddecode(ctx context.Context, str string) []byte {
 }
 
 func (s *security) areBytesEqual(a, b []byte) bool {
-	return subtle.ConstantTimeCompare(a, b) == 1
+	normalizedB := make([]byte, len(a))
+	copy(normalizedB, b)
+
+	contentEqual := subtle.ConstantTimeCompare(a, normalizedB)
+	lengthEqual := subtle.ConstantTimeEq(int32(len(a)), int32(len(b)))
+
+	return contentEqual&lengthEqual == 1
 }
