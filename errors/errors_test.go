@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"runtime"
 	"testing"
 
 	"github.com/downsized-devs/sdk-go/codes"
@@ -82,6 +83,13 @@ func TestCompile(t *testing.T) {
 
 func TestGetCaller(t *testing.T) {
 	pwd, _ := os.Getwd()
+
+	// Capture the error and its creation line at runtime so the test remains
+	// correct regardless of future edits that shift line numbers in this file.
+	sdkErr := NewWithCode(codes.CodeBadRequest, "bad request")
+	_, _, sdkErrLine, _ := runtime.Caller(0)
+	sdkErrLine-- // NewWithCode was called on the line above
+
 	type args struct {
 		err error
 	}
@@ -96,9 +104,9 @@ func TestGetCaller(t *testing.T) {
 	}{
 		{
 			name:            "ok",
-			args:            args{err: NewWithCode(codes.CodeBadRequest, "bad request")},
+			args:            args{err: sdkErr},
 			want:            pwd + "/errors_test.go",
-			want1:           99,
+			want1:           sdkErrLine,
 			checkLineNumber: true,
 			want2:           "bad request",
 			wantErr:         false,
