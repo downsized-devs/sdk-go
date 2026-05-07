@@ -24,7 +24,7 @@ func (e *App) Error() string {
 }
 
 // Unwrap returns the underlying error so that errors.Is and errors.As can
-// traverse the chain through an App value.
+// traverse the chain through a *App value.
 func (e *App) Unwrap() error {
 	return e.sys
 }
