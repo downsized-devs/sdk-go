@@ -189,8 +189,9 @@ func Test_getCaller(t *testing.T) {
 		obj interface{}
 	}
 
-	_, _, sdkErrLine, _ := runtime.Caller(0); sdkErrLine++ // sdkErr is created on the next line
 	sdkErr := errors.NewWithCode(codes.CodeBadRequest, "test")
+	_, _, sdkErrLine, _ := runtime.Caller(0)
+	sdkErrLine-- // sdkErr was created on the line above
 
 	tests := []struct {
 		name string
