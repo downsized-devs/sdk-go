@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"testing"
 	"time"
 
@@ -188,8 +189,8 @@ func Test_getCaller(t *testing.T) {
 		obj interface{}
 	}
 
-	sdkErr := errors.NewWithCode(codes.CodeBadRequest, "test") // line captured below
-	sdkErrLine := 191                                          // line number of the sdkErr assignment above; kept as named const for clarity
+	_, _, sdkErrLine, _ := runtime.Caller(0); sdkErrLine++ // sdkErr is created on the next line
+	sdkErr := errors.NewWithCode(codes.CodeBadRequest, "test")
 
 	tests := []struct {
 		name string
