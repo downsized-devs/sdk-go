@@ -189,7 +189,7 @@ func Test_getCaller(t *testing.T) {
 	}
 
 	sdkErr := errors.NewWithCode(codes.CodeBadRequest, "test") // line captured below
-	sdkErrLine := 191                                           // line number of the sdkErr assignment above; kept as named const for clarity
+	sdkErrLine := 191                                          // line number of the sdkErr assignment above; kept as named const for clarity
 
 	tests := []struct {
 		name string
