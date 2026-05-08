@@ -7,6 +7,14 @@ import (
 	"text/template"
 )
 
+const (
+	apiCreate   = "create"
+	apiEdit     = "edit"
+	apiGet      = "get"
+	apiActivate = "activate"
+	apiDelete   = "delete"
+)
+
 type usecaseItem struct {
 	EntityName          string
 	EntityNameUpper     string
@@ -97,11 +105,11 @@ func (d *usecaseItem) AppendInterfaceAndFunction() error {
 }
 func (d *usecaseItem) appendInterface(lines []string, api string) []string {
 	tempInterface := map[string]string{
-		"create":   "   Create(ctx context.Context, params entity." + d.EntityNameUpper + "CreateParam) (entity." + d.EntityNameUpper + ", error)",
-		"edit":     "	Update(ctx context.Context, updateParam entity." + d.EntityNameUpper + "UpdateParam, selectParam entity." + d.EntityNameUpper + "Param) error",
-		"get":      "	GetListAdmin(ctx context.Context, params entity." + d.EntityNameUpper + "Param) ([]entity." + d.EntityNameUpper + ", *entity.Pagination, error)",
-		"activate": "	Activate(ctx context.Context, params entity." + d.EntityNameUpper + "Param) error",
-		"delete":   "	Delete(ctx context.Context, params entity." + d.EntityNameUpper + "Param) error",
+		apiCreate:   "   Create(ctx context.Context, params entity." + d.EntityNameUpper + "CreateParam) (entity." + d.EntityNameUpper + ", error)",
+		apiEdit:     "	Update(ctx context.Context, updateParam entity." + d.EntityNameUpper + "UpdateParam, selectParam entity." + d.EntityNameUpper + "Param) error",
+		apiGet:      "	GetListAdmin(ctx context.Context, params entity." + d.EntityNameUpper + "Param) ([]entity." + d.EntityNameUpper + ", *entity.Pagination, error)",
+		apiActivate: "	Activate(ctx context.Context, params entity." + d.EntityNameUpper + "Param) error",
+		apiDelete:   "	Delete(ctx context.Context, params entity." + d.EntityNameUpper + "Param) error",
 	}
 	result := []string{}
 	for _, v := range lines {

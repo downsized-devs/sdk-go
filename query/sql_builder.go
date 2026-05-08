@@ -119,7 +119,7 @@ func (s *sqlClausebuilder) AddSuffixQuery(suffix string) *sqlClausebuilder {
 // example: db=id prefix=p result=p.id
 func (s *sqlClausebuilder) AddAliasPrefix(alias string, ptr interface{}) *sqlClausebuilder {
 	p := reflect.ValueOf(ptr)
-	if p.Kind() != reflect.Ptr {
+	if p.Kind() != reflect.Pointer {
 		panic(errors.NewWithCode(codes.CodeInvalidValue, "passed interface{} should be a pointer"))
 	}
 	v := p.Elem()
@@ -136,7 +136,7 @@ func (s *sqlClausebuilder) AddAliasPrefix(alias string, ptr interface{}) *sqlCla
 func (s *sqlClausebuilder) Build(param interface{}) (string, []interface{}, string, []interface{}, error) {
 	// return error if the param is not a pointer or has nil value
 	p := reflect.ValueOf(param)
-	if p.Kind() != reflect.Ptr || p.IsNil() {
+	if p.Kind() != reflect.Pointer || p.IsNil() {
 		return "", nil, "", nil, errors.NewWithCode(codes.CodeInvalidValue, "passed param should be a pointer and cannot be nil")
 	}
 
@@ -191,7 +191,7 @@ func (s *sqlClausebuilder) BuildUpdate(update interface{}, where interface{}) (s
 	u := reflect.ValueOf(update)
 	w := reflect.ValueOf(where)
 
-	if u.Kind() != reflect.Ptr || u.IsNil() || w.Kind() != reflect.Ptr || w.IsNil() {
+	if u.Kind() != reflect.Pointer || u.IsNil() || w.Kind() != reflect.Pointer || w.IsNil() {
 		return "", nil, errors.NewWithCode(codes.CodeInvalidValue, "passed update or where param should be a pointer and cannot be nil")
 	}
 

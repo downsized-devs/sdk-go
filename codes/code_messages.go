@@ -14,6 +14,11 @@ type Message struct {
 	BodyID     string
 }
 
+const (
+	fileUploadFailedTitleEN = "File Upload Failed"
+	fileUploadFailedTitleID = "Data Gagal Diunggah"
+)
+
 // HTTP message
 var (
 	// 4xx
@@ -241,23 +246,23 @@ var (
 
 	ErrMsgFileUploadForwardDate = Message{
 		StatusCode: http.StatusBadRequest,
-		TitleEN:    "File Upload Failed",
-		TitleID:    "Data Gagal Diunggah",
+		TitleEN:    fileUploadFailedTitleEN,
+		TitleID:    fileUploadFailedTitleID,
 		BodyEN:     language.FileUploadForwardDateErrorEN,
 		BodyID:     language.FileUploadForwardDateErrorID,
 	}
 
 	ErrMsgFileInvalidDate = Message{
 		StatusCode: http.StatusBadRequest,
-		TitleEN:    "File Upload Failed",
-		TitleID:    "Data Gagal Diunggah",
+		TitleEN:    fileUploadFailedTitleEN,
+		TitleID:    fileUploadFailedTitleID,
 		BodyEN:     language.FileUploadInvalidDateErrorEN,
 		BodyID:     language.FileUploadInvalidDateErrorID,
 	}
 
 	ErrMsgFileInvalidPondIsNotRegister = Message{
 		StatusCode: http.StatusBadRequest,
-		TitleEN:    "File Upload Failed",
+		TitleEN:    fileUploadFailedTitleEN,
 		TitleID:    "Gagal Mengunggah Berkas",
 		BodyEN:     language.FileUploadInvalidPondIsNotRegisterErrorEN,
 		BodyID:     language.FileUploadInvalidPondIsNotRegisterErrorID,
@@ -345,8 +350,8 @@ var (
 
 	ErrMsgFileUploadInvalidExtension = Message{
 		StatusCode: http.StatusBadRequest,
-		TitleEN:    "File Upload Failed",
-		TitleID:    "Data Gagal Diunggah",
+		TitleEN:    fileUploadFailedTitleEN,
+		TitleID:    fileUploadFailedTitleID,
 		BodyEN:     "File format or file extension not valid",
 		BodyID:     "Format file atau ekstensi file tidak valid",
 	}

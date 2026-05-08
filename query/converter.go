@@ -42,11 +42,21 @@ const (
 	TimeArr
 )
 
+const (
+	nullStringType = "null.String"
+	nullBoolType   = "null.Bool"
+	nullFloatType  = "null.Float64"
+	nullIntType    = "null.Int64"
+	nullTimeType   = "null.Time"
+	nullDateType   = "null.Date"
+	timeType       = "time.Time"
+)
+
 func traverseOnParam(paramTagName, dbTagName, fieldTagName, fieldName, paramTagValue, dbTagValue string, aliasMap map[string]string, p reflect.Value, builderFunc builderFunction) {
 	switch p.Kind() {
 
 	// on pointer/ interface
-	case reflect.Ptr, reflect.Interface:
+	case reflect.Pointer, reflect.Interface:
 
 		if !p.Elem().IsValid() || p.IsNil() {
 			return
@@ -197,17 +207,17 @@ func convertOnTypes(paramTagValue, dbTagValue, fieldName string, e reflect.Value
 }
 
 func isTimeType(e reflect.Value) bool {
-	return e.Kind() == reflect.Struct && (e.Type().String() == "null.Time" || e.Type().String() == "null.Date" || e.Type().String() == "time.Time")
+	return e.Kind() == reflect.Struct && (e.Type().String() == nullTimeType || e.Type().String() == nullDateType || e.Type().String() == timeType)
 }
 
 func isNullType(e reflect.Value) bool {
 	return e.Kind() == reflect.Struct &&
-		(e.Type().String() == "null.String" ||
-			e.Type().String() == "null.Bool" ||
-			e.Type().String() == "null.Float64" ||
-			e.Type().String() == "null.Int64" ||
-			e.Type().String() == "null.Time" ||
-			e.Type().String() == "null.Date")
+		(e.Type().String() == nullStringType ||
+			e.Type().String() == nullBoolType ||
+			e.Type().String() == nullFloatType ||
+			e.Type().String() == nullIntType ||
+			e.Type().String() == nullTimeType ||
+			e.Type().String() == nullDateType)
 }
 
 func getNameFromStructTagOrOriginalName(fieldName string, v reflect.Value, i int) string {
