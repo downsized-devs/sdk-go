@@ -43,7 +43,6 @@ func Test_security_b64Stddecode_InvalidInput(t *testing.T) {
 	}
 }
 
-
 func Test_security_Decrypt_InvalidHex(t *testing.T) {
 	s := &security{log: logger.Init(logger.Config{})}
 	ctx := context.Background()
@@ -70,7 +69,6 @@ func Test_security_Decrypt_WrongKey(t *testing.T) {
 	_, err := s.Decrypt(ctx, "wrong-pass", 1, enc)
 	assert.NotNil(t, err)
 }
-
 
 func Test_security_Encrypt_Decrypt(t *testing.T) {
 	type args struct {
