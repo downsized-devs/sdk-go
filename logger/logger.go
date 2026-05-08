@@ -18,6 +18,15 @@ import (
 var once = sync.Once{}
 var now = time.Now
 
+const (
+	defaultTimeElapsed = "0ms"
+	requestIDKey       = "request_id"
+	userAgentKey       = "user_agent"
+	userIDKey          = "user_id"
+	serviceVersionKey  = "service_version"
+	timeElapsedKey     = "time_elapsed"
+)
+
 type Interface interface {
 	// TODO add Debugf
 	Trace(ctx context.Context, obj any)
@@ -137,17 +146,17 @@ func getContextFields(ctx context.Context) map[string]any {
 	reqstart := appcontext.GetRequestStartTime(ctx)
 	apprespcode := appcontext.GetAppResponseCode(ctx)
 	appErrMsg := appcontext.GetAppErrorMessage(ctx)
-	timeElapsed := "0ms"
+	timeElapsed := defaultTimeElapsed
 	if !time.Time.IsZero(reqstart) {
 		timeElapsed = fmt.Sprintf("%dms", int64(now().Sub(reqstart)/time.Millisecond))
 	}
 
 	cf := map[string]interface{}{
-		"request_id":      appcontext.GetRequestId(ctx),
-		"user_agent":      appcontext.GetUserAgent(ctx),
-		"user_id":         appcontext.GetUserId(ctx),
-		"service_version": appcontext.GetServiceVersion(ctx),
-		"time_elapsed":    timeElapsed,
+		requestIDKey:      appcontext.GetRequestId(ctx),
+		userAgentKey:      appcontext.GetUserAgent(ctx),
+		userIDKey:         appcontext.GetUserId(ctx),
+		serviceVersionKey: appcontext.GetServiceVersion(ctx),
+		timeElapsedKey:    timeElapsed,
 	}
 
 	if apprespcode > 0 {

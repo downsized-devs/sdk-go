@@ -31,7 +31,7 @@ func Test_traverseOnParam(t *testing.T) {
 				paramTagValue: "",
 				dbTagValue:    "",
 				aliasMap:      map[string]string{},
-				p:             reflect.ValueOf(reflect.Ptr),
+				p:             reflect.ValueOf(reflect.Pointer),
 			},
 		},
 	}

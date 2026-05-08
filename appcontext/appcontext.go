@@ -34,6 +34,8 @@ const (
 	serviceName      contextKey = "ServiceName"
 )
 
+const defaultDeviceType = "web"
+
 func SetAcceptLanguage(ctx context.Context, lang string) context.Context {
 	return context.WithValue(ctx, acceptLanguage, lang)
 }
@@ -122,7 +124,7 @@ func GetDeviceType(ctx context.Context) string {
 	platform, ok := ctx.Value(deviceType).(string)
 	if !ok {
 		// return web as the default device type
-		return "web"
+		return defaultDeviceType
 	}
 
 	return platform
