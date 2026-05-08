@@ -177,3 +177,69 @@ func TestGetCode(t *testing.T) {
 		})
 	}
 }
+
+func TestApp_Unwrap(t *testing.T) {
+	inner := NewWithCode(codes.CodeBadRequest, "inner error")
+	app := &App{sys: inner}
+	if got := app.Unwrap(); got != inner {
+		t.Errorf("App.Unwrap() = %v, want %v", got, inner)
+	}
+}
+
+func TestWrapWithCode(t *testing.T) {
+	cause := fmt.Errorf("original error")
+	wrapped := WrapWithCode(cause, codes.CodeBadRequest, "wrapped: %s", "msg")
+	if GetCode(wrapped) != codes.CodeBadRequest {
+		t.Errorf("WrapWithCode() code = %v, want %v", GetCode(wrapped), codes.CodeBadRequest)
+	}
+	// errors.Is must still find the cause
+	if !Is(wrapped, cause) {
+		t.Errorf("WrapWithCode() wrapped error should satisfy errors.Is for the cause")
+	}
+}
+
+func TestIs(t *testing.T) {
+	sentinel := fmt.Errorf("sentinel")
+	wrapped := fmt.Errorf("wrap: %w", sentinel)
+	if !Is(wrapped, sentinel) {
+		t.Errorf("Is() should find sentinel in wrapped chain")
+	}
+	if Is(wrapped, fmt.Errorf("other")) {
+		t.Errorf("Is() should not match unrelated error")
+	}
+}
+
+func TestAs(t *testing.T) {
+	inner := NewWithCode(codes.CodeBadRequest, "bad request")
+	wrapped := fmt.Errorf("wrap: %w", inner)
+	var st *stacktrace
+	if !As(wrapped, &st) {
+		t.Errorf("As() should find *stacktrace in wrapped chain")
+	}
+	if st == nil {
+		t.Errorf("As() should set target to the *stacktrace value")
+	}
+}
+
+func TestStacktrace_Unwrap(t *testing.T) {
+	cause := fmt.Errorf("root cause")
+	err := WrapWithCode(cause, codes.CodeBadRequest, "outer")
+	// Unwrap through the stacktrace should expose the cause
+	if !Is(err, cause) {
+		t.Errorf("stacktrace.Unwrap() should expose cause via errors.Is")
+	}
+}
+
+func TestCompile_Indonesian(t *testing.T) {
+	got, _ := Compile(NewWithCode(codes.CodeAuthFailure, "auth failed"), "id")
+	if got != 401 {
+		t.Errorf("Compile(Indonesian) got status %d, want 401", got)
+	}
+}
+
+func TestNewWithCode_Formatting(t *testing.T) {
+	err := NewWithCode(codes.CodeBadRequest, "value is %d", 42)
+	if err.Error() != "value is 42" {
+		t.Errorf("NewWithCode() message = %q, want %q", err.Error(), "value is 42")
+	}
+}

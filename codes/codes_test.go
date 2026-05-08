@@ -23,6 +23,26 @@ func TestCompile(t *testing.T) {
 			args: args{code: CodeSuccess, lang: language.English},
 			want: DisplayMessage{StatusCode: http.StatusOK, Title: "OK", Body: "Request successful"},
 		},
+		{
+			name: "default success message in indonesian",
+			args: args{code: CodeSuccess, lang: language.Indonesian},
+			want: DisplayMessage{StatusCode: http.StatusOK, Title: "OK", Body: "Request berhasil"},
+		},
+		{
+			name: "code not in ApplicationMessages uses default",
+			args: args{code: CodeBadRequest, lang: language.English},
+			want: DisplayMessage{StatusCode: http.StatusOK, Title: "OK", Body: "Request successful"},
+		},
+		{
+			name: "code in ApplicationMessages - english",
+			args: args{code: CodeAccepted, lang: language.English},
+			want: DisplayMessage{StatusCode: http.StatusAccepted, Title: "Accepted", Body: "Request accepted"},
+		},
+		{
+			name: "code in ApplicationMessages - indonesian",
+			args: args{code: CodeAccepted, lang: language.Indonesian},
+			want: DisplayMessage{StatusCode: http.StatusAccepted, Title: "Diterima", Body: "Request diterima"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

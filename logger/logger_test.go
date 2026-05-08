@@ -226,6 +226,32 @@ func Test_getCaller(t *testing.T) {
 	}
 }
 
+func TestDefaultLogger(t *testing.T) {
+	l := DefaultLogger()
+	if l == nil {
+		t.Error("DefaultLogger() should not return nil")
+	}
+}
+
+func Test_logger_Debugf(t *testing.T) {
+	l := &logger{}
+	// Should not panic
+	l.Debugf(context.Background(), "hello %s", "world")
+}
+
+func Test_logger_Panic(t *testing.T) {
+	l := &logger{}
+	// Panic has an internal recover(); calling it should not panic the test.
+	l.Panic("panic message")
+}
+
+func Test_getPanicStacktrace(t *testing.T) {
+	fields := getPanicStacktrace()
+	if _, ok := fields["stacktrace"]; !ok {
+		t.Errorf("getPanicStacktrace() missing 'stacktrace' key, got %v", fields)
+	}
+}
+
 func Test_getContextFields(t *testing.T) {
 	mockTime := time.Now()
 
@@ -276,6 +302,18 @@ func Test_getContextFields(t *testing.T) {
 			args: args{ctx: appcontext.SetAppResponseCode(context.Background(), codes.CodeInvalidValue)},
 			want: map[string]interface{}{
 				"app_resp_code":   codes.CodeInvalidValue,
+				"request_id":      "",
+				"service_version": "",
+				"time_elapsed":    "0ms",
+				"user_agent":      "",
+				"user_id":         0,
+			},
+		},
+		{
+			name: "get context fields app error message",
+			args: args{ctx: appcontext.SetAppErrorMessage(context.Background(), "something went wrong")},
+			want: map[string]interface{}{
+				"app_err_msg":     "something went wrong",
 				"request_id":      "",
 				"service_version": "",
 				"time_elapsed":    "0ms",
