@@ -17,6 +17,7 @@ type Message struct {
 const (
 	fileUploadFailedTitleEN = "File Upload Failed"
 	fileUploadFailedTitleID = "Data Gagal Diunggah"
+	requestSuccessfulBodyEN = "Request successful"
 )
 
 // HTTP message
@@ -579,7 +580,7 @@ var (
 		StatusCode: http.StatusOK,
 		TitleEN:    language.HTTPStatusText(language.English, http.StatusOK),
 		TitleID:    language.HTTPStatusText(language.Indonesian, http.StatusOK),
-		BodyEN:     "Request successful",
+		BodyEN:     requestSuccessfulBodyEN,
 		BodyID:     "Request berhasil",
 	}
 	SuccessAccepted = Message{

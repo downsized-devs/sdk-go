@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -181,8 +182,8 @@ func TestGetCode(t *testing.T) {
 func TestApp_Unwrap(t *testing.T) {
 	inner := NewWithCode(codes.CodeBadRequest, "inner error")
 	app := &App{sys: inner}
-	if got := app.Unwrap(); got != inner {
-		t.Errorf("App.Unwrap() = %v, want %v", got, inner)
+	if got := app.Unwrap(); !errors.Is(got, inner) {
+		t.Errorf("App.Unwrap() = %v, want error matching %v", got, inner)
 	}
 }
 
