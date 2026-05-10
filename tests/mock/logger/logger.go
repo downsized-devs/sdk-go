@@ -51,6 +51,23 @@ func (mr *MockInterfaceMockRecorder) Debug(ctx, obj any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Debug", reflect.TypeOf((*MockInterface)(nil).Debug), ctx, obj)
 }
 
+// Debugf mocks base method.
+func (m *MockInterface) Debugf(ctx context.Context, format string, args ...any) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, format}
+	for _, a := range args {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "Debugf", varargs...)
+}
+
+// Debugf indicates an expected call of Debugf.
+func (mr *MockInterfaceMockRecorder) Debugf(ctx, format any, args ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, format}, args...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Debugf", reflect.TypeOf((*MockInterface)(nil).Debugf), varargs...)
+}
+
 // Error mocks base method.
 func (m *MockInterface) Error(ctx context.Context, obj any) {
 	m.ctrl.T.Helper()

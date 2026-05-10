@@ -18,6 +18,9 @@ import (
 	"google.golang.org/api/option"
 )
 
+// contextKey is a package-local type used for auth context values.
+// It is intentionally distinct from appcontext.contextKey to avoid
+// collisions when both packages store values in the same context.
 type contextKey string
 
 const (

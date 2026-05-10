@@ -76,6 +76,9 @@ func (c *cache) connect(ctx context.Context) {
 	}
 
 	if c.conf.TLS.Enabled {
+		if c.conf.TLS.InsecureSkipVerify {
+			c.log.Warn(ctx, "redis TLS: InsecureSkipVerify is enabled — TLS certificate verification is disabled; do not use this in production")
+		}
 		redisOpts.TLSConfig = &tls.Config{
 			InsecureSkipVerify: c.conf.TLS.InsecureSkipVerify, //nolint:gosec
 		}

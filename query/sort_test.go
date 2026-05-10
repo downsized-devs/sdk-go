@@ -173,3 +173,41 @@ func Test_validatePage(t *testing.T) {
 		})
 	}
 }
+
+func Test_normalizeSortBy(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []string
+		want  []string
+	}{
+		{
+			name:  "single comma-separated string",
+			input: []string{"param1,param2,param3"},
+			want:  []string{"param1", "param2", "param3"},
+		},
+		{
+			name:  "multiple strings unchanged",
+			input: []string{"param1", "param2"},
+			want:  []string{"param1", "param2"},
+		},
+		{
+			name:  "single string with spaces",
+			input: []string{"param1, param2"},
+			want:  []string{"param1", "param2"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := normalizeSortBy(tt.input)
+			if len(got) != len(tt.want) {
+				t.Errorf("normalizeSortBy() len = %d, want %d", len(got), len(tt.want))
+				return
+			}
+			for i := range got {
+				if got[i] != tt.want[i] {
+					t.Errorf("normalizeSortBy()[%d] = %q, want %q", i, got[i], tt.want[i])
+				}
+			}
+		})
+	}
+}
