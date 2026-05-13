@@ -14,6 +14,13 @@ type Message struct {
 	BodyID     string
 }
 
+const (
+	requestSuccessfulBodyEN = "Request successful"
+	requestSuccessfulBodyID = "Request berhasil"
+	requestAcceptedBodyEN   = "Request accepted"
+	requestAcceptedBodyID   = "Request diterima"
+)
+
 // HTTP message
 var (
 	// 4xx
@@ -279,15 +286,15 @@ var (
 		StatusCode: http.StatusOK,
 		TitleEN:    language.HTTPStatusText(language.English, http.StatusOK),
 		TitleID:    language.HTTPStatusText(language.Indonesian, http.StatusOK),
-		BodyEN:     "Request successful",
-		BodyID:     "Request berhasil",
+		BodyEN:     requestSuccessfulBodyEN,
+		BodyID:     requestSuccessfulBodyID,
 	}
 	SuccessAccepted = Message{
 		StatusCode: http.StatusAccepted,
 		TitleEN:    language.HTTPStatusText(language.English, http.StatusAccepted),
 		TitleID:    language.HTTPStatusText(language.Indonesian, http.StatusAccepted),
-		BodyEN:     "Request accepted",
-		BodyID:     "Request diterima",
+		BodyEN:     requestAcceptedBodyEN,
+		BodyID:     requestAcceptedBodyID,
 	}
 
 	// Image
