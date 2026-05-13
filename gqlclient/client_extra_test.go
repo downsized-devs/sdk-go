@@ -134,3 +134,61 @@ func TestGraphErr_Error(t *testing.T) {
 	err := graphErr{Message: "bad"}
 	assert.Equal(t, "graphql: bad", err.Error())
 }
+
+// failingReader returns an error on the first Read so that io.Copy fails.
+type failingReader struct{}
+
+func (failingReader) Read([]byte) (int, error) { return 0, errors.New("read fail") }
+
+// Triggers the "preparing file" io.Copy error branch in runWithPostFields.
+func TestRun_Multipart_FilePrepareError(t *testing.T) {
+	c := NewClient("http://example.com",
+		UseMultipartForm(),
+		WithHTTPClient(&http.Client{Transport: errRoundTripper{err: errors.New("never reached")}}),
+	)
+	req := NewRequest("query{}")
+	req.File("upload", "x.txt", failingReader{})
+	err := c.Run(context.Background(), req, nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "preparing file")
+}
+
+// Triggers the "encode variables" json error branch in runWithPostFields by
+// passing a value json cannot marshal (channels are not encodable).
+func TestRun_Multipart_EncodeVariablesError(t *testing.T) {
+	c := NewClient("http://example.com",
+		UseMultipartForm(),
+		WithHTTPClient(&http.Client{Transport: errRoundTripper{err: errors.New("never reached")}}),
+	)
+	req := NewRequest("query{}")
+	req.Var("ch", make(chan int))
+	err := c.Run(context.Background(), req, nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "encode variables")
+}
+
+// Triggers the "encode body" json error branch in runWithJSON.
+func TestRun_JSON_EncodeBodyError(t *testing.T) {
+	c := NewClient("http://example.com",
+		WithHTTPClient(&http.Client{Transport: errRoundTripper{err: errors.New("never reached")}}),
+	)
+	req := NewRequest("query{}")
+	req.Var("ch", make(chan int))
+	err := c.Run(context.Background(), req, nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "encode body")
+}
+
+// Triggers the multipart non-200 + bad JSON body path.
+func TestRun_Multipart_Non200WithBadBody(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`not json`))
+	}))
+	defer srv.Close()
+
+	c := NewClient(srv.URL, UseMultipartForm())
+	err := c.Run(context.Background(), NewRequest("query{}"), nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "non-200")
+}
