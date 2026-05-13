@@ -14,12 +14,6 @@ type Message struct {
 	BodyID     string
 }
 
-const (
-	fileUploadFailedTitleEN = "File Upload Failed"
-	fileUploadFailedTitleID = "Data Gagal Diunggah"
-	requestSuccessfulBodyEN = "Request successful"
-)
-
 // HTTP message
 var (
 	// 4xx
@@ -125,292 +119,12 @@ var (
 	}
 
 	// Application specific messages
-	ErrMsgFileUploadSowBackdate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Stocking Upload Failed, file date can't be older than cycle start date.",
-		TitleID:    "Data Tebar Gagal Diunggah, tanggal berkas harus lebih baru dari tanggal mulai siklus.",
-		BodyEN:     language.FileUploadBackDateErrorEN,
-		BodyID:     language.FileUploadBackDateErrorID,
-	}
-
-	ErrMsgFileUploadDailyBackdate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Daily Monitoring Upload Failed, file date can't be older than cycle start date.",
-		TitleID:    "Data Monitoring Harian Gagal Diunggah, tanggal berkas harus lebih baru dari tanggal mulai siklus.",
-		BodyEN:     language.FileUploadBackDateErrorEN,
-		BodyID:     language.FileUploadBackDateErrorID,
-	}
-
-	ErrMsgFileUploadHarvestBackdate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Harvest Upload Failed, file date can't be older than cycle start date.",
-		TitleID:    "Data Panen Gagal Diunggah, tanggal berkas harus lebih baru dari tanggal mulai siklus.",
-		BodyEN:     language.FileUploadBackDateErrorEN,
-		BodyID:     language.FileUploadBackDateErrorID,
-	}
-
-	ErrMsgFileUploadSamplingBackdate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Sampling Monitoring Upload Failed, file date can't be older than cycle start date.",
-		TitleID:    "Data Sampling Gagal Diunggah, tanggal berkas harus lebih baru dari tanggal mulai siklus.",
-		BodyEN:     language.FileUploadBackDateErrorEN,
-		BodyID:     language.FileUploadBackDateErrorID,
-	}
-
-	ErrMsgFileUploadTreatmentBackdate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Treatment Upload Failed",
-		TitleID:    "Data Treatment Gagal Diunggah",
-		BodyEN:     language.FileUploadBackDateErrorEN,
-		BodyID:     language.FileUploadBackDateErrorID,
-	}
-
-	ErrMsgFileUploadBackdate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "File Upload Failed, file date can't be older than cycle start date.",
-		TitleID:    "Data Gagal Diunggah, tanggal berkas harus lebih baru dari tanggal mulai siklus.",
-		BodyEN:     language.FileUploadBackDateErrorEN,
-		BodyID:     language.FileUploadBackDateErrorID,
-	}
-
-	ErrMsgFileUploadDocDopMiscalculation = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "File Upload Failed, file DOC/DOP is miscalculated",
-		TitleID:    "Data Gagal Diunggah, kalkulasi DOC/DOP tidak bersesuaian",
-		BodyEN:     language.FileUploadDocDopErrorEN,
-		BodyID:     language.FileUploadDocDopErrorID,
-	}
-
-	ErrMsgFileUploadWrongDate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "File Upload Failed, the date format is wrong.",
-		TitleID:    "Data Gagal Diunggah, format tanggal salah.",
-		BodyEN:     language.FileUploadWrongDateFormatErrorEN,
-		BodyID:     language.FileUploadWrongDateFormatErrorID,
-	}
-
-	ErrMsgFileUploadUnregisteredPond = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "File Upload Failed, unregistered pond",
-		TitleID:    "Data Gagal Diunggah, kolam belum terdaftar",
-		BodyEN:     language.FileUploadUnregisteredPondErrorEN,
-		BodyID:     language.FileUploadUnregisteredPondErrorID,
-	}
-
-	ErrMsgFileUploadIncorrectDataFormat = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "File Upload Failed, incorrect data format",
-		TitleID:    "Data Gagal Diunggah, format data salah",
-		BodyEN:     language.FileUploadIncorrectDataFormatErrorEN,
-		BodyID:     language.FileUploadIncorrectDataFormatErrorID,
-	}
-
-	ErrMsgFileUploadSowForwardDate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Stocking Upload Failed",
-		TitleID:    "Data Tebar Gagal Diunggah",
-		BodyEN:     language.FileUploadForwardDateErrorEN,
-		BodyID:     language.FileUploadForwardDateErrorID,
-	}
-
-	ErrMsgFileUploadDailyForwardDate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Daily Monitoring Upload Failed, file date can't be older than cycle start date.",
-		TitleID:    "Monitoring Harian Gagal, tanggal berkas harus lebih baru dari tanggal mulai siklus.",
-		BodyEN:     language.FileUploadForwardDateErrorEN,
-		BodyID:     language.FileUploadForwardDateErrorID,
-	}
-
-	ErrMsgFileUploadHarvestForwardDate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Harvest Upload Failed",
-		TitleID:    "Data Panen Gagal Diunggah",
-		BodyEN:     language.FileUploadForwardDateErrorEN,
-		BodyID:     language.FileUploadForwardDateErrorID,
-	}
-
-	ErrMsgFileUploadSamplingForwardDate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Sampling Upload Failed",
-		TitleID:    "Data Sampling Gagal Diunggah",
-		BodyEN:     language.FileUploadForwardDateErrorEN,
-		BodyID:     language.FileUploadForwardDateErrorID,
-	}
-
-	ErrMsgFileUploadTreatmentForwardDate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Treatment Upload Failed",
-		TitleID:    "Data Treatment Gagal Diunggah",
-		BodyEN:     language.FileUploadForwardDateErrorEN,
-		BodyID:     language.FileUploadForwardDateErrorID,
-	}
-
-	ErrMsgFileUploadForwardDate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    fileUploadFailedTitleEN,
-		TitleID:    fileUploadFailedTitleID,
-		BodyEN:     language.FileUploadForwardDateErrorEN,
-		BodyID:     language.FileUploadForwardDateErrorID,
-	}
-
-	ErrMsgFileInvalidDate = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    fileUploadFailedTitleEN,
-		TitleID:    fileUploadFailedTitleID,
-		BodyEN:     language.FileUploadInvalidDateErrorEN,
-		BodyID:     language.FileUploadInvalidDateErrorID,
-	}
-
-	ErrMsgFileInvalidPondIsNotRegister = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    fileUploadFailedTitleEN,
-		TitleID:    "Gagal Mengunggah Berkas",
-		BodyEN:     language.FileUploadInvalidPondIsNotRegisterErrorEN,
-		BodyID:     language.FileUploadInvalidPondIsNotRegisterErrorID,
-	}
-
-	ErrMsgFileUploadWrongFile = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "File Upload Failed, wrong file selected.",
-		TitleID:    "Data Gagal Diunggah, berkas terpilih salah.",
-		BodyEN:     language.FileUploadWrongFileErrorEN,
-		BodyID:     language.FileUploadWrongFileErrorID,
-	}
-
-	ErrMsgFileUploadSowWrongFile = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Stocking Upload Failed, wrong file selected.",
-		TitleID:    "Data Tebar Gagal Diunggah, berkas terpilih salah.",
-		BodyEN:     language.FileUploadWrongFileErrorEN,
-		BodyID:     language.FileUploadWrongFileErrorID,
-	}
-
-	ErrMsgFileUploadDailyWrongFile = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Daily Monitoring Upload Failed, wrong file selected.",
-		TitleID:    "Data Monitoring Harian Gagal Diunggah, berkas terpilih salah.",
-		BodyEN:     language.FileUploadWrongFileErrorEN,
-		BodyID:     language.FileUploadWrongFileErrorID,
-	}
-
-	ErrMsgFileUploadHarvestWrongFile = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Harvest Upload Failed, wrong file selected.",
-		TitleID:    "Data Panen Gagal Diunggah, berkas terpilih salah.",
-		BodyEN:     language.FileUploadWrongFileErrorEN,
-		BodyID:     language.FileUploadWrongFileErrorID,
-	}
-
-	ErrMsgFileUploadSamplingWrongFile = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Sampling Monitoring Upload Failed, wrong file selected.",
-		TitleID:    "Data Sampling Gagal Diunggah, berkas terpilih salah.",
-		BodyEN:     language.FileUploadWrongFileErrorEN,
-		BodyID:     language.FileUploadWrongFileErrorID,
-	}
-
-	ErrMsgFileUploadTreatmentWrongFile = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Treatment Upload Failed, wrong file selected.",
-		TitleID:    "Data Treatment Gagal Diunggah, berkas terpilih salah.",
-		BodyEN:     language.FileUploadWrongFileErrorEN,
-		BodyID:     language.FileUploadWrongFileErrorID,
-	}
-
-	ErrMsgFileUploadProductionPlanWrongFile = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Production Plan Upload Failed, wrong file selected.",
-		TitleID:    "Rencana Produksi Gagal Diunggah, berkas terpilih salah.",
-		BodyEN:     language.FileUploadWrongFileErrorEN,
-		BodyID:     language.FileUploadWrongFileErrorID,
-	}
-
-	ErrMsgFileUploadBulkOrderWrongFile = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Bulk Order Upload Failed",
-		TitleID:    "Order Bulk Gagal Diunggah",
-		BodyEN:     language.FileUploadWrongFileErrorEN,
-		BodyID:     language.FileUploadWrongFileErrorID,
-	}
-
-	ErrMsgFileUploadSowNotUploaded = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Stocking File Not Uploaded",
-		TitleID:    "Data Tebar Belum Diunggah",
-		BodyEN:     "Please upload stocking data first before uploading other data.",
-		BodyID:     "Mohon unggah data tebar terlebih dahulu sebelum mengunggah data lainnya.",
-	}
-
-	ErrMsgFileUploadProductionPlanNotUploaded = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Production Plan File Not Uploaded",
-		TitleID:    "File Rencana Produksi Belum Diunggah",
-		BodyEN:     "Please upload production plan data first before uploading sow data.",
-		BodyID:     "Mohon unggah rencana produksi terlebih dahulu sebelum mengunggah data tebar.",
-	}
-
-	ErrMsgFileUploadInvalidExtension = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    fileUploadFailedTitleEN,
-		TitleID:    fileUploadFailedTitleID,
-		BodyEN:     "File format or file extension not valid",
-		BodyID:     "Format file atau ekstensi file tidak valid",
-	}
-
-	ErrMsgCycleEndFailedNoActivePond = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "End Cycle Failed",
-		TitleID:    "Gagal Mengakhiri Siklus",
-		BodyEN:     "Cycle doesn't have active ponds.",
-		BodyID:     "Belum ada kolam aktif di dalam siklus.",
-	}
-
-	ErrMsgCycleEndFailedNoSelectedPond = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "End Cycle Failed",
-		TitleID:    "Gagal Mengakhiri Siklus",
-		BodyEN:     "No pond is selected.",
-		BodyID:     "Tidak ada kolam yang dipilih.",
-	}
-
-	ErrMsgMetricsProductivityNoDaily = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Productivity Data Not Available",
-		TitleID:    "Data Produktivitas Tidak Tersedia",
-		BodyEN:     "Productivity data is not available daily.",
-		BodyID:     "Data produktivitas tidak dapat ditampilkan harian.",
-	}
-
-	ErrMsgCodeCycleStartFailedNameTooLong = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Create Cycle Failed, cycle name too long.",
-		TitleID:    "Gagal Membuat Siklus, nama siklus terlalu panjang.",
-		BodyEN:     "Name is too long.",
-		BodyID:     "Nama terlalu panjang.",
-	}
-
 	ErrMsgResetPassword = Message{
 		StatusCode: http.StatusBadRequest,
 		TitleEN:    "Failed To Reset Password",
 		TitleID:    "Gagal Mengatur Ulang Kata Sandi",
 		BodyEN:     "",
 		BodyID:     "",
-	}
-
-	ErrMsgCycleNotFound = Message{
-		StatusCode: http.StatusNotFound,
-		TitleEN:    "Cycle Not Found",
-		TitleID:    "Siklus Tidak Ditemukan",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-
-	ErrMsgCycleStartFailedOngoingCycle = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Create Cycle Failed, ongoing cycle already exists.",
-		TitleID:    "Gagal Membuat Siklus, sudah ada siklus berjalan.",
-		BodyEN:     "Please end current cycle before creating new ones",
-		BodyID:     "Mohon akhiri siklus yang sedang berjalan sebelum membuat siklus baru",
 	}
 
 	ErrMsgPasswordDoesNotMatch = Message{
@@ -467,14 +181,6 @@ var (
 		TitleID:    "Token Reset Pasword Tidak Valid",
 		BodyEN:     "Please check your token",
 		BodyID:     "Silakan periksa kembali token anda",
-	}
-
-	ErrMsgInsertFeedbackWeeklyLimit = Message{
-		StatusCode: http.StatusBadRequest,
-		TitleEN:    "Cannot Insert Feedback",
-		TitleID:    "Saran Tidak Dapat Dikirim",
-		BodyEN:     "Feedback can only be given once a week",
-		BodyID:     "Saran hanya dapat diberikan sekali setiap minggu",
 	}
 
 	ErrMsgLockExist = Message{
@@ -542,14 +248,7 @@ var (
 		BodyID:     "",
 	}
 
-	// TImelib Error
-	ErrMsgTimelib = Message{
-		StatusCode: http.StatusInternalServerError,
-		TitleEN:    "Timelib error",
-		TitleID:    "Timelib mengalami kegagalan",
-	}
-
-	// TImelib Error
+	// Translator Error
 	ErrMsgTranslatorlib = Message{
 		StatusCode: http.StatusInternalServerError,
 		TitleEN:    "Translator error",
@@ -580,7 +279,7 @@ var (
 		StatusCode: http.StatusOK,
 		TitleEN:    language.HTTPStatusText(language.English, http.StatusOK),
 		TitleID:    language.HTTPStatusText(language.Indonesian, http.StatusOK),
-		BodyEN:     requestSuccessfulBodyEN,
+		BodyEN:     "Request successful",
 		BodyID:     "Request berhasil",
 	}
 	SuccessAccepted = Message{
@@ -589,216 +288,6 @@ var (
 		TitleID:    language.HTTPStatusText(language.Indonesian, http.StatusAccepted),
 		BodyEN:     "Request accepted",
 		BodyID:     "Request diterima",
-	}
-	SuccessUploadSow = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "Stocking Upload Success",
-		TitleID:    "Data Tebar Berhasil Diunggah",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUploadDailyMonitoring = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "Daily Monitoring Upload Success",
-		TitleID:    "Data Monitoring Harian Berhasil Diunggah",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUploadSampling = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "Sampling Upload Success",
-		TitleID:    "Data Sampling Berhasil Diunggah",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUploadPartialHarvest = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "Partial Harvest Upload Success",
-		TitleID:    "Data Panen Parsial Berhasil Diunggah",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUploadTotalHarvest = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "Total Harvest Upload Success",
-		TitleID:    "Data Panen Total Berhasil Diunggah",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUploadProductionPlan = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "Production Plan Upload Success",
-		TitleID:    "Rencana Produksi Berhasil Diunggah",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-
-	// Cycles
-	SuccessCreateCycle = Message{
-		StatusCode: http.StatusCreated,
-		TitleEN:    "You Have Successfully Created A New Cycle",
-		TitleID:    "Anda Telah Berhasil Membuat Siklus Baru",
-		BodyEN:     "Input data by uploading files",
-		BodyID:     "Masukan data dengan mengunggah file",
-	}
-	SuccessUpdateCycle = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Updated The Cycle",
-		TitleID:    "Anda Telah Berhasil Memperbarui Siklus",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessDeleteCycle = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Deleted The Cycle",
-		TitleID:    "Anda Telah Berhasil Menghapus Siklus",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessEndCycle = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Ended The Cycle",
-		TitleID:    "Anda Telah Berhasil Mengakhiri Siklus",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-
-	// Farms
-	SuccessCreateFarm = Message{
-		StatusCode: http.StatusCreated,
-		TitleEN:    "You Have Successfully Created A New Farm",
-		TitleID:    "Anda Telah Berhasil Mendaftarkan Tambak Baru",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUpdateFarm = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Updated The Farm",
-		TitleID:    "Anda Telah Berhasil Memperbarui Tambak",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessDeleteFarm = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Deleted The Farm",
-		TitleID:    "Anda Telah Berhasil Menghapus Tambak",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-
-	// Modules
-	SuccessCreateModule = Message{
-		StatusCode: http.StatusCreated,
-		TitleEN:    "You have Successfully Created A New Module",
-		TitleID:    "Anda Telah Berhasil Membuat Modul Baru",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUpdateModule = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Updated The Module",
-		TitleID:    "Anda Telah Berhasil Memperbarui Modul",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessDeleteModule = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Deleted The Module",
-		TitleID:    "Anda Telah Berhasil Menghapus Modul",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-
-	// Ponds
-	SuccessCreatePond = Message{
-		StatusCode: http.StatusCreated,
-		TitleEN:    "You have Successfully Created A New Pond",
-		TitleID:    "Anda Telah Berhasil Membuat Kolam Baru",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUpdatePond = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Updated The Pond",
-		TitleID:    "Anda Telah Berhasil Memperbarui Kolam",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessDeletePond = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Deleted The Pond",
-		TitleID:    "Anda Telah Berhasil Menghapus Kolam",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-
-	// Pond Diseases
-	SuccessCreatePondDisease = Message{
-		StatusCode: http.StatusCreated,
-		TitleEN:    "You have Successfully Created A New Pond Disease",
-		TitleID:    "Anda Telah Berhasil Membuat Penyakit Tambak Baru",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUpdatePondDisease = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Updated The Pond Disease",
-		TitleID:    "Anda Telah Berhasil Memperbarui Penyakit Tambak",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessDeletePondDisease = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Deleted The Pond Disease",
-		TitleID:    "Anda Telah Berhasil Menghapus Penyakit Tambak",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-
-	// Tickets
-	SuccessCreateTicket = Message{
-		StatusCode: http.StatusCreated,
-		TitleEN:    "You have Successfully Created A New Ticket",
-		TitleID:    "Anda Telah Berhasil Membuat Tiket Baru",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUpdateTicket = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Updated The Ticket",
-		TitleID:    "Anda Telah Berhasil Memperbarui Tiket",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessDeleteTicket = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Deleted The Ticket",
-		TitleID:    "Anda Telah Berhasil Menghapus Tiket",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-
-	// User Codes
-	SuccessCreateUser = Message{
-		StatusCode: http.StatusCreated,
-		TitleEN:    "You have Successfully Created A New User",
-		TitleID:    "Anda Telah Berhasil Membuat Pengguna Baru",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessUpdateUser = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Updated The User",
-		TitleID:    "Anda Telah Berhasil Memperbarui Pengguna",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-	SuccessDeleteUser = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "You Have Successfully Deleted The User",
-		TitleID:    "Anda Telah Berhasil Menghapus Pengguna",
-		BodyEN:     "",
-		BodyID:     "",
 	}
 
 	// Image
@@ -811,7 +300,7 @@ var (
 	}
 
 	// Verif Token
-	SuccesResetPassword = Message{
+	SuccessResetPassword = Message{
 		StatusCode: http.StatusOK,
 		TitleEN:    "Reset password success. Please check your email.",
 		TitleID:    "Pengaturan ulang kata sandi berhasil. Silakan cek email anda.",
@@ -822,24 +311,6 @@ var (
 		StatusCode: http.StatusOK,
 		TitleEN:    "Access Granted",
 		TitleID:    "Akses Diberikan",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-
-	// Faq Token
-	SuccesCreateFaqFeedback = Message{
-		StatusCode: http.StatusOK,
-		TitleEN:    "Create feedback success.",
-		TitleID:    "Pembuatan saran berhasil.",
-		BodyEN:     "",
-		BodyID:     "",
-	}
-
-	// Bulk Upload Order
-	SuccessBulkUploadOrder = Message{
-		StatusCode: http.StatusCreated,
-		TitleEN:    "You have Successfully Upload Bulk Order",
-		TitleID:    "Anda Telah Berhasil Mengunggah Bulk Order",
 		BodyEN:     "",
 		BodyID:     "",
 	}

@@ -304,10 +304,6 @@ var ErrorMessages = AppMessage{
 	CodeForbidden:                    ErrMsgForbidden,
 	CodeAuthRevokeRefreshTokenFailed: ErrMsgRevokeRefreshTokenFailed,
 
-	CodeExcelFailedParsing:    ErrMsgBadRequest,
-	CodeExcelInvalidType:      ErrMsgFileUploadWrongFile,
-	CodeExcelFailedToSaveFile: ErrMsgInternalServerError,
-
 	CodeStorageS3Upload: ErrMsgBadRequest,
 
 	CodeConvert:     ErrMsgInternalServerError,
