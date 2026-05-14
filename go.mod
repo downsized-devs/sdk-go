@@ -36,8 +36,8 @@ require (
 	github.com/xuri/excelize/v2 v2.6.2-0.20220823160047-cb8bca0e92cb
 	go.mongodb.org/mongo-driver v1.17.2
 	go.uber.org/mock v0.4.0
-	golang.org/x/crypto v0.26.0
-	golang.org/x/text v0.17.0
+	golang.org/x/crypto v0.35.0
+	golang.org/x/text v0.22.0
 	google.golang.org/api v0.107.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	modernc.org/sqlite v1.48.1
