@@ -2,18 +2,6 @@ package language
 
 import "net/http"
 
-const (
-	FileUploadBackDateErrorEN                 = "Backdate, file date cannot be accepted before cycle start date"
-	FileUploadWrongFileErrorEN                = "Please check excel template and format."
-	FileUploadForwardDateErrorEN              = "Forward date, file date cannot be accepted beyond cycle start date"
-	FileUploadInvalidDateErrorEN              = "Please check the date column in excel to not exceed the current time or before the start of doc"
-	FileUploadInvalidPondIsNotRegisterErrorEN = "Pond is not registered. Please check the template file"
-	FileUploadWrongDateFormatErrorEN          = "Incorrect date format"
-	FileUploadUnregisteredPondErrorEN         = "Unregistered pond"
-	FileUploadIncorrectDataFormatErrorEN      = "Incorrect data format"
-	FileUploadDocDopErrorEN                   = "Incorrcet DOC/DOP calculation"
-)
-
 var statusTextEn = map[int]string{
 	http.StatusContinue:           "Continue",
 	http.StatusSwitchingProtocols: "Switching Protocols",

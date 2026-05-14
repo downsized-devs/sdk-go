@@ -23,7 +23,7 @@ require (
 	github.com/matryer/is v1.4.0
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/pdfcpu/pdfcpu v0.6.0
-	github.com/pkg/errors v0.9.1
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.12.2
 	github.com/prometheus/common v0.32.1
 	github.com/rs/zerolog v1.26.1

@@ -25,3 +25,9 @@ func (st *stacktrace) ExitCode() int {
 	}
 	return int(st.code)
 }
+
+// Unwrap returns the underlying cause so that errors.Is and errors.As can
+// traverse the full error chain.
+func (st *stacktrace) Unwrap() error {
+	return st.cause
+}

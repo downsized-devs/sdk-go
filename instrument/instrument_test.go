@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,15 +22,14 @@ func Test_instrument_HTTPRequestTimer(t *testing.T) {
 	}
 	tests := []struct {
 		name     string
-		mockFunc func(c Config, a args)
+		mockFunc func(i *instrument, a args)
 		config   Config
 		args     args
 		want     want
 	}{
 		{
 			name: "ok",
-			mockFunc: func(c Config, a args) {
-				i := Init(c)
+			mockFunc: func(i *instrument, a args) {
 				timer := i.HTTPRequestTimer(a.path, a.method)
 				timer.ObserveDuration()
 			},
@@ -51,8 +49,9 @@ func Test_instrument_HTTPRequestTimer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.mockFunc(tt.config, tt.args)
-			assert.Equal(t, tt.want.labelCount, testutil.CollectAndCount(requestDuration))
+			instr := Init(tt.config).(*instrument)
+			tt.mockFunc(instr, tt.args)
+			assert.Equal(t, tt.want.labelCount, testutil.CollectAndCount(instr.requestDuration))
 		})
 	}
 }
@@ -70,15 +69,14 @@ func Test_instrument_HTTPRequestCounter(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		mockFunc func(c Config, a args)
+		mockFunc func(i *instrument, a args)
 		config   Config
 		args     args
 		want     want
 	}{
 		{
 			name: "ok",
-			mockFunc: func(c Config, a args) {
-				i := Init(c)
+			mockFunc: func(i *instrument, a args) {
 				i.HTTPRequestCounter(a.path, a.method)
 				i.HTTPRequestCounter(a.path, a.method)
 			},
@@ -99,9 +97,10 @@ func Test_instrument_HTTPRequestCounter(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.mockFunc(tt.config, tt.args)
-			assert.Equal(t, tt.want.labelCount, testutil.CollectAndCount(requestTotal))
-			assert.Equal(t, tt.want.labelValue, testutil.ToFloat64(requestTotal.WithLabelValues(tt.args.path, tt.args.method)))
+			instr := Init(tt.config).(*instrument)
+			tt.mockFunc(instr, tt.args)
+			assert.Equal(t, tt.want.labelCount, testutil.CollectAndCount(instr.requestTotal))
+			assert.Equal(t, tt.want.labelValue, testutil.ToFloat64(instr.requestTotal.WithLabelValues(tt.args.path, tt.args.method)))
 		})
 	}
 }
@@ -116,15 +115,14 @@ func Test_instrument_HTTPResponseStatusCounter(t *testing.T) {
 	}
 	tests := []struct {
 		name     string
-		mockFunc func(c Config, a args)
+		mockFunc func(i *instrument, a args)
 		config   Config
 		args     args
 		want     want
 	}{
 		{
 			name: "ok",
-			mockFunc: func(c Config, a args) {
-				i := Init(c)
+			mockFunc: func(i *instrument, a args) {
 				i.HTTPResponseStatusCounter(404)
 			},
 			config: Config{
@@ -142,15 +140,16 @@ func Test_instrument_HTTPResponseStatusCounter(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt.mockFunc(tt.config, tt.args)
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want.labelCount, testutil.CollectAndCount(responseStatus))
-			assert.Equal(t, tt.want.labelValue, testutil.ToFloat64(responseStatus.WithLabelValues(strconv.Itoa(tt.args.code))))
+			instr := Init(tt.config).(*instrument)
+			tt.mockFunc(instr, tt.args)
+			assert.Equal(t, tt.want.labelCount, testutil.CollectAndCount(instr.responseStatus))
+			assert.Equal(t, tt.want.labelValue, testutil.ToFloat64(instr.responseStatus.WithLabelValues(strconv.Itoa(tt.args.code))))
 		})
 	}
 }
 
-// TODO: nedd to execute real SQL
+// TODO: need to execute real SQL
 func Test_instrument_RegisterDBStats(t *testing.T) {
 	type fields struct {
 		cfg   Config
@@ -173,10 +172,6 @@ func Test_instrument_RegisterDBStats(t *testing.T) {
 						Enabled: true,
 					},
 				},
-				prome: promeRegistry{
-					registerer: prometheus.DefaultRegisterer,
-					gatherer:   prometheus.DefaultGatherer,
-				},
 			},
 			args: args{
 				db:     &sql.DB{},
@@ -186,17 +181,13 @@ func Test_instrument_RegisterDBStats(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			i := &instrument{
-				cfg:   tt.fields.cfg,
-				prome: tt.fields.prome,
-			}
+			i := Init(tt.fields.cfg)
 			i.RegisterDBStats(tt.args.db, tt.args.dbname)
 		})
 	}
 }
 
-func Test_instrument_MySQLQueryTimer(t *testing.T) {
+func Test_instrument_DatabaseQueryTimer(t *testing.T) {
 	type args struct {
 		queryname string
 	}
@@ -205,16 +196,15 @@ func Test_instrument_MySQLQueryTimer(t *testing.T) {
 	}
 	tests := []struct {
 		name     string
-		mockFunc func(c Config, a args)
+		mockFunc func(i *instrument, a args)
 		config   Config
 		args     args
 		want     want
 	}{
 		{
 			name: "ok",
-			mockFunc: func(c Config, a args) {
-				i := Init(c)
-				timer := i.MySQLQueryTimer(a.queryname)
+			mockFunc: func(i *instrument, a args) {
+				timer := i.DatabaseQueryTimer("testdb", "leader", a.queryname)
 				timer.ObserveDuration()
 			},
 			config: Config{
@@ -231,9 +221,10 @@ func Test_instrument_MySQLQueryTimer(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt.mockFunc(tt.config, tt.args)
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want.labelCount, testutil.CollectAndCount(dbQueryDuration))
+			instr := Init(tt.config).(*instrument)
+			tt.mockFunc(instr, tt.args)
+			assert.Equal(t, tt.want.labelCount, testutil.CollectAndCount(instr.dbQueryDuration))
 		})
 	}
 }

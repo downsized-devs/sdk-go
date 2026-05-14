@@ -154,7 +154,9 @@ func (s *sqlClausebuilder) Build(param interface{}) (string, []interface{}, stri
 	}
 
 	// page pagination
-	// TODO: implement cursor pagination
+	// Cursor-based pagination is not yet implemented; when useCursor is true
+	// and rawCursor is non-empty the caller must apply cursor filtering
+	// manually before calling Build.
 	if !s.useCursor || len(s.rawCursor) < 1 {
 		// sort must be done first before page pagination
 		s.sort()

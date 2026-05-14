@@ -2,18 +2,6 @@ package language
 
 import "net/http"
 
-const (
-	FileUploadBackDateErrorID                 = "Backdate, tanggal file tidak bisa diterima sebelum tanggal mulai siklus."
-	FileUploadWrongFileErrorID                = "Mohon periksa kembali format dan template excel."
-	FileUploadForwardDateErrorID              = "Forward date, tanggal file tidak bisa diterima setelah tanggal mulai siklus"
-	FileUploadInvalidDateErrorID              = "Mohon periksa kembali tanggal yang ada pada kolom excel untuk tidak melebihi waktu saat ini atau kurang dari waktu doc pertama."
-	FileUploadInvalidPondIsNotRegisterErrorID = "Kolam tidak terdaftar. Mohon periksa template Anda."
-	FileUploadWrongDateFormatErrorID          = "Format tanggal salah"
-	FileUploadUnregisteredPondErrorID         = "Kolam belum terdaftar"
-	FileUploadIncorrectDataFormatErrorID      = "Format data salah"
-	FileUploadDocDopErrorID                   = "Kalkulasi DOC/DOP tidak sesuai"
-)
-
 // Surprisingly, we have a kinda official translation for HTTP status in Indonesian.
 // Check it here: https://id.wikipedia.org/wiki/Daftar_kode_status_HTTP
 var statusTextId = map[int]string{
