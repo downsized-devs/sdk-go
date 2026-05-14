@@ -1,0 +1,18 @@
+name: "CodeQL config for sdk-go"
+
+# Use GitHub's security-extended pack on top of the default query suite.
+# Drop this line to keep just the default suite.
+queries:
+  - uses: security-extended
+
+# Exclude generated code, vendored dependencies, and test fixtures from
+# being scanned and from contributing to alert counts.
+paths-ignore:
+  - "tests/mock/**"
+  - "**/*_test.go"
+  - "**/testdata/**"
+  - "generator/**"   # code-generation templates; flagged findings are not runtime issues
+
+# Optional: limit to the actual SDK source tree.
+# paths:
+#   - "."

@@ -1,0 +1,19 @@
+# Codecov configuration.
+# Generated mocks live under tests/mock/ and are produced by mockgen — they
+# are not hand-written code and should not affect coverage metrics.
+ignore:
+  - "tests/mock/**/*"
+  # Test helpers under tests/ are non-production support code.
+  - "tests/**/*_test.go"
+
+coverage:
+  status:
+    project:
+      default:
+        # Don't fail the project status check on small regressions in
+        # generated or refactor-only patches.
+        threshold: 1%
+    patch:
+      default:
+        # Patch coverage is informational, not a merge blocker.
+        informational: true
