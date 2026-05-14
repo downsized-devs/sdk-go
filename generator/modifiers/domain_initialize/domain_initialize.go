@@ -41,12 +41,13 @@ func (d *domainInitialize) Initialize() error {
 	for scanner.Scan() {
 		ln := scanner.Text()
 		lines = append(lines, ln)
-		if strings.Contains(ln, "import (") {
+		switch {
+		case strings.Contains(ln, "import ("):
 			lines = append(lines, "	\"github.com/downsized-devs/generic-service/src/business/domain/"+d.EntityNameSnakeCase+"\"")
 			continue
-		} else if strings.Contains(ln, "type Domains struct {") {
+		case strings.Contains(ln, "type Domains struct {"):
 			lines = append(lines, "	"+d.EntityNameUpper+" "+d.EntityNameSnakeCase+".Interface")
-		} else if strings.Contains(ln, "d := &Domains{") {
+		case strings.Contains(ln, "d := &Domains{"):
 			lines = append(lines, "		"+d.EntityNameUpper+":           "+d.EntityNameSnakeCase+".Init(params.Log, params.Db, params.Rd, params.Json, params.Audit),")
 		}
 	}

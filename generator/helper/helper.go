@@ -21,7 +21,7 @@ func ConvertToUpperCase(text string) string {
 	return result
 }
 
-// This funciton is to add space before every UpperCase character {textExample => test Example}
+// This function is to add space before every UpperCase character {textExample => test Example}
 func convertToSpace(text string) string {
 	regex := regexp.MustCompile(`([A-Z])`)
 	result := regex.ReplaceAllString(text, " $1")

@@ -112,7 +112,7 @@ func ToCamelCase(input string) string {
 	return toCamelInitCase(input, false)
 }
 
-// Convert text to camle case string with upper case in beginning
+// Convert text to camel case string with upper case in beginning
 // ex: "additional item" --> "AdditionalItem"
 func ToPascalCase(input string) string {
 	return toCamelInitCase(input, true)

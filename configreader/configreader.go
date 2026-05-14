@@ -15,8 +15,9 @@ import (
 )
 
 const (
-	JSONType string = "json"
-	YAMLType string = "yaml"
+	JSONType   string = "json"
+	YAMLType   string = "yaml"
+	defaultEnv string = "dev"
 )
 
 type Interface interface {
@@ -78,12 +79,12 @@ func (c *configReader) mergeEnvConfig() {
 	case os.Getenv("SERVICE_VERSION") != "":
 		svcVersion = os.Getenv("SERVICE_VERSION")
 	default:
-		svcVersion = "dev"
+		svcVersion = defaultEnv
 	}
 
 	svcEnvironment := os.Getenv("SERVICE_ENVIRONMENT")
 	if svcEnvironment == "" {
-		svcEnvironment = "dev"
+		svcEnvironment = defaultEnv
 	}
 
 	sm := c.viper.GetStringMap("meta")
@@ -94,7 +95,8 @@ func (c *configReader) mergeEnvConfig() {
 
 func (c *configReader) resolveJSONRef() {
 	refmap := make(map[string]interface{})
-	refregxp := regexp.MustCompile(`^\\$ref:#\\/(.*)$`)
+	refregxpstr := "^\\$ref:#\\/(.*)$"
+	refregxp := regexp.MustCompile(refregxpstr)
 	for _, k := range c.viper.AllKeys() {
 		refpath := c.viper.GetString(k)
 		if refregxp.MatchString(refpath) {

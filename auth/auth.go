@@ -18,6 +18,9 @@ import (
 	"google.golang.org/api/option"
 )
 
+// contextKey is a package-local type used for auth context values.
+// It is intentionally distinct from appcontext.contextKey to avoid
+// collisions when both packages store values in the same context.
 type contextKey string
 
 const (
@@ -308,11 +311,12 @@ func (a *auth) VerifyToken(ctx context.Context, bearertoken string) (*firebase_a
 	token, err := a.firebase.VerifyIDTokenAndCheckRevoked(ctx, bearertoken)
 	if err != nil {
 		a.log.Error(ctx, errors.NewWithCode(codes.CodeAuthFailure, "failed to get token info with err %v", err))
-		if strings.Contains(err.Error(), expiredTokenMessage) {
+		switch {
+		case strings.Contains(err.Error(), expiredTokenMessage):
 			return nil, errors.NewWithCode(codes.CodeAuthAccessTokenExpired, "token is expired with err: %v", err)
-		} else if strings.Contains(err.Error(), revokedTokenMessage) {
+		case strings.Contains(err.Error(), revokedTokenMessage):
 			return nil, errors.NewWithCode(codes.CodeAuthRefreshTokenExpired, "token is revoked with err: %v", err)
-		} else {
+		default:
 			return nil, errors.NewWithCode(codes.CodeAuthInvalidToken, "invalid token with err: %v", err)
 		}
 	}
@@ -354,7 +358,7 @@ func (a *auth) RevokeUserRefreshToken(ctx context.Context, uid string) error {
 
 	err := a.firebase.RevokeRefreshTokens(ctx, uid)
 	if err != nil {
-		return errors.NewWithCode(codes.CodeAuthRevokeRefreshTokenFailed, err.Error())
+		return errors.NewWithCode(codes.CodeAuthRevokeRefreshTokenFailed, "%s", err.Error())
 	}
 	return nil
 }

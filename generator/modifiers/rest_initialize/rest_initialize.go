@@ -65,11 +65,14 @@ func (d *restInitialize) Initialize() error {
 
 func (d *restInitialize) addText(ln string, isFindingRegister bool, count int, lines []string) ([]string, bool, int) {
 	mapApi := d.mapApi()
-	if strings.Contains(ln, "func (r *rest) Register() {") {
+	switch {
+	case strings.Contains(ln, "func (r *rest) Register() {"):
 		isFindingRegister = true
-	} else if isFindingRegister && strings.Contains(ln, "{") {
+		lines = append(lines, ln)
+	case isFindingRegister && strings.Contains(ln, "{"):
 		count++
-	} else if isFindingRegister && strings.Contains(ln, "}") && count == 0 {
+		lines = append(lines, ln)
+	case isFindingRegister && strings.Contains(ln, "}") && count == 0:
 		temp := []string{"	// " + d.EntityNameLowerSpace}
 		if mapApi["create"] {
 			temp = append(temp, "	v1.POST(\"/"+d.EntityNameLowerDash+"\", r.Create"+d.EntityNameUpper+")")
@@ -88,10 +91,13 @@ func (d *restInitialize) addText(ln string, isFindingRegister bool, count int, l
 		}
 
 		lines = append(lines, temp...)
-	} else if isFindingRegister && strings.Contains(ln, "}") {
+		lines = append(lines, ln)
+	case isFindingRegister && strings.Contains(ln, "}"):
 		count--
+		lines = append(lines, ln)
+	default:
+		lines = append(lines, ln)
 	}
-	lines = append(lines, ln)
 
 	return lines, isFindingRegister, count
 }

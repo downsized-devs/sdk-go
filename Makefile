@@ -1,3 +1,7 @@
+.PHONY: build
+build:
+	@go build -v ./...
+
 .PHONY: run-tests
 run-tests:
 	@go test -v -failfast `go list ./...` -cover
@@ -14,6 +18,14 @@ run-integ-tests:
 run-integ-tests-report:
 	@go test -v -failfast `go list ./...` -cover  -tags=integration -coverprofile=coverage.out -json > test-report.out
 
+.PHONY: lint
+lint:
+	@`go env GOPATH`/bin/golangci-lint run
+
+.PHONY: lint-install
+lint-install:
+	@go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.0.2
+
 .PHONY:
 mock-install:
 	@go install go.uber.org/mock/mockgen@v0.4.0
@@ -27,6 +39,7 @@ mock-all:
 	@make mock util=auth subutil=auth
 	@make mock util=configbuilder subutil=configbuilder
 	@make mock util=configreader subutil=configreader
+	@make mock util=clock subutil=clock
 	@make mock util=instrument subutil=instrument
 	@make mock util=logger subutil=logger
 	@make mock util=parser subutil=parser
@@ -45,7 +58,6 @@ mock-all:
 	@make mock util=slack subutil=slack
 	@make mock util=featureflag subutil=feature_flag
 	@make mock util=ratelimiter subutil=rate_limiter
-	@make mock util=timelib subutil=timelib
 	@make mock util=security subutil=security
 	@make mock util=tracker subutil=tracker
 	@make mock util=messaging subutil=messaging

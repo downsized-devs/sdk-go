@@ -5,9 +5,9 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/hmac"
-	"crypto/md5"
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
@@ -40,7 +40,7 @@ type security struct {
 
 type ScryptConfig struct {
 	Base64SignerKey     string
-	Base64SaltSeperator string
+	Base64SaltSeparator string
 	Rounds              int
 	MemoryCost          int
 }
@@ -156,7 +156,7 @@ func (s *security) HashPassword(ctx context.Context, secretKey, password string)
 	return hex.EncodeToString(computedHash.Sum(nil))
 }
 
-func (s *security) CompareHashPassword(ctx context.Context, hashPassword, secretKey, password string) bool {
+func (s *security) CompareHashPassword(ctx context.Context, secretKey, hashPassword, password string) bool {
 	return hashPassword == s.HashPassword(ctx, secretKey, password)
 }
 
@@ -165,7 +165,7 @@ func (s *security) ScryptPassword(ctx context.Context, salt string, password str
 	N := 1 << s.scrypt.MemoryCost // CPU/memory cost parameter (must be a power of 2)
 	r := s.scrypt.Rounds          // block size parameter
 	p := 1                        // parallelization parameter
-	saltConcat := append(s.b64Stddecode(ctx, salt), s.b64Stddecode(ctx, s.scrypt.Base64SaltSeperator)...)
+	saltConcat := append(s.b64Stddecode(ctx, salt), s.b64Stddecode(ctx, s.scrypt.Base64SaltSeparator)...)
 	derivedKey, err := scrypt.Key([]byte(password), saltConcat, N, r, p, keyLen)
 	if err != nil {
 		s.log.Error(ctx, fmt.Sprintf("Error generating derived key: %v", err))
@@ -204,5 +204,9 @@ func (s *security) b64Stddecode(ctx context.Context, str string) []byte {
 }
 
 func (s *security) areBytesEqual(a, b []byte) bool {
-	return md5.Sum(a) == md5.Sum(b)
+	if len(a) != len(b) {
+		return false
+	}
+
+	return subtle.ConstantTimeCompare(a, b) == 1
 }

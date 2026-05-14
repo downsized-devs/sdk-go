@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	goerr "errors"
+
 	"github.com/blevesearch/bleve"
 	"github.com/downsized-devs/sdk-go/logger"
 )
@@ -40,7 +42,7 @@ func (i *indexer) NewIndex(ctx context.Context, indexPath string) error {
 	// Open or create the Bleve index at the specified indexPath
 	index, err := bleve.Open(indexPath)
 	if err != nil {
-		if err == bleve.ErrorIndexPathDoesNotExist {
+		if goerr.Is(err, bleve.ErrorIndexPathDoesNotExist) {
 			// If the index path does not exist, create a new index
 			indexMapping := bleve.NewIndexMapping()
 			index, err = bleve.New(indexPath, indexMapping)

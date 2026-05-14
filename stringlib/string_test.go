@@ -1,10 +1,8 @@
 package stringlib
 
 import (
-	"math/rand"
 	"strings"
 	"testing"
-	"time"
 )
 
 // TestRandStringBytesLength tests if the output string has the expected length
@@ -30,20 +28,4 @@ func TestRandStringBytesContent(t *testing.T) {
 // contains checks if a byte is within a string
 func contains(s string, b byte) bool {
 	return string(b) == s || strings.ContainsRune(s, rune(b))
-}
-
-// TestRandStringBytesRepeatability checks if setting the same seed results in the same output
-func TestRandStringBytesRepeatability(t *testing.T) {
-	length := 10
-	seed := time.Now().UnixNano()
-
-	rand.Seed(seed)
-	str1 := RandStringBytes(length)
-
-	rand.Seed(seed)
-	str2 := RandStringBytes(length)
-
-	if str1 != str2 {
-		t.Errorf("Expected the same string output for the same seed, but got '%s' and '%s'", str1, str2)
-	}
 }

@@ -102,7 +102,7 @@ func (t *tracker) PushWebhook(ctx context.Context, payload []byte, headers map[s
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, t.opt.Webhook.URL, bytes.NewBuffer(payload))
 	if err != nil {
-		return errors.NewWithCode(codes.CodeErrorHttpNewRequest, err.Error())
+		return errors.NewWithCode(codes.CodeErrorHttpNewRequest, "%s", err.Error())
 	}
 
 	for k, v := range headers {
@@ -111,16 +111,16 @@ func (t *tracker) PushWebhook(ctx context.Context, payload []byte, headers map[s
 
 	resp, err := t.webhookClient.Do(req)
 	if err != nil {
-		return errors.NewWithCode(codes.CodeErrorHttpDo, err.Error())
+		return errors.NewWithCode(codes.CodeErrorHttpDo, "%s", err.Error())
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return errors.NewWithCode(codes.CodeErrorIoutilReadAll, err.Error())
+		return errors.NewWithCode(codes.CodeErrorIoutilReadAll, "%s", err.Error())
 	}
 
 	if resp.StatusCode != 200 {
-		return errors.NewWithCode(codes.CodeErrorHttpDo, fmt.Sprintf("send event webhook error: %s", string(body)))
+		return errors.NewWithCode(codes.CodeErrorHttpDo, "send event webhook error: %s", string(body))
 	}
 
 	return nil

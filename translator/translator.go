@@ -69,7 +69,7 @@ func parseLanguageId(conf Config) (locales.Translator, []locales.Translator, err
 		case language.Indonesian:
 			locales = append(locales, id.New())
 		default:
-			return nil, nil, errors.NewWithCode(codes.CodeTranslatorError, fmt.Sprintf("unsupported languages ID %s", v))
+			return nil, nil, errors.NewWithCode(codes.CodeTranslatorError, "unsupported languages ID %s", v)
 		}
 	}
 
@@ -81,7 +81,16 @@ func parseLanguageId(conf Config) (locales.Translator, []locales.Translator, err
 }
 
 func (ut *translator) Translate(ctx context.Context, key interface{}, params ...string) (string, error) {
-	if key == nil || key.(string) == "" {
+	if key == nil {
+		return "", nil
+	}
+
+	strKey, ok := key.(string)
+	if !ok {
+		return "", errors.NewWithCode(codes.CodeTranslatorError, "key must be a string")
+	}
+
+	if strKey == "" {
 		return "", nil
 	}
 
@@ -91,6 +100,6 @@ func (ut *translator) Translate(ctx context.Context, key interface{}, params ...
 		trans = ut.translator.GetFallback()
 	}
 
-	return trans.T(key, params...)
+	return trans.T(strKey, params...)
 
 }

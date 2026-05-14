@@ -149,12 +149,64 @@ func Test_validatePage(t *testing.T) {
 		args args
 		want int64
 	}{
-		// TODO: Add test cases.
+		{
+			name: "p <= 0",
+			args: args{p: 0},
+			want: 1,
+		},
+		{
+			name: "p = 1",
+			args: args{p: 1},
+			want: 1,
+		},
+		{
+			name: "p > 1",
+			args: args{p: 2},
+			want: 2,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := validatePage(tt.args.p); got != tt.want {
 				t.Errorf("validatePage() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_normalizeSortBy(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []string
+		want  []string
+	}{
+		{
+			name:  "single comma-separated string",
+			input: []string{"param1,param2,param3"},
+			want:  []string{"param1", "param2", "param3"},
+		},
+		{
+			name:  "multiple strings unchanged",
+			input: []string{"param1", "param2"},
+			want:  []string{"param1", "param2"},
+		},
+		{
+			name:  "single string with spaces",
+			input: []string{"param1, param2"},
+			want:  []string{"param1", "param2"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := normalizeSortBy(tt.input)
+			if len(got) != len(tt.want) {
+				t.Errorf("normalizeSortBy() len = %d, want %d", len(got), len(tt.want))
+				return
+			}
+			for i := range got {
+				if got[i] != tt.want[i] {
+					t.Errorf("normalizeSortBy()[%d] = %q, want %q", i, got[i], tt.want[i])
+				}
 			}
 		})
 	}

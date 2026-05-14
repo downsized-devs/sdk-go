@@ -3,7 +3,6 @@ package gqlclient
 import (
 	"context"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -19,7 +18,7 @@ func TestDoJSON(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls++
 		is.Equal(r.Method, http.MethodPost)
-		b, err := ioutil.ReadAll(r.Body)
+		b, err := io.ReadAll(r.Body)
 		is.NoErr(err)
 		is.Equal(string(b), `{"query":"query {}","variables":null}`+"\n")
 		io.WriteString(w, `{
@@ -48,7 +47,7 @@ func TestDoJSONServerError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls++
 		is.Equal(r.Method, http.MethodPost)
-		b, err := ioutil.ReadAll(r.Body)
+		b, err := io.ReadAll(r.Body)
 		is.NoErr(err)
 		is.Equal(string(b), `{"query":"query {}","variables":null}`+"\n")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -73,7 +72,7 @@ func TestDoJSONBadRequestErr(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls++
 		is.Equal(r.Method, http.MethodPost)
-		b, err := ioutil.ReadAll(r.Body)
+		b, err := io.ReadAll(r.Body)
 		is.NoErr(err)
 		is.Equal(string(b), `{"query":"query {}","variables":null}`+"\n")
 		w.WriteHeader(http.StatusBadRequest)
@@ -102,7 +101,7 @@ func TestQueryJSON(t *testing.T) {
 	var calls int
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		calls++
-		b, err := ioutil.ReadAll(r.Body)
+		b, err := io.ReadAll(r.Body)
 		is.NoErr(err)
 		is.Equal(string(b), `{"query":"query {}","variables":{"username":"matryer"}}`+"\n")
 		_, err = io.WriteString(w, `{"data":{"value":"some data"}}`)
@@ -168,7 +167,7 @@ func TestWithClient(t *testing.T) {
 		Transport: roundTripperFunc(func(req *http.Request) (*http.Response, error) {
 			calls++
 			resp := &http.Response{
-				Body: ioutil.NopCloser(strings.NewReader(`{"data":{"key":"value"}}`)),
+				Body: io.NopCloser(strings.NewReader(`{"data":{"key":"value"}}`)),
 			}
 			return resp, nil
 		}),
@@ -388,7 +387,7 @@ func TestFile(t *testing.T) {
 		defer file.Close()
 		is.Equal(header.Filename, "filename.txt")
 
-		b, err := ioutil.ReadAll(file)
+		b, err := io.ReadAll(file)
 		is.NoErr(err)
 		is.Equal(string(b), `This is a file`)
 
@@ -410,4 +409,42 @@ type roundTripperFunc func(req *http.Request) (*http.Response, error)
 
 func (fn roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return fn(req)
+}
+
+func TestRequest_Vars(t *testing.T) {
+	req := NewRequest("query { user(id: $id) { name } }")
+	req.Var("id", 42)
+	vars := req.Vars()
+	if vars["id"] != 42 {
+		t.Errorf("Vars()['id'] = %v, want 42", vars["id"])
+	}
+}
+
+func TestRequest_Files(t *testing.T) {
+	req := NewRequest("mutation upload($file: Upload!) { upload(file: $file) }")
+	r := strings.NewReader("file content")
+	req.File("file", "test.txt", r)
+	files := req.Files()
+	if len(files) != 1 {
+		t.Fatalf("Files() returned %d files, want 1", len(files))
+	}
+	if files[0].Field != "file" || files[0].Name != "test.txt" {
+		t.Errorf("Files()[0] = {%q, %q}, want {file, test.txt}", files[0].Field, files[0].Name)
+	}
+}
+
+func TestRequest_Query(t *testing.T) {
+	q := "query { me { id } }"
+	req := NewRequest(q)
+	if got := req.Query(); got != q {
+		t.Errorf("Query() = %q, want %q", got, q)
+	}
+}
+
+func TestRequest_Vars_nil(t *testing.T) {
+	req := NewRequest("query {}")
+	// When no vars have been set, Vars() returns nil.
+	if vars := req.Vars(); vars != nil {
+		t.Errorf("Vars() on new request = %v, want nil", vars)
+	}
 }

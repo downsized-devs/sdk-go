@@ -8,6 +8,68 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_security_Init(t *testing.T) {
+	log := logger.Init(logger.Config{})
+	cfg := ScryptConfig{
+		Base64SignerKey:     "MoaHZJjRSE9Ktj6HnIkoldV+BmXpD7YVboHgJOY4SDnUNiNMTUILxlsY4igO3Uzx/n/VwFju9IC4fQfgDy7LwQ==",
+		Base64SaltSeparator: "Bw==",
+		Rounds:              8,
+		MemoryCost:          14,
+	}
+	s := Init(log, cfg)
+	if s == nil {
+		t.Error("Init() should not return nil")
+	}
+}
+
+func Test_security_areBytesEqual_DifferentLengths(t *testing.T) {
+	s := &security{log: logger.Init(logger.Config{})}
+	// Different lengths should always return false without timing leak.
+	a := []byte("short")
+	b := []byte("much longer slice")
+	if s.areBytesEqual(a, b) {
+		t.Error("areBytesEqual() should return false when lengths differ")
+	}
+}
+
+func Test_security_b64Stddecode_InvalidInput(t *testing.T) {
+	s := &security{log: logger.Init(logger.Config{})}
+	// Non-base64 input should not panic; it returns nil/empty and logs the error.
+	ctx := context.Background()
+	result := s.b64Stddecode(ctx, "!!!not-valid-base64!!!")
+	// Result is nil or empty when decoding fails.
+	if len(result) != 0 {
+		t.Errorf("b64Stddecode() with invalid input should return empty bytes, got %v", result)
+	}
+}
+
+func Test_security_Decrypt_InvalidHex(t *testing.T) {
+	s := &security{log: logger.Init(logger.Config{})}
+	ctx := context.Background()
+
+	// Invalid hex in salt field
+	_, err := s.Decrypt(ctx, "pass", 123, "ZZZZ-aabb-ccdd")
+	assert.NotNil(t, err)
+
+	// Invalid hex in iv field
+	_, err = s.Decrypt(ctx, "pass", 123, "aabb-ZZZZ-ccdd")
+	assert.NotNil(t, err)
+
+	// Invalid hex in data field
+	_, err = s.Decrypt(ctx, "pass", 123, "aabb-ccdd-ZZZZ")
+	assert.NotNil(t, err)
+}
+
+func Test_security_Decrypt_WrongKey(t *testing.T) {
+	s := &security{log: logger.Init(logger.Config{})}
+	ctx := context.Background()
+
+	// Encrypt with one passphrase, decrypt with another — aesgcm.Open should fail.
+	enc := s.Encrypt(ctx, "correct-pass", 1, "plaintext")
+	_, err := s.Decrypt(ctx, "wrong-pass", 1, enc)
+	assert.NotNil(t, err)
+}
+
 func Test_security_Encrypt_Decrypt(t *testing.T) {
 	type args struct {
 		ctx        context.Context
@@ -118,8 +180,8 @@ func Test_security_CompareHashPassword(t *testing.T) {
 	}
 	type args struct {
 		ctx          context.Context
-		hashPassword string
 		secretKey    string
+		hashPassword string
 		password     string
 	}
 	tests := []struct {
@@ -135,8 +197,8 @@ func Test_security_CompareHashPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:          context.Background(),
-				hashPassword: "93435c1a22a97eb31d56ee721b650d90cb17daf535b8f8d4727035e1cbf6821c",
 				secretKey:    "secret-key",
+				hashPassword: "93435c1a22a97eb31d56ee721b650d90cb17daf535b8f8d4727035e1cbf6821c",
 				password:     "password",
 			},
 			want: true,
@@ -148,8 +210,8 @@ func Test_security_CompareHashPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:          context.Background(),
-				hashPassword: "93435c1a22a97eb31d56ee721b650d90cb17daf535b8f8d4727035e1cbf6821c-failed",
 				secretKey:    "secret-key",
+				hashPassword: "93435c1a22a97eb31d56ee721b650d90cb17daf535b8f8d4727035e1cbf6821c-failed",
 				password:     "password",
 			},
 			want: false,
@@ -160,7 +222,7 @@ func Test_security_CompareHashPassword(t *testing.T) {
 			s := &security{
 				log: tt.fields.log,
 			}
-			if got := s.CompareHashPassword(tt.args.ctx, tt.args.hashPassword, tt.args.secretKey, tt.args.password); got != tt.want {
+			if got := s.CompareHashPassword(tt.args.ctx, tt.args.secretKey, tt.args.hashPassword, tt.args.password); got != tt.want {
 				t.Errorf("security.CompareHashPassword() = %v, want %v", got, tt.want)
 			}
 		})
@@ -170,7 +232,7 @@ func Test_security_CompareHashPassword(t *testing.T) {
 func Test_security_ScryptPassword(t *testing.T) {
 	config := ScryptConfig{
 		Base64SignerKey:     "MoaHZJjRSE9Ktj6HnIkoldV+BmXpD7YVboHgJOY4SDnUNiNMTUILxlsY4igO3Uzx/n/VwFju9IC4fQfgDy7LwQ==",
-		Base64SaltSeperator: "Bw==",
+		Base64SaltSeparator: "Bw==",
 		Rounds:              8,
 		MemoryCost:          14,
 	}
@@ -200,7 +262,7 @@ func Test_security_ScryptPassword(t *testing.T) {
 				salt:     "ekr/rlgB6tovww==",
 				password: "D0wn5izeDd3v5",
 			},
-			want: "8bVI07w7zmyTgnSU8fE2C6Nn/pzEiukZJEFkWSFch5zOxypmjRt67C0aikpfQ/3z5T2XF9vmJF5PkaskD9D1sw==",
+			want: "8WTYvjqmK1naiAZnAFthrXzvdiW2SKFW6RWCsFe8bhhCr7PZ9EUr9WgZOQSYNMoSRujIlaNluzLl7u268P1FJQ==",
 		},
 	}
 	for _, tt := range tests {
@@ -219,7 +281,7 @@ func Test_security_ScryptPassword(t *testing.T) {
 func Test_security_CompareScryptPassword(t *testing.T) {
 	config := ScryptConfig{
 		Base64SignerKey:     "MoaHZJjRSE9Ktj6HnIkoldV+BmXpD7YVboHgJOY4SDnUNiNMTUILxlsY4igO3Uzx/n/VwFju9IC4fQfgDy7LwQ==",
-		Base64SaltSeperator: "Bw==",
+		Base64SaltSeparator: "Bw==",
 		Rounds:              8,
 		MemoryCost:          14,
 	}
@@ -247,7 +309,7 @@ func Test_security_CompareScryptPassword(t *testing.T) {
 			},
 			args: args{
 				ctx:          context.Background(),
-				passwordHash: "8bVI07w7zmyTgnSU8fE2C6Nn/pzEiukZJEFkWSFch5zOxypmjRt67C0aikpfQ/3z5T2XF9vmJF5PkaskD9D1sw==",
+				passwordHash: "8WTYvjqmK1naiAZnAFthrXzvdiW2SKFW6RWCsFe8bhhCr7PZ9EUr9WgZOQSYNMoSRujIlaNluzLl7u268P1FJQ==",
 				salt:         "ekr/rlgB6tovww==",
 				password:     "D0wn5izeDd3v5",
 			},

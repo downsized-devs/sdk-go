@@ -1,10 +1,9 @@
 package operator
 
-// Go Generics for Ternary function that returns the first value if the condition is true, and returns the second value if the condition is false
+// Ternary returns a if condition is true, otherwise it returns b.
 func Ternary[T comparable](condition bool, a, b T) T {
 	if condition {
 		return a
-	} else {
-		return b
 	}
+	return b
 }

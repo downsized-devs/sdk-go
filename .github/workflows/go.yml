@@ -1,0 +1,61 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+
+    - uses: actions/cache@v5
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version-file: 'go.mod'
+
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Run gofmt
+      run: |
+        unformatted="$(gofmt -s -l .)"
+        if [ -n "$unformatted" ]; then
+          echo "Unformatted files:"
+          echo "$unformatted"
+          exit 1
+        fi
+
+    - name: Run tests
+      run: make run-tests
+
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v7.0.0
+      with:
+        version: latest
+        skip-cache: true
+        args: --timeout=10m
+
+    - name: Build
+      run: make build
+
+    - name: Coverage
+      run: make run-tests-report
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v6
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.out

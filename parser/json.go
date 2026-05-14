@@ -114,7 +114,7 @@ func (p *jsonParser) Marshal(orig interface{}) ([]byte, error) {
 	stream.WriteVal(orig)
 	result := make([]byte, stream.Buffered())
 	if stream.Error != nil {
-		return nil, errors.NewWithCode(codes.CodeJSONMarshalError, stream.Error.Error())
+		return nil, errors.NewWithCode(codes.CodeJSONMarshalError, "%s", stream.Error.Error())
 	}
 	copy(result, stream.Buffer())
 	return result, nil
@@ -130,13 +130,13 @@ func (p *jsonParser) MarshalWithSchemaValidation(sch string, orig interface{}) (
 	}
 	s, ok := p.schema[sch]
 	if !ok {
-		return nil, errors.NewWithCode(codes.CodeJSONSchemaNotFound, fmt.Sprintf("schema not found : %s", sch))
+		return nil, errors.NewWithCode(codes.CodeJSONSchemaNotFound, "schema not found : %s", sch)
 	}
 
 	blobLoader := gojsonschema.NewBytesLoader(blob)
 	res, err := s.Validate(blobLoader)
 	if err != nil {
-		return nil, errors.NewWithCode(codes.CodeJSONValidationError, err.Error())
+		return nil, errors.NewWithCode(codes.CodeJSONValidationError, "%s", err.Error())
 	}
 
 	if !res.Valid() {
@@ -156,7 +156,7 @@ func (p *jsonParser) Unmarshal(blob []byte, dest interface{}) error {
 	defer p.API.ReturnIterator(iter)
 	iter.ReadVal(dest)
 	if iter.Error != nil {
-		return errors.NewWithCode(codes.CodeJSONUnmarshalError, iter.Error.Error())
+		return errors.NewWithCode(codes.CodeJSONUnmarshalError, "%s", iter.Error.Error())
 	}
 	return nil
 }

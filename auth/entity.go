@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	revokedTokenMessage = "ID token has been revoked"
-	expiredTokenMessage = "ID token has expired"
+	revokedTokenMessage = "ID token has been revoked" //nolint:gosec
+	expiredTokenMessage = "ID token has expired"      //nolint:gosec
 )
 
 type Token struct {

@@ -41,12 +41,13 @@ func (d *usecaseInitialize) Initialize() error {
 	for scanner.Scan() {
 		ln := scanner.Text()
 		lines = append(lines, ln)
-		if strings.Contains(ln, "import (") {
+		switch {
+		case strings.Contains(ln, "import ("):
 			lines = append(lines, "	\"github.com/downsized-devs/generic-service/src/business/usecase/"+d.EntityNameSnakeCase+"\"")
 			continue
-		} else if strings.Contains(ln, "type Usecases struct {") {
+		case strings.Contains(ln, "type Usecases struct {"):
 			lines = append(lines, "	"+d.EntityNameUpper+" "+d.EntityNameSnakeCase+".Interface")
-		} else if strings.Contains(ln, "uc := &Usecases{") {
+		case strings.Contains(ln, "uc := &Usecases{"):
 			lines = append(lines, "		"+d.EntityNameUpper+":           "+d.EntityNameSnakeCase+".Init("+d.EntityNameSnakeCase+".InitParam{Log: params.Log, Dom: params.Dom."+d.EntityNameUpper+", Auth: params.Auth}),")
 		}
 	}

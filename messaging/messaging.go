@@ -17,9 +17,9 @@ const (
 )
 
 type Interface interface {
-	SubstribeToTpic(ctx context.Context, deviceToken, topic string) error
+	SubscribeToTopic(ctx context.Context, deviceToken, topic string) error
 	UnsubscribeFromTopic(ctx context.Context, deviceToken, topic string) error
-	BroadCastToTopic(ctx context.Context, topic string, payload map[string]string) error
+	BroadcastToTopic(ctx context.Context, topic string, payload map[string]string) error
 	BatchSendDryRun(ctx context.Context, tokens []string) ([]string, error)
 }
 
@@ -81,7 +81,7 @@ func Init(cfg Config, log logger.Interface, json parser.JsonInterface, httpClien
 }
 
 // Function to allow a device to subscribe from specific topic
-func (m *messaging) SubstribeToTpic(ctx context.Context, deviceToken, topic string) error {
+func (m *messaging) SubscribeToTopic(ctx context.Context, deviceToken, topic string) error {
 	tokens := []string{deviceToken}
 
 	// This guarante return an error if the device token is not subscribed properly (e.g device token is malformed, or even does not exist)
@@ -107,7 +107,7 @@ func (m *messaging) UnsubscribeFromTopic(ctx context.Context, deviceToken, topic
 }
 
 // Function to send a messagte to specific topic
-func (m *messaging) BroadCastToTopic(ctx context.Context, topic string, payload map[string]string) error {
+func (m *messaging) BroadcastToTopic(ctx context.Context, topic string, payload map[string]string) error {
 	message := &firebase_messaging.Message{
 		Data:  payload,
 		Topic: topic,

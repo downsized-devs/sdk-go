@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"crypto/tls"
+	goerr "errors"
 	"fmt"
 	"time"
 
@@ -16,7 +17,7 @@ import (
 var ErrNotObtained = redislock.ErrNotObtained
 
 const (
-	Nil = redis.Nil
+	Nil = redis.Nil //nolint: errname
 )
 
 type Locker *redislock.Lock
@@ -75,8 +76,11 @@ func (c *cache) connect(ctx context.Context) {
 	}
 
 	if c.conf.TLS.Enabled {
+		if c.conf.TLS.InsecureSkipVerify {
+			c.log.Warn(ctx, "redis TLS: InsecureSkipVerify is enabled — TLS certificate verification is disabled; do not use this in production")
+		}
 		redisOpts.TLSConfig = &tls.Config{
-			InsecureSkipVerify: c.conf.TLS.InsecureSkipVerify,
+			InsecureSkipVerify: c.conf.TLS.InsecureSkipVerify, //nolint:gosec
 		}
 	}
 
@@ -109,7 +113,7 @@ func (c *cache) SetEX(ctx context.Context, key string, val string, expTime time.
 
 	err := c.rdb.SetEX(ctx, key, val, expTime).Err()
 	if err != nil {
-		return errors.NewWithCode(codes.CodeRedisSetex, err.Error())
+		return errors.NewWithCode(codes.CodeRedisSetex, "%s", err.Error())
 	}
 
 	return nil
@@ -118,10 +122,10 @@ func (c *cache) SetEX(ctx context.Context, key string, val string, expTime time.
 func (c *cache) Lock(ctx context.Context, key string, expTime time.Duration) (*redislock.Lock, error) {
 	// Obtain lock
 	lock, err := c.rlock.Obtain(ctx, key, expTime, nil)
-	if err == redislock.ErrNotObtained {
+	if goerr.Is(err, redislock.ErrNotObtained) {
 		return nil, err
 	} else if err != nil {
-		return nil, errors.NewWithCode(codes.CodeFailedLock, err.Error())
+		return nil, errors.NewWithCode(codes.CodeFailedLock, "%s", err.Error())
 	}
 
 	return lock, nil
@@ -130,10 +134,10 @@ func (c *cache) Lock(ctx context.Context, key string, expTime time.Duration) (*r
 func (c *cache) LockRelease(ctx context.Context, lock *redislock.Lock) error {
 	if lock != nil {
 		err := lock.Release(ctx)
-		if err == redislock.ErrLockNotHeld {
+		if goerr.Is(err, redislock.ErrLockNotHeld) {
 			return err
 		} else if err != nil {
-			return errors.NewWithCode(codes.CodeFailedReleaseLock, err.Error())
+			return errors.NewWithCode(codes.CodeFailedReleaseLock, "%s", err.Error())
 		}
 	}
 
@@ -152,7 +156,7 @@ func (c *cache) Del(ctx context.Context, key string) error {
 	if err := iter.Err(); err != nil {
 		return err
 	}
-	c.log.Info(ctx, fmt.Sprintf("sucessfuly deleted %d numbers of key", keysCount))
+	c.log.Info(ctx, fmt.Sprintf("successfully deleted %d numbers of key", keysCount))
 
 	return nil
 }
