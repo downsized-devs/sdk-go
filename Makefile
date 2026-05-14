@@ -1,26 +1,21 @@
 .PHONY: build
 build:
-	@make lint
 	@go build -v ./...
 
 .PHONY: run-tests
 run-tests:
-	@make lint
 	@go test -v -failfast `go list ./...` -cover
 
 .PHONY: run-tests-report
 run-tests-report:
-	@make lint
 	@go test -v -failfast `go list ./...` -cover -coverprofile=coverage.out -json > test-report.out
 
 .PHONY: run-integ-tests
 run-integ-tests:
-	@make lint
 	@go test -v -failfast `go list ./...` -cover -tags=integration
 
 .PHONY: run-integ-tests-report
 run-integ-tests-report:
-	@make lint
 	@go test -v -failfast `go list ./...` -cover  -tags=integration -coverprofile=coverage.out -json > test-report.out
 
 .PHONY: lint
