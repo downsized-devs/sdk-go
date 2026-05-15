@@ -1,9 +1,13 @@
 name: "CodeQL config for sdk-go"
 
-# Use GitHub's security-extended pack on top of the default query suite.
-# Drop this line to keep just the default suite.
+# Run two query suites in one analysis:
+#   security-extended  → submitted as Code Scanning (Security tab)
+#   code-quality       → submitted as Code Quality (Code Quality tab)
+# The split between Security and Code Quality is controlled by `analysis-kinds`
+# on the analyze step in .github/workflows/codeql.yml.
 queries:
   - uses: security-extended
+  - uses: code-quality
 
 # Exclude generated code, vendored dependencies, and test fixtures from
 # being scanned and from contributing to alert counts.
