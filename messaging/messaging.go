@@ -23,9 +23,19 @@ type Interface interface {
 	BatchSendDryRun(ctx context.Context, tokens []string) ([]string, error)
 }
 
+// firebaseMessenger is the internal seam over firebase.google.com/go/messaging.Client
+// so tests can swap in a fake. The real *firebase_messaging.Client satisfies it
+// automatically.
+type firebaseMessenger interface {
+	SubscribeToTopic(ctx context.Context, tokens []string, topic string) (*firebase_messaging.TopicManagementResponse, error)
+	UnsubscribeFromTopic(ctx context.Context, tokens []string, topic string) (*firebase_messaging.TopicManagementResponse, error)
+	Send(ctx context.Context, message *firebase_messaging.Message) (string, error)
+	SendMulticastDryRun(ctx context.Context, message *firebase_messaging.MulticastMessage) (*firebase_messaging.BatchResponse, error)
+}
+
 type messaging struct {
 	log      logger.Interface
-	firebase *firebase_messaging.Client
+	firebase firebaseMessenger
 }
 
 type FirebaseAccountKey struct {

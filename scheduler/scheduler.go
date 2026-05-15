@@ -47,7 +47,7 @@ type scheduler struct {
 	engine gocron.Scheduler
 }
 
-func New(cfg Config, log logger.Interface) Interface {
+func Init(cfg Config, log logger.Interface) Interface {
 	engine, err := gocron.NewScheduler()
 	if err != nil {
 		log.Panic(err)
@@ -90,6 +90,8 @@ func (s *scheduler) Register(ctx context.Context, opt JobOption, handlerFunc any
 		jobOption = gocron.MonthlyJob(1, gocron.NewDaysOfTheMonth(opt.RunningDate), gocron.NewAtTimes(
 			gocron.NewAtTime(uint(opt.RunningTime.Hour()), uint(opt.RunningTime.Minute()), uint(opt.RunningTime.Second())), //nolint:gosec
 		))
+	default:
+		return fmt.Errorf("scheduler: unknown JobType %q", opt.JobType)
 	}
 
 	job, err := s.engine.NewJob(jobOption, gocron.NewTask(handlerFunc))

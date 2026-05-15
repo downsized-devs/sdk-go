@@ -35,7 +35,7 @@ Pick the entry-point package for what you're trying to build. The full catalogue
 | **Time & jobs** | [`clock`](./clock), [`dates`](./dates), [`scheduler`](./scheduler) |
 | **Files & documents** | [`files`](./files), [`pdf`](./pdf), [`parser`](./parser) |
 | **Primitives & helpers** | [`character`](./character), [`checker`](./checker), [`convert`](./convert), [`num`](./num), [`operator`](./operator), [`stringlib`](./stringlib), [`header`](./header) |
-| **Tooling** | [`generator`](./generator) (CLI scaffolder), [`tests`](./tests) (gomock fixtures) |
+| **Tooling** | [`tests`](./tests) (gomock fixtures). The scaffolding CLI is now [`scaffolder-go`](https://github.com/downsized-devs/scaffolder-go). |
 
 ## Common Use Cases
 
@@ -55,7 +55,7 @@ Pick the entry-point package for what you're trying to build. The full catalogue
 | Send transactional email with MJML templates | [`email`](./email) |
 | Send Slack notifications | [`slack`](./slack) |
 | Multi-language responses | [`language`](./language) + [`translator`](./translator) |
-| Generate API boilerplate | `go run github.com/downsized-devs/sdk-go/generator --name X --path ./svc --api` |
+| Generate API boilerplate | `go run github.com/downsized-devs/scaffolder-go --entity_name X --file_location ./svc --api "create,edit,get,delete"` |
 
 ## Minimal example
 
@@ -81,9 +81,8 @@ func main() {
 Every top-level directory is a self-contained package. Internal dependencies form a DAG with `logger`, `codes`, and `errors` as the most-depended-on nodes — see [docs/DEPENDENCY_GRAPH.md](./docs/DEPENDENCY_GRAPH.md).
 
 ```
-/<package>/         # one package per directory (41 in total)
+/<package>/         # one package per directory (40 in total)
 /docs/              # cross-cutting documentation
-/generator/         # code-scaffolding CLI
 /tests/mock/        # gomock fixtures, one subdir per mockable package
 Makefile, go.mod    # repository root
 ```
@@ -99,7 +98,7 @@ Makefile, go.mod    # repository root
 
 ## Migration & breaking changes
 
-Stable packages follow semantic versioning at the module level. The full policy is in [STABILITY.md](./STABILITY.md). Each major release ships a `MIGRATION-vX.md` in `docs/` describing renamed symbols, removed packages, and field reshapes — none exist yet because no v1.0 has been cut.
+From `v1.0.0` onward, every package is **Stable** and follows the binding semver policy in [STABILITY.md](./STABILITY.md). Each major release ships a `MIGRATION-vX.md` in `docs/` describing renamed symbols, removed packages, and field reshapes.
 
 If a breaking change is unavoidable in a minor release, expect:
 
@@ -107,23 +106,21 @@ If a breaking change is unavoidable in a minor release, expect:
 2. The new symbol shipped alongside the old one for one minor cycle.
 3. Removal only at the next major version.
 
-## Roadmap (inferred)
+## Roadmap
 
-The roadmap below is a **proposal** based on what's in tree today, not a published plan. Maintainers should edit before publishing.
+- **v1.0** — every package Stable; semver becomes binding (see [STABILITY.md](./STABILITY.md)).
+- **Post-v1** — additive only on Stable interfaces. Deprecations carry one minor cycle before removal at the next major.
 
-- **Near term** — close out the in-flight bug-fix branches (`copilot/fix-*`); raise test coverage for `featureflag`, `messaging`, `nosql`, `scheduler` (currently no tests).
-- **Pre-v1.0** — replace the "find a better way" helper in `query/query.go:12`; finalise `pdf` API surface; decide whether `generator` ships in the same module or becomes its own repo.
-- **v1.0** — freeze the `Interface` shape of every "Stable" package; commit to semver guarantees in [STABILITY.md](./STABILITY.md).
+## Code scaffolder
 
-## Code Generator
-
-The [`generator`](./generator) folder contains a scaffolding tool for new services:
+The code-scaffolding CLI lives in its own repo: [`scaffolder-go`](https://github.com/downsized-devs/scaffolder-go).
 
 ```bash
-go run ./generator --name <EntityName> --path <output-path> --api
+go run github.com/downsized-devs/scaffolder-go \
+    --entity_name <EntityName> \
+    --file_location <output-path> \
+    --api "create,edit,get,activate,delete"
 ```
-
-See [generator/README.md](./generator/README.md) for flag details.
 
 ## Tooling
 

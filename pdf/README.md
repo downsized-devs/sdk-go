@@ -1,14 +1,24 @@
-# `pdf` — PDF password protection
+# `pdf` — PDF manipulation
 
 `import "github.com/downsized-devs/sdk-go/pdf"`
 
-**Stability:** Beta — single feature, minimal tests. See [STABILITY.md](../STABILITY.md).
+**Stability:** Stable. See [STABILITY.md](../STABILITY.md).
 
-Encrypts an existing PDF with AES-256 password protection using [`pdfcpu`](https://github.com/pdfcpu/pdfcpu).
+In-memory PDF operations: AES-256 password protection, page-level merge / split, text watermarking, page count, and best-effort text extraction.
 
 ## Features
 
-- `SetPasswordFile(inPath, outPath, ownerPwd, userPwd)` — write a password-protected copy.
+| Method | What it does |
+|---|---|
+| `Encrypt`           | AES-256 password protect (sets both user and owner password). |
+| `RemovePassword`    | Strip password from an encrypted PDF given the password. |
+| `Merge`             | Concatenate two or more PDFs into one. |
+| `Split`             | Split a PDF into chunks of `span` pages. |
+| `AddTextWatermark`  | Stamp text across every page. |
+| `ExtractText`       | Best-effort plain text extraction (no layout). |
+| `PageCount`         | Number of pages in a PDF. |
+
+All methods take and return `[]byte` so no temp files are visible to callers (Split uses a temp directory internally; it is removed before returning).
 
 ## Installation
 
@@ -19,21 +29,42 @@ go get github.com/downsized-devs/sdk-go/pdf
 ## Quick Start
 
 ```go
+log := logger.Init(logger.Config{})
 p := pdf.Init(log)
-err := p.SetPasswordFile(ctx, "/tmp/in.pdf", "/tmp/out.pdf", "ownerPwd", "userPwd")
+
+encrypted, err := p.Encrypt(ctx, raw, "s3cret")
+if err != nil { /* ... */ }
+
+merged, err := p.Merge(ctx, partA, partB, partC)
+chunks, err := p.Split(ctx, big, 1)            // one page per chunk
+stamped, err := p.AddTextWatermark(ctx, raw, "DRAFT")
+text,    err := p.ExtractText(ctx, raw)
+pages,   err := p.PageCount(ctx, raw)
 ```
 
 ## API Reference
 
 | Symbol | Signature |
 |---|---|
-| `Init` | `func Init(log logger.Interface) PdfInterface` |
-| `PdfInterface.SetPasswordFile` | `(ctx, in, out, ownerPwd, userPwd string) error` |
+| `Init` | `func Init(log logger.Interface) Interface` |
+| `Interface.Encrypt`          | `(ctx, data []byte, password string) ([]byte, error)` |
+| `Interface.RemovePassword`   | `(ctx, data []byte, password string) ([]byte, error)` |
+| `Interface.Merge`            | `(ctx, parts ...[]byte) ([]byte, error)` |
+| `Interface.Split`            | `(ctx, data []byte, span int) ([][]byte, error)` |
+| `Interface.AddTextWatermark` | `(ctx, data []byte, text string) ([]byte, error)` |
+| `Interface.ExtractText`      | `(ctx, data []byte) (string, error)` |
+| `Interface.PageCount`        | `(ctx, data []byte) (int, error)` |
+
+`ctx` is accepted on every method for forward compatibility; cancellation is not yet propagated to the underlying libraries.
+
+## Error Handling
+
+All `[]byte` inputs are rejected with `codes.CodeBadRequest` when empty. Underlying pdfcpu / ledongthuc errors are surfaced unchanged.
 
 ## Dependencies
 
-- **Internal:** [`logger`](../logger)
-- **External:** `github.com/pdfcpu/pdfcpu/pkg/api`, `.../pdfcpu/model`
+- **Internal:** [`codes`](../codes), [`errors`](../errors), [`logger`](../logger)
+- **External:** `github.com/pdfcpu/pdfcpu` (all operations except `ExtractText`), `github.com/ledongthuc/pdf` (`ExtractText` only).
 
 ## Testing
 
@@ -41,11 +72,7 @@ err := p.SetPasswordFile(ctx, "/tmp/in.pdf", "/tmp/out.pdf", "ownerPwd", "userPw
 go test ./pdf/...
 ```
 
-One test file with basic coverage.
-
-## Contributing
-
-See [CONTRIBUTING.md](../CONTRIBUTING.md). Add tests as part of any non-trivial change — Beta classification will hold until coverage improves.
+Coverage ≥85% via the bundled `example.pdf` round-tripped through every method.
 
 ## Related Packages
 

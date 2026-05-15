@@ -1,6 +1,6 @@
 # Stability Policy
 
-> How we version `sdk-go`, what each stability level promises, and how breaking changes are introduced. Stability levels here were **inferred from code signals** (test presence, exported `Interface`, TODO markers) — maintainers should review and adjust before treating this as policy.
+> How we version `sdk-go`, what each stability level promises, and how breaking changes are introduced.
 
 ## Versioning
 
@@ -8,51 +8,46 @@
 
 We follow [semantic versioning](https://semver.org):
 
-- **MAJOR** — breaking changes to any **Stable** package's public API.
-- **MINOR** — additive changes to Stable packages; any change (including breaking) to **Beta** or **Experimental** packages.
-- **PATCH** — bug fixes only.
+- **MAJOR** — breaking changes to any Stable package's public API. Allowed.
+- **MINOR** — additive changes only to Stable packages. Old code keeps compiling.
+- **PATCH** — bug fixes only. No surface changes.
 
-> No v1.0.0 has been cut yet. Until then, every release is `0.y.z` and the project reserves the right to make breaking changes in minor versions across all packages — though we will avoid this in practice for the packages marked Stable below.
+Starting with **v1.0.0** this contract is **binding**: no breaking change ships outside a major version. Pre-v1 tags (`v0.y.z`) made no such promise.
 
 ## Stability levels
 
 | Level | What it means | Breaking-change cadence |
 |---|---|---|
-| **Stable** | Public `Interface` is frozen; covered by tests; relied on internally and externally. | Only at major version bumps after v1.0. |
-| **Beta** | API is mostly settled but may shift. Tests partial or absent. Suitable for production with care. | May break in minor versions. |
+| **Stable** | Public `Interface` is frozen; covered by tests; relied on internally and externally. | Only at major version bumps. |
+| **Beta** | API is mostly settled but may shift. Suitable for production with care. | May break in minor versions. |
 | **Experimental** | Early-stage or single-use. API will change. | May break or be removed without notice. |
 | **Deprecated** | Replaced by another package or symbol. Kept for one major version then removed. | Receives only critical bug fixes. |
 
-## Per-package stability
-
-Stability below is **inferred from code signals only** — presence of tests, presence of an exported `Interface`, and any in-source `TODO`/`FIXME` markers. Maintainers should override any row that doesn't match their actual stance.
+## Per-package stability (v1.0.0)
 
 ### Stable
 
-`appcontext`, `audit`, `auth`, `character`, `checker`, `clock`, `codes`, `configbuilder`, `configreader`, `convert`, `dates`, `email`, `errors`, `files`, `gqlclient`, `header`, `instrument`, `language`, `local_storage`, `logger`, `null`, `num`, `operator`, `parser`, `ratelimiter`, `redis`, `security`, `slack`, `sql`, `storage`, `stringlib`, `tracker`, `translator`
+`appcontext`, `audit`, `auth`, `character`, `checker`, `clock`, `codes`, `configbuilder`, `configreader`, `convert`, `dates`, `email`, `errors`, `featureflag`, `files`, `gqlclient`, `header`, `instrument`, `language`, `local_storage`, `logger`, `messaging`, `nosql`, `null`, `num`, `operator`, `parser`, `pdf`, `query`, `ratelimiter`, `redis`, `scheduler`, `security`, `slack`, `sql`, `storage`, `stringlib`, `tracker`, `translator`
 
-Signals: exported `Interface`, ≥1 test file with meaningful coverage, no in-source deprecation markers, used by ≥2 other packages or by external consumers.
+All Stable packages share these traits:
+
+- Exported `Interface` (or, where one package houses several seams: `JsonInterface`/`CsvInterface`/`TemplateInterface`) with a frozen signature.
+- ≥1 test file with meaningful coverage. Packages whose tests require an external service (sql, slack, tracker) ship integration tests under `//go:build integration`.
+- No `// TODO` / `// FIXME` markers on hot paths in the public API.
+
+Adding a new public symbol is a minor bump; renaming or removing one is a major bump.
 
 ### Beta
 
-| Package | Why Beta (signal) |
-|---|---|
-| `featureflag` | No test files in package; wraps a fast-moving upstream (`go-feature-flag`). |
-| `messaging` | No test files in package; Firebase Cloud Messaging surface may grow. |
-| `nosql` | No test files in package; MongoDB API surface is intentionally small but not exercised. |
-| `pdf` | Single-feature (`SetPasswordFile`); minimal test; expect more methods. |
-| `query` | `// I hate this, find a better way for insert many rows` TODO in `query/query.go`. The clause-builder side is mature but the bulk-insert helper is on notice. |
-| `scheduler` | No test files in package; gocron upstream still evolving. |
+_None._ The `pdf`, `query`, `featureflag`, `messaging`, `nosql`, and `scheduler` packages were promoted to Stable in v1.0 after their gaps (missing tests, in-flight rewrites) were closed.
 
 ### Experimental
 
-| Package | Why Experimental (signal) |
-|---|---|
-| `generator` | CLI tool, not a library. Public surface is the flags, not Go symbols. Templates change with consumer needs. |
+_None._ The code-scaffolding CLI that previously lived under `generator/` was extracted to a sibling repo, [`scaffolder-go`](https://github.com/downsized-devs/scaffolder-go), before v1.
 
 ### Deprecated
 
-None at this time.
+_None._
 
 ## Breaking-change policy
 
@@ -65,7 +60,7 @@ A "breaking change" to a Stable package means any of:
 
 For Stable packages, breaking changes follow this dance:
 
-1. **Deprecate.** Add `// Deprecated: use NewThing instead.` on the symbol. Add a row to the [Deprecations](#current-deprecations) table below in the same PR.
+1. **Deprecate.** Add `// Deprecated: use NewThing instead.` on the symbol. Add a row to the [Current deprecations](#current-deprecations) table below in the same PR.
 2. **Provide the replacement.** Ship the new symbol alongside the old one for at least one minor version.
 3. **Remove.** Drop the deprecated symbol at the next major version.
 
@@ -82,8 +77,6 @@ Adding a new method to an existing `Interface` is the most common foot-gun — i
 - The **latest minor** of the current major receives bug fixes and security patches.
 - The **previous major** receives security patches only for 6 months after the next major ships.
 - Older majors are end-of-life and will not receive any updates.
-
-This is the *intended* policy after v1.0. Before v1.0 we make no support guarantees and recommend pinning to a specific tag.
 
 ## How to propose a stability change
 

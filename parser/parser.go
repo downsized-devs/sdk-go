@@ -2,7 +2,7 @@ package parser
 
 import "github.com/downsized-devs/sdk-go/logger"
 
-type Parser interface {
+type Interface interface {
 	JsonParser() JsonInterface
 	CsvParser() CsvInterface
 }
@@ -17,7 +17,7 @@ type parser struct {
 	Csv  CsvInterface
 }
 
-func InitParser(log logger.Interface, opt Options) Parser {
+func Init(log logger.Interface, opt Options) Interface {
 	return &parser{
 		Json: initJson(opt.JsonOptions, log),
 		Csv:  initCsv(),

@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	messaging "firebase.google.com/go/messaging"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -20,6 +21,7 @@ import (
 type MockInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockInterfaceMockRecorder is the mock recorder for MockInterface.
@@ -54,32 +56,32 @@ func (mr *MockInterfaceMockRecorder) BatchSendDryRun(ctx, tokens any) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchSendDryRun", reflect.TypeOf((*MockInterface)(nil).BatchSendDryRun), ctx, tokens)
 }
 
-// BroadCastToTopic mocks base method.
-func (m *MockInterface) BroadCastToTopic(ctx context.Context, topic string, payload map[string]string) error {
+// BroadcastToTopic mocks base method.
+func (m *MockInterface) BroadcastToTopic(ctx context.Context, topic string, payload map[string]string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BroadCastToTopic", ctx, topic, payload)
+	ret := m.ctrl.Call(m, "BroadcastToTopic", ctx, topic, payload)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// BroadCastToTopic indicates an expected call of BroadCastToTopic.
-func (mr *MockInterfaceMockRecorder) BroadCastToTopic(ctx, topic, payload any) *gomock.Call {
+// BroadcastToTopic indicates an expected call of BroadcastToTopic.
+func (mr *MockInterfaceMockRecorder) BroadcastToTopic(ctx, topic, payload any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BroadCastToTopic", reflect.TypeOf((*MockInterface)(nil).BroadCastToTopic), ctx, topic, payload)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BroadcastToTopic", reflect.TypeOf((*MockInterface)(nil).BroadcastToTopic), ctx, topic, payload)
 }
 
-// SubstribeToTpic mocks base method.
-func (m *MockInterface) SubstribeToTpic(ctx context.Context, deviceToken, topic string) error {
+// SubscribeToTopic mocks base method.
+func (m *MockInterface) SubscribeToTopic(ctx context.Context, deviceToken, topic string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SubstribeToTpic", ctx, deviceToken, topic)
+	ret := m.ctrl.Call(m, "SubscribeToTopic", ctx, deviceToken, topic)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SubstribeToTpic indicates an expected call of SubstribeToTpic.
-func (mr *MockInterfaceMockRecorder) SubstribeToTpic(ctx, deviceToken, topic any) *gomock.Call {
+// SubscribeToTopic indicates an expected call of SubscribeToTopic.
+func (mr *MockInterfaceMockRecorder) SubscribeToTopic(ctx, deviceToken, topic any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubstribeToTpic", reflect.TypeOf((*MockInterface)(nil).SubstribeToTpic), ctx, deviceToken, topic)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubscribeToTopic", reflect.TypeOf((*MockInterface)(nil).SubscribeToTopic), ctx, deviceToken, topic)
 }
 
 // UnsubscribeFromTopic mocks base method.
@@ -94,4 +96,88 @@ func (m *MockInterface) UnsubscribeFromTopic(ctx context.Context, deviceToken, t
 func (mr *MockInterfaceMockRecorder) UnsubscribeFromTopic(ctx, deviceToken, topic any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnsubscribeFromTopic", reflect.TypeOf((*MockInterface)(nil).UnsubscribeFromTopic), ctx, deviceToken, topic)
+}
+
+// MockfirebaseMessenger is a mock of firebaseMessenger interface.
+type MockfirebaseMessenger struct {
+	ctrl     *gomock.Controller
+	recorder *MockfirebaseMessengerMockRecorder
+	isgomock struct{}
+}
+
+// MockfirebaseMessengerMockRecorder is the mock recorder for MockfirebaseMessenger.
+type MockfirebaseMessengerMockRecorder struct {
+	mock *MockfirebaseMessenger
+}
+
+// NewMockfirebaseMessenger creates a new mock instance.
+func NewMockfirebaseMessenger(ctrl *gomock.Controller) *MockfirebaseMessenger {
+	mock := &MockfirebaseMessenger{ctrl: ctrl}
+	mock.recorder = &MockfirebaseMessengerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockfirebaseMessenger) EXPECT() *MockfirebaseMessengerMockRecorder {
+	return m.recorder
+}
+
+// Send mocks base method.
+func (m *MockfirebaseMessenger) Send(ctx context.Context, message *messaging.Message) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Send", ctx, message)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Send indicates an expected call of Send.
+func (mr *MockfirebaseMessengerMockRecorder) Send(ctx, message any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockfirebaseMessenger)(nil).Send), ctx, message)
+}
+
+// SendMulticastDryRun mocks base method.
+func (m *MockfirebaseMessenger) SendMulticastDryRun(ctx context.Context, message *messaging.MulticastMessage) (*messaging.BatchResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendMulticastDryRun", ctx, message)
+	ret0, _ := ret[0].(*messaging.BatchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SendMulticastDryRun indicates an expected call of SendMulticastDryRun.
+func (mr *MockfirebaseMessengerMockRecorder) SendMulticastDryRun(ctx, message any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMulticastDryRun", reflect.TypeOf((*MockfirebaseMessenger)(nil).SendMulticastDryRun), ctx, message)
+}
+
+// SubscribeToTopic mocks base method.
+func (m *MockfirebaseMessenger) SubscribeToTopic(ctx context.Context, tokens []string, topic string) (*messaging.TopicManagementResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SubscribeToTopic", ctx, tokens, topic)
+	ret0, _ := ret[0].(*messaging.TopicManagementResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SubscribeToTopic indicates an expected call of SubscribeToTopic.
+func (mr *MockfirebaseMessengerMockRecorder) SubscribeToTopic(ctx, tokens, topic any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubscribeToTopic", reflect.TypeOf((*MockfirebaseMessenger)(nil).SubscribeToTopic), ctx, tokens, topic)
+}
+
+// UnsubscribeFromTopic mocks base method.
+func (m *MockfirebaseMessenger) UnsubscribeFromTopic(ctx context.Context, tokens []string, topic string) (*messaging.TopicManagementResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UnsubscribeFromTopic", ctx, tokens, topic)
+	ret0, _ := ret[0].(*messaging.TopicManagementResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UnsubscribeFromTopic indicates an expected call of UnsubscribeFromTopic.
+func (mr *MockfirebaseMessengerMockRecorder) UnsubscribeFromTopic(ctx, tokens, topic any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UnsubscribeFromTopic", reflect.TypeOf((*MockfirebaseMessenger)(nil).UnsubscribeFromTopic), ctx, tokens, topic)
 }

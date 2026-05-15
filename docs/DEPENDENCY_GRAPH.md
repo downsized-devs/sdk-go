@@ -135,7 +135,6 @@ Each row lists the **direct** sibling packages a given package imports.
 | errors | codes, language, operator |
 | featureflag | logger |
 | files | — |
-| generator | (internal subpackages only) |
 | gqlclient | — |
 | header | — |
 | instrument | — |
