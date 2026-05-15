@@ -85,7 +85,7 @@ jobs:
           echo "new_version=v${major}.${minor}.${patch}" >> "$GITHUB_OUTPUT"
 
       - name: Check Semver Format
-        run: ./semver -v ${{ steps.bump-semver.outputs.new_version }}
+        run: bash ./semver -v "${{ steps.bump-semver.outputs.new_version }}"
 
       - name: Create Release Notes
         id: create-release
