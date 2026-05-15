@@ -69,6 +69,14 @@ func (i *indexer) NewIndex(ctx context.Context, indexPath string) error {
 }
 
 func (idx *indexer) Index(ctx context.Context, key string, data interface{}) error {
+	if idx == nil {
+		return fmt.Errorf("indexer is nil")
+	}
+
+	if idx.index == nil {
+		return fmt.Errorf("bleve index is not initialized: call NewIndex before Index")
+	}
+
 	if err := idx.index.Index(key, data); err != nil {
 		return err
 	}
@@ -77,6 +85,10 @@ func (idx *indexer) Index(ctx context.Context, key string, data interface{}) err
 }
 
 func (idx *indexer) Search(ctx context.Context, query string) ([]string, error) {
+	if idx.index == nil {
+		return nil, fmt.Errorf("index is not initialized")
+	}
+
 	searchRequest := bleve.NewSearchRequest(bleve.NewQueryStringQuery(query))
 	searchResult, err := idx.index.Search(searchRequest)
 	if err != nil {

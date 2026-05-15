@@ -70,18 +70,27 @@ func (d *usecaseItem) Replace() error {
 	return nil
 }
 
-func (d *usecaseItem) AppendInterfaceAndFunction() error {
-	f, err := os.OpenFile(d.Location+"/src/business/usecase/"+d.EntityNameSnakeCase+"/"+d.EntityNameSnakeCase+".go", os.O_RDWR, 0644)
+func (d *usecaseItem) AppendInterfaceAndFunction() (err error) {
+	path := d.Location + "/src/business/usecase/" + d.EntityNameSnakeCase + "/" + d.EntityNameSnakeCase + ".go"
+
+	// Read phase: load existing content into memory.
+	fRead, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
 		return err
 	}
-	scanner := bufio.NewScanner(f)
+	scanner := bufio.NewScanner(fRead)
 	lines := []string{}
 	for scanner.Scan() {
-		ln := scanner.Text()
-		lines = append(lines, ln)
+		lines = append(lines, scanner.Text())
 	}
-	f.Close()
+	if scanErr := scanner.Err(); scanErr != nil {
+		_ = fRead.Close()
+		return scanErr
+	}
+	if closeErr := fRead.Close(); closeErr != nil {
+		return closeErr
+	}
+
 	for _, api := range d.Api {
 		apiLower := strings.ToLower(api)
 		apiLower = strings.ReplaceAll(apiLower, " ", "")
@@ -92,16 +101,21 @@ func (d *usecaseItem) AppendInterfaceAndFunction() error {
 		}
 	}
 	content := strings.Join(lines, "\n")
-	f, err = os.OpenFile(d.Location+"/src/business/usecase/"+d.EntityNameSnakeCase+"/"+d.EntityNameSnakeCase+".go", os.O_RDWR, 0644)
+
+	// Write phase: re-open the file and rewrite from offset 0. The deferred
+	// close preserves any earlier err (CWE-252: writable handles can lose
+	// data on Close failure).
+	f, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		if closeErr := f.Close(); closeErr != nil && err == nil {
+			err = closeErr
+		}
+	}()
 	_, err = f.WriteAt([]byte(content), 0)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 func (d *usecaseItem) appendInterface(lines []string, api string) []string {
 	tempInterface := map[string]string{
@@ -138,18 +152,23 @@ func (d *usecaseItem) replaceFunction(templatePath, generatedPath string) (*os.F
 	return file, nil
 }
 
-func (d *usecaseItem) getFunction(path string) ([]string, error) {
+func (d *usecaseItem) getFunction(path string) (lines []string, err error) {
 	f, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		if closeErr := f.Close(); closeErr != nil && err == nil {
+			err = closeErr
+		}
+	}()
 	scanner := bufio.NewScanner(f)
-	lines := []string{}
 	for scanner.Scan() {
-		ln := scanner.Text()
-		lines = append(lines, ln)
+		lines = append(lines, scanner.Text())
 	}
-	f.Close()
+	if scanErr := scanner.Err(); scanErr != nil {
+		return lines, scanErr
+	}
 	return lines, nil
 }
 
