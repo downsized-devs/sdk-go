@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main ]
 
+# Principle of least privilege: this workflow only reads source code and
+# uploads coverage (which uses CODECOV_TOKEN, not GITHUB_TOKEN). No write
+# access to the repo is required.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest

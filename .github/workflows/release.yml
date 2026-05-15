@@ -1,5 +1,11 @@
 name: "SDK: Release"
 
+# Principle of least privilege: this workflow creates a GitHub release via
+# the REST API. contents:write is the only GITHUB_TOKEN scope required;
+# Slack notifications use SLACK_WEBHOOK_URL, not GITHUB_TOKEN.
+permissions:
+  contents: write
+
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
