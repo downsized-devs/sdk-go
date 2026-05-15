@@ -16,12 +16,12 @@ import (
 
 // fakeFirebaseAuth captures calls and returns canned responses.
 type fakeFirebaseAuth struct {
-	getUsersRes  *firebase_auth.GetUsersResult
-	getUsersErr  error
-	getUsersIds  []firebase_auth.UserIdentifier
+	getUsersRes *firebase_auth.GetUsersResult
+	getUsersErr error
+	getUsersIds []firebase_auth.UserIdentifier
 
-	createRes  *firebase_auth.UserRecord
-	createErr  error
+	createRes *firebase_auth.UserRecord
+	createErr error
 
 	updateRes *firebase_auth.UserRecord
 	updateErr error
