@@ -2,6 +2,8 @@ package handlerRest
 
 import (
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -176,4 +178,111 @@ func Test_handlerRest_AppendInterfaceAndFunction(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_handlerRest_AppendInterfaceAndFunction_ReadOpenError(t *testing.T) {
+	d := &handlerRest{
+		EntityNameSnakeCase: "missing_entity",
+		Location:            "does/not/exist",
+	}
+	err := d.AppendInterfaceAndFunction()
+	if err == nil {
+		t.Fatal("expected error when target file is missing during read phase, got nil")
+	}
+	if !os.IsNotExist(err) && !strings.Contains(err.Error(), "no such file") {
+		t.Errorf("expected file-not-found error, got %v", err)
+	}
+}
+
+func Test_handlerRest_AppendInterfaceAndFunction_DirectoryAsTarget(t *testing.T) {
+	// OpenFile against a directory in O_RDWR mode fails on darwin/linux,
+	// exercising the early-return branch of the read phase.
+	tmpDir := t.TempDir()
+	entityDir := filepath.Join(tmpDir, "src", "handler", "rest", "fake.go")
+	if err := os.MkdirAll(entityDir, 0o755); err != nil {
+		t.Fatalf("setup: %v", err)
+	}
+	d := &handlerRest{
+		EntityNameSnakeCase: "fake",
+		Location:            tmpDir,
+	}
+	if err := d.AppendInterfaceAndFunction(); err == nil {
+		t.Fatal("expected error when target path is a directory, got nil")
+	}
+}
+
+func Test_handlerRest_AppendInterfaceAndFunction_EmptyAPI(t *testing.T) {
+	// Empty Api skips the append loop, so the read phase, write phase, and
+	// deferred close all run to completion on a real file. Exercises the
+	// happy path of the named-return + defer-close pattern.
+	tmpDir := t.TempDir()
+	restDir := filepath.Join(tmpDir, "src", "handler", "rest")
+	if err := os.MkdirAll(restDir, 0o755); err != nil {
+		t.Fatalf("setup: %v", err)
+	}
+	target := filepath.Join(restDir, "entity.go")
+	original := []byte("package rest\n// existing\n")
+	if err := os.WriteFile(target, original, 0o644); err != nil {
+		t.Fatalf("setup: %v", err)
+	}
+	d := &handlerRest{
+		EntityNameSnakeCase: "entity",
+		Location:            tmpDir,
+		Api:                 nil,
+	}
+	if err := d.AppendInterfaceAndFunction(); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	got, err := os.ReadFile(target)
+	if err != nil {
+		t.Fatalf("read back: %v", err)
+	}
+	// strings.Join with no separator additions still preserves original
+	// content; main concern is that the file isn't truncated or corrupted.
+	if len(got) == 0 {
+		t.Errorf("file was truncated, want non-empty content")
+	}
+}
+
+func Test_handlerRest_getFunction(t *testing.T) {
+	tmpDir := t.TempDir()
+	d := &handlerRest{}
+
+	t.Run("returns lines on success", func(t *testing.T) {
+		path := filepath.Join(tmpDir, "ok.txt")
+		if err := os.WriteFile(path, []byte("alpha\nbeta\ngamma\n"), 0o644); err != nil {
+			t.Fatalf("setup: %v", err)
+		}
+		lines, err := d.getFunction(path)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		want := []string{"alpha", "beta", "gamma"}
+		if len(lines) != len(want) {
+			t.Fatalf("got %d lines, want %d (%v)", len(lines), len(want), lines)
+		}
+		for i, ln := range lines {
+			if ln != want[i] {
+				t.Errorf("line %d = %q, want %q", i, ln, want[i])
+			}
+		}
+	})
+
+	t.Run("returns error when file is missing", func(t *testing.T) {
+		_, err := d.getFunction(filepath.Join(tmpDir, "does-not-exist.txt"))
+		if err == nil {
+			t.Fatal("expected error for missing file, got nil")
+		}
+	})
+
+	t.Run("returns error when path is a directory", func(t *testing.T) {
+		dirPath := filepath.Join(tmpDir, "as-dir")
+		if err := os.Mkdir(dirPath, 0o755); err != nil {
+			t.Fatalf("setup: %v", err)
+		}
+		_, err := d.getFunction(dirPath)
+		if err == nil {
+			t.Fatal("expected error when opening a directory, got nil")
+		}
+	})
 }
