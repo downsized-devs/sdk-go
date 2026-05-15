@@ -38,6 +38,13 @@ func Init(cfg Config, log logger.Interface) Interface {
 	return i
 }
 
+// NewIndex opens or creates a bleve index at indexPath.
+//
+// SECURITY: indexPath is passed straight to bleve.Open / bleve.New, which
+// creates a directory on disk. Callers MUST validate indexPath against a
+// known-good root (e.g. Config.IndexPath) before invoking this method —
+// passing user-controlled input enables arbitrary filesystem writes
+// wherever this process has permission.
 func (i *indexer) NewIndex(ctx context.Context, indexPath string) error {
 	// Open or create the Bleve index at the specified indexPath
 	index, err := bleve.Open(indexPath)
@@ -86,7 +93,14 @@ func (idx *indexer) Search(ctx context.Context, query string) ([]string, error) 
 	return results, nil
 }
 
-// DeleteIndex deletes the specified index directory.
+// DeleteIndex recursively removes the directory at indexDir.
+//
+// SECURITY: indexDir is passed straight to os.RemoveAll with no validation.
+// Callers MUST ensure indexDir is constrained to a known-good root (e.g.
+// Config.IndexPath) before calling — passing user-controlled input enables
+// arbitrary recursive deletion anywhere this process can write. This
+// method does not enforce path containment; that is the caller's
+// responsibility.
 func (idx *indexer) DeleteIndex(ctx context.Context, indexDir string) error {
 	// Remove the index directory
 	err := os.RemoveAll(indexDir)
