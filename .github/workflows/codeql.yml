@@ -47,7 +47,3 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ matrix.language }}"
-          # Publish results to both surfaces: security findings go to the
-          # Security tab, code-quality findings go to the Code Quality tab.
-          # Replaces GitHub's separate default-setup run for Code Quality.
-          analysis-kinds: code-scanning,code-quality

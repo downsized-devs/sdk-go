@@ -1,53 +1,84 @@
-# graphql
+# `gqlclient` — low-level GraphQL HTTP client
 
-Forked from: [machinebox/graphql](https://github.com/machinebox/graphql)
+`import "github.com/downsized-devs/sdk-go/gqlclient"`
 
-Low-level GraphQL client for Go.
+**Stability:** Stable — see [STABILITY.md](../STABILITY.md)
 
-* Simple, familiar API
-* Respects `context.Context` timeouts and cancellation
-* Build and execute any kind of GraphQL request
-* Use strong Go types for response data
-* Use variables and upload files
-* Simple error handling
+Minimal GraphQL client with JSON and multipart-form transport. Forked from [`machinebox/graphql`](https://github.com/machinebox/graphql); no internal sdk-go dependencies.
 
-## Usage
+## Features
+
+- Simple, familiar API
+- Respects `context.Context` timeouts and cancellation
+- Build and execute any kind of GraphQL request
+- Use strong Go types for response data
+- Use variables and upload files (multipart)
+- Pluggable HTTP client via `WithHTTPClient`
+
+## Installation
+
+```bash
+go get github.com/downsized-devs/sdk-go/gqlclient
+```
+
+## Quick Start
 
 ```go
-import "context"
-// create a client (safe to share across requests)
-client := graphql.NewClient("https://machinebox.io/graphql")
-// make a request
-req := graphql.NewRequest(`
-    query ($key: String!) {
-        items (id:$key) {
-            field1
-            field2
-            field3
-        }
+client := gqlclient.NewClient("https://api.example.com/graphql")
+
+req := gqlclient.NewRequest(`
+    query($key: String!) {
+        items(id: $key) { field1 field2 field3 }
     }
 `)
-
-// set any variables
 req.Var("key", "value")
-// set header fields
 req.Header.Set("Cache-Control", "no-cache")
-// define a Context for the request
-ctx := context.Background()
-// run it and capture the response
-var respData ResponseStruct
-if err := client.Run(ctx, req, &respData); err != nil {
-    log.Fatal(err)
+
+var resp struct{ Items []struct{ Field1, Field2, Field3 string } }
+if err := client.Run(ctx, req, &resp); err != nil {
+    return err
 }
 ```
 
-### File support via multipart form data
+## API Reference
 
-By default, the package will send a JSON body. To enable the sending of files, you can opt to
-use multipart form data instead using the `UseMultipartForm` option when you create your `Client`:
+| Symbol | Signature |
+|---|---|
+| `NewClient` | `(endpoint string, opts ...ClientOption) *Client` |
+| `NewRequest` | `(query string) *Request` |
+| `Client.Run` | `(ctx, *Request, dest any) error` |
+| `Request.Var` | `(key string, value any)` |
+| `Request.Header` | `http.Header` field |
+| `WithHTTPClient(*http.Client)` | option |
+| `UseMultipartForm()` | option |
+| `ImmediatelyCloseReqBody()` | option |
+| `File` | upload struct (`Field`, `Name`, `R io.Reader`). |
+
+## Examples
+
+### File upload via multipart
 
 ```go
-client := graphql.NewClient("https://machinebox.io/graphql", graphql.UseMultipartForm())
+client := gqlclient.NewClient(url, gqlclient.UseMultipartForm())
+req := gqlclient.NewRequest(`mutation($file: Upload!){ upload(file:$file) }`)
+req.File("file", "photo.jpg", file)
+_ = client.Run(ctx, req, nil)
 ```
 
-For more information, [read the original godoc package documentation](http://godoc.org/github.com/machinebox/graphql) or the [blog post](https://blog.machinebox.io/a-graphql-client-library-for-go-5bffd0455878).
+## Dependencies
+
+stdlib only.
+
+## Testing
+
+```bash
+go test ./gqlclient/...
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](../CONTRIBUTING.md). Upstream is the machinebox fork — preserve the original behaviour unless intentionally diverging.
+
+## Related Packages
+
+- [`parser`](../parser) — for handling GraphQL responses outside the client decoder.
