@@ -28,7 +28,7 @@ Pick the entry-point package for what you're trying to build. The full catalogue
 |---|---|
 | **Configuration & bootstrap** | [`appcontext`](./appcontext), [`configbuilder`](./configbuilder), [`configreader`](./configreader), [`featureflag`](./featureflag) |
 | **Logging, errors, observability** | [`logger`](./logger), [`errors`](./errors), [`codes`](./codes), [`audit`](./audit), [`instrument`](./instrument), [`tracker`](./tracker) |
-| **Data & storage** | [`sql`](./sql), [`nosql`](./nosql), [`redis`](./redis), [`storage`](./storage), [`local_storage`](./local_storage), [`query`](./query), [`null`](./null) |
+| **Data & storage** | [`sql`](./sql), [`nosql`](./nosql), [`redis`](./redis), [`storage`](./storage), [`localstorage`](./localstorage), [`query`](./query), [`null`](./null) |
 | **Auth & security** | [`auth`](./auth), [`security`](./security), [`ratelimiter`](./ratelimiter) |
 | **Messaging & integrations** | [`email`](./email), [`messaging`](./messaging), [`slack`](./slack), [`gqlclient`](./gqlclient) |
 | **I18n & locale** | [`language`](./language), [`translator`](./translator) |

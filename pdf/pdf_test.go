@@ -197,3 +197,51 @@ func TestExtractText_EmptyInput(t *testing.T) {
 	_, err := p.ExtractText(context.Background(), nil)
 	assert.Error(t, err)
 }
+
+// garbage is a non-empty byte slice that is syntactically not a PDF. Used to
+// drive the api.* and ledongpdf.NewReader failure paths past the len==0 guards.
+var garbage = []byte("not a pdf, just noise to defeat the empty-input guard")
+
+func TestEncrypt_InvalidPDF(t *testing.T) {
+	p := newPDF()
+	_, err := p.Encrypt(context.Background(), garbage, "secret")
+	assert.Error(t, err)
+}
+
+func TestRemovePassword_InvalidPDF(t *testing.T) {
+	p := newPDF()
+	_, err := p.RemovePassword(context.Background(), garbage, "secret")
+	assert.Error(t, err)
+}
+
+func TestMerge_InvalidPart(t *testing.T) {
+	p := newPDF()
+	data := loadExample(t)
+	// Two non-empty inputs forces api.MergeRaw, where the garbage part fails.
+	_, err := p.Merge(context.Background(), data, garbage)
+	assert.Error(t, err)
+}
+
+func TestSplit_InvalidPDF(t *testing.T) {
+	p := newPDF()
+	_, err := p.Split(context.Background(), garbage, 1)
+	assert.Error(t, err)
+}
+
+func TestAddTextWatermark_InvalidPDF(t *testing.T) {
+	p := newPDF()
+	_, err := p.AddTextWatermark(context.Background(), garbage, "WM")
+	assert.Error(t, err)
+}
+
+func TestExtractText_InvalidPDF(t *testing.T) {
+	p := newPDF()
+	_, err := p.ExtractText(context.Background(), garbage)
+	assert.Error(t, err)
+}
+
+func TestPageCount_InvalidPDF(t *testing.T) {
+	p := newPDF()
+	_, err := p.PageCount(context.Background(), garbage)
+	assert.Error(t, err)
+}

@@ -64,4 +64,4 @@ mock-all:
 	@make mock util=nosql subutil=nosql
 	@make mock util=pdf subutil=pdf
 	@make mock util=scheduler subutil=scheduler
-	@make mock util=local_storage subutil=local_storage
+	@make mock util=localstorage subutil=localstorage

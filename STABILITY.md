@@ -27,7 +27,7 @@ Starting with **v1.0.0** this contract is **binding**: no breaking change ships 
 
 ### Stable
 
-`appcontext`, `audit`, `auth`, `character`, `checker`, `clock`, `codes`, `configbuilder`, `configreader`, `convert`, `dates`, `email`, `errors`, `featureflag`, `files`, `gqlclient`, `header`, `instrument`, `language`, `local_storage`, `logger`, `messaging`, `nosql`, `null`, `num`, `operator`, `parser`, `pdf`, `query`, `ratelimiter`, `redis`, `scheduler`, `security`, `slack`, `sql`, `storage`, `stringlib`, `tracker`, `translator`
+`appcontext`, `audit`, `auth`, `character`, `checker`, `clock`, `codes`, `configbuilder`, `configreader`, `convert`, `dates`, `email`, `errors`, `featureflag`, `files`, `gqlclient`, `header`, `instrument`, `language`, `localstorage`, `logger`, `messaging`, `nosql`, `null`, `num`, `operator`, `parser`, `pdf`, `query`, `ratelimiter`, `redis`, `scheduler`, `security`, `slack`, `sql`, `storage`, `stringlib`, `tracker`, `translator`
 
 All Stable packages share these traits:
 

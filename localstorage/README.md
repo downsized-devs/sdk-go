@@ -1,6 +1,6 @@
-# `local_storage` — Bleve-backed local full-text search
+# `localstorage` — Bleve-backed local full-text search
 
-`import "github.com/downsized-devs/sdk-go/local_storage"`
+`import "github.com/downsized-devs/sdk-go/localstorage"`
 
 **Stability:** Stable — see [STABILITY.md](../STABILITY.md)
 
@@ -16,13 +16,13 @@ Local on-disk search index using [Bleve](https://github.com/blevesearch/bleve). 
 ## Installation
 
 ```bash
-go get github.com/downsized-devs/sdk-go/local_storage
+go get github.com/downsized-devs/sdk-go/localstorage
 ```
 
 ## Quick Start
 
 ```go
-ls := local_storage.Init(local_storage.Config{
+ls := localstorage.Init(localstorage.Config{
     Path: "./search-index",
 }, log)
 
@@ -55,7 +55,7 @@ hits, _ := ls.Search(ctx, "products", "apple")
 ## Testing
 
 ```bash
-go test ./local_storage/...
+go test ./localstorage/...
 ```
 
 ## Contributing

@@ -8,7 +8,7 @@ All packages share the import root `github.com/downsized-devs/sdk-go`. The scaff
 
 - **Configuration & bootstrap**: [appcontext](#appcontext) · [configbuilder](#configbuilder) · [configreader](#configreader) · [featureflag](#featureflag)
 - **Logging, errors, observability**: [logger](#logger) · [errors](#errors) · [codes](#codes) · [audit](#audit) · [instrument](#instrument) · [tracker](#tracker)
-- **Data & storage**: [sql](#sql) · [nosql](#nosql) · [redis](#redis) · [storage](#storage) · [local_storage](#local_storage) · [query](#query) · [null](#null)
+- **Data & storage**: [sql](#sql) · [nosql](#nosql) · [redis](#redis) · [storage](#storage) · [localstorage](#localstorage) · [query](#query) · [null](#null)
 - **Auth & security**: [auth](#auth) · [security](#security) · [ratelimiter](#ratelimiter)
 - **Messaging & integrations**: [email](#email) · [messaging](#messaging) · [slack](#slack) · [gqlclient](#gqlclient)
 - **I18n & locale**: [language](#language) · [translator](#translator)
@@ -40,7 +40,7 @@ All packages share the import root `github.com/downsized-devs/sdk-go`. The scaff
 | <a id="header"></a>**header** | HTTP header & MIME constants | ~18 string constants (content types, cache control, header keys) | Stable | Jun 2024 |
 | <a id="instrument"></a>**instrument** | Prometheus metrics for HTTP, DB, scheduler | `MetricsHandler`, `HTTPRequestTimer`/`Counter`, `RegisterDBStats`, `DatabaseQueryTimer`, `SchedulerRunningTimer`/`Counter` | Stable | May 2026 |
 | <a id="language"></a>**language** | Locale constants + HTTP status text | EN/ID/JA/DE constants; `HTTPStatusText(lang, code)` | Stable | May 2026 |
-| <a id="local_storage"></a>**local_storage** | Bleve-backed full-text local index | `NewIndex`, `Index`, `Search`, `DeleteIndex` | Stable | May 2026 |
+| <a id="localstorage"></a>**localstorage** | Bleve-backed full-text local index | `NewIndex`, `Index`, `Search`, `DeleteIndex` | Stable | May 2026 |
 | <a id="logger"></a>**logger** | Structured logging on zerolog | Trace/Debug/Info/Warn/Error/Fatal/Panic, `Debugf`, context-field extraction | Stable | May 2026 |
 | <a id="messaging"></a>**messaging** | Firebase Cloud Messaging | `SubscribeToTopic`, `UnsubscribeFromTopic`, `BroadcastToTopic`, `BatchSendDryRun` | Stable | May 2026 |
 | <a id="nosql"></a>**nosql** | MongoDB wrapper | `Find`, `FindOne`, `InsertOne`, `UpdateOne`, `UpdateMany`, `Close` | Stable | May 2026 |
@@ -85,7 +85,7 @@ import (
     "github.com/downsized-devs/sdk-go/header"
     "github.com/downsized-devs/sdk-go/instrument"
     "github.com/downsized-devs/sdk-go/language"
-    "github.com/downsized-devs/sdk-go/local_storage"
+    "github.com/downsized-devs/sdk-go/localstorage"
     "github.com/downsized-devs/sdk-go/logger"
     "github.com/downsized-devs/sdk-go/messaging"
     "github.com/downsized-devs/sdk-go/nosql"

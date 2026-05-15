@@ -69,7 +69,7 @@ graph LR
     nosql --> logger
 
     pdf[pdf] --> logger
-    local_storage[local_storage] --> logger
+    localstorage[localstorage] --> logger
     scheduler[scheduler] --> logger
     featureflag[featureflag] --> logger
 
@@ -139,7 +139,7 @@ Each row lists the **direct** sibling packages a given package imports.
 | header | — |
 | instrument | — |
 | language | — |
-| local_storage | logger |
+| localstorage | logger |
 | logger | appcontext, errors |
 | messaging | logger, parser |
 | nosql | codes, errors, logger |
@@ -176,7 +176,7 @@ Major third-party libraries per package (stdlib excluded).
 | email | `gopkg.in/gomail.v2`, `github.com/Boostport/mjml-go` |
 | featureflag | `github.com/thomaspoignant/go-feature-flag` |
 | instrument | `github.com/prometheus/client_golang` |
-| local_storage | `github.com/blevesearch/bleve` |
+| localstorage | `github.com/blevesearch/bleve` |
 | logger | `github.com/rs/zerolog` |
 | messaging | `firebase.google.com/go`, `firebase.google.com/go/messaging`, `google.golang.org/api/option` |
 | nosql | `go.mongodb.org/mongo-driver` |

@@ -19,7 +19,6 @@ tests/
         featureflag/
         gqlclient/
         instrument/
-        local_storage/
         localstorage/
         logger/
         messaging/
