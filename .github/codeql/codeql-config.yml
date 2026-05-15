@@ -1,10 +1,12 @@
 name: "CodeQL config for sdk-go"
 
 # Run two query suites in one analysis:
-#   security-extended  → submitted as Code Scanning (Security tab)
-#   code-quality       → submitted as Code Quality (Code Quality tab)
-# The split between Security and Code Quality is controlled by `analysis-kinds`
-# on the analyze step in .github/workflows/codeql.yml.
+#   security-extended  → standard security queries
+#   code-quality       → code-quality queries (style, complexity, dead code, …)
+# Both produce findings in the Code Scanning / Security tab. GitHub's separate
+# "Code Quality" findings tab is currently only populated by the default setup
+# (it uses an internal init parameter that isn't part of the public action API),
+# so disable that default setup in repo settings once this consolidation merges.
 queries:
   - uses: security-extended
   - uses: code-quality

@@ -86,7 +86,7 @@ linters:
         path: _test\.go
       - linters:
           - govet
-        text: non-constant format string in call to github.com/delosaqua/go-sdk/errors.NewWithCode
+        text: non-constant format string in call to github.com/downsized-devs/sdk-go/errors.NewWithCode
     paths:
       - third_party$
       - builtin$

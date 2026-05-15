@@ -1,8 +1,11 @@
 name: "SDK: Release"
 
 # Principle of least privilege: this workflow creates a GitHub release via
-# the REST API. contents:write is the only GITHUB_TOKEN scope required;
-# Slack notifications use SLACK_WEBHOOK_URL, not GITHUB_TOKEN.
+# the REST API. contents:write is the only GITHUB_TOKEN scope required.
+# Release notifications post to a Discord webhook (DISCORD_RELEASE_WEBHOOK_URL
+# repo secret); the webhook is a bearer-style URL and needs no GITHUB_TOKEN
+# scopes. If the secret is unset, the notification steps log and skip without
+# failing the release.
 permissions:
   contents: write
 
@@ -22,24 +25,43 @@ on:
           - "minor"
           - "major"
 
-env:
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_ALERT_DEVOPS_STAGING }}
-
 jobs:
   release:
     timeout-minutes: 30
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
-      - uses: DelosAqua/slack@v2.2.0
-        with:
-          status: starting
-          config: .github/config/slack-alert-start.yml
-          slack_info: .github/config/slack-info.yml
+      # Posts an embed to a Discord channel via incoming webhook. The webhook
+      # URL is the only secret; no GITHUB_TOKEN scopes are needed. If the
+      # secret is missing the step logs and skips so a misconfigured environment
+      # never blocks a release.
+      - name: Notify Discord (release starting)
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL }}
+          REPO: ${{ github.repository }}
+          BUMP: ${{ github.event.inputs.versionbump }}
+          ACTOR: ${{ github.actor }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "DISCORD_RELEASE_WEBHOOK_URL is not set; skipping Discord notification."
+            exit 0
+          fi
+          payload=$(jq -nc \
+            --arg repo "$REPO" --arg bump "$BUMP" --arg actor "$ACTOR" --arg run "$RUN_URL" \
+            '{embeds:[{title:"Release starting",color:3447003,fields:[
+              {name:"Repository",value:$repo,inline:true},
+              {name:"Bump",value:$bump,inline:true},
+              {name:"Actor",value:$actor,inline:true},
+              {name:"Run",value:$run}
+            ]}]}')
+          curl -sS -X POST -H "Content-Type: application/json" \
+            --data "$payload" "$DISCORD_WEBHOOK_URL"
 
       - name: Get Latest Tag
         id: latest-tag
@@ -48,11 +70,19 @@ jobs:
           echo "tag=$(git tag --merged | sort -V | tail -1)" >> "$GITHUB_OUTPUT"
 
       - name: Generate New Bumped Version
-        uses: DelosAqua/action-bump-semver@v1.1.0
         id: bump-semver
-        with:
-          current_version: ${{ steps.latest-tag.outputs.tag }}
-          level: ${{ github.event.inputs.versionbump }}
+        run: |
+          current="${{ steps.latest-tag.outputs.tag }}"
+          level="${{ github.event.inputs.versionbump }}"
+          version="${current#v}"
+          IFS='.' read -r major minor patch <<< "$version"
+          case "$level" in
+            major) major=$((major+1)); minor=0; patch=0 ;;
+            minor) minor=$((minor+1)); patch=0 ;;
+            patch) patch=$((patch+1)) ;;
+            *) echo "unknown bump level: $level" >&2; exit 1 ;;
+          esac
+          echo "new_version=v${major}.${minor}.${patch}" >> "$GITHUB_OUTPUT"
 
       - name: Check Semver Format
         run: ./semver -v ${{ steps.bump-semver.outputs.new_version }}
@@ -65,12 +95,41 @@ jobs:
             https://api.github.com/repos/${{ github.repository }}/releases \
             -d '{"tag_name":"${{ steps.bump-semver.outputs.new_version }}", "generate_release_notes":true}'
 
-      - uses: DelosAqua/slack@v2.2.0
-        with:
-          status: ${{ job.status }}
-          config: .github/config/slack-alert-version.yml
-          slack_info: .github/config/slack-info.yml
-          steps: ${{ toJson(steps) }}
-        env:
-          SERVICE_VERSION: ${{ steps.bump-semver.outputs.new_version }}
+      # Mirror of the start notification, fired on every termination (success,
+      # failure, cancelled). Colour-coded so the channel reads at a glance.
+      - name: Notify Discord (release result)
         if: always()
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL }}
+          JOB_STATUS: ${{ job.status }}
+          REPO: ${{ github.repository }}
+          NEW_VERSION: ${{ steps.bump-semver.outputs.new_version }}
+          ACTOR: ${{ github.actor }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "DISCORD_RELEASE_WEBHOOK_URL is not set; skipping Discord notification."
+            exit 0
+          fi
+          case "$JOB_STATUS" in
+            success)   color=3066993 ;;   # green
+            failure)   color=15158332 ;;  # red
+            cancelled) color=10070709 ;;  # gray
+            *)         color=15844367 ;;  # amber fallback
+          esac
+          payload=$(jq -nc \
+            --arg status "$JOB_STATUS" \
+            --arg repo "$REPO" \
+            --arg version "${NEW_VERSION:-unknown}" \
+            --arg actor "$ACTOR" \
+            --arg run "$RUN_URL" \
+            --argjson color "$color" \
+            '{embeds:[{title:("Release " + $status),color:$color,fields:[
+              {name:"Repository",value:$repo,inline:true},
+              {name:"Version",value:$version,inline:true},
+              {name:"Actor",value:$actor,inline:true},
+              {name:"Run",value:$run}
+            ]}]}')
+          curl -sS -X POST -H "Content-Type: application/json" \
+            --data "$payload" "$DISCORD_WEBHOOK_URL"
