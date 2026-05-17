@@ -227,7 +227,7 @@ func (a *auth) RegisterUser(ctx context.Context, user FirebaseUser) (FirebaseUse
 	}
 
 	if user.IsDisabled.Valid {
-		params.Disabled(user.IsEmailVerified.Bool)
+		params.Disabled(user.IsDisabled.Bool)
 	}
 
 	u, err := a.firebase.CreateUser(ctx, params)
@@ -276,7 +276,7 @@ func (a *auth) UpdateUser(ctx context.Context, user FirebaseUser) (FirebaseUser,
 	}
 
 	if user.IsDisabled.Valid {
-		params.Disabled(user.IsEmailVerified.Bool)
+		params.Disabled(user.IsDisabled.Bool)
 	}
 
 	if user.Password != "" {

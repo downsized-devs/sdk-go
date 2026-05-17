@@ -95,21 +95,18 @@ func (s *storage) Download(ctx context.Context, key string) ([]byte, error) {
 	if err != nil {
 		return nil, errors.NewWithCode(codes.CodeStorageS3Download, "failed to download file, with err: %v", err)
 	}
-
-	size := int(*obj.ContentLength)
-	buffer := make([]byte, size)
 	defer obj.Body.Close()
-	var bbuffer bytes.Buffer
-	for {
-		byteSize, err := obj.Body.Read(buffer)
-		if byteSize > 0 {
-			bbuffer.Write(buffer[:byteSize])
-		} else if err == io.EOF || err != nil {
-			break
-		}
+
+	data, err := io.ReadAll(obj.Body)
+	if err != nil {
+		return nil, errors.NewWithCode(codes.CodeStorageS3Download, "failed to read object body for key %s: %v", key, err)
 	}
 
-	return bbuffer.Bytes(), nil
+	if obj.ContentLength != nil && int64(len(data)) != *obj.ContentLength {
+		return nil, errors.NewWithCode(codes.CodeStorageS3Download, "short read for key %s: got %d bytes, expected %d", key, len(data), *obj.ContentLength)
+	}
+
+	return data, nil
 }
 
 func (s *storage) Delete(ctx context.Context, key string) error {

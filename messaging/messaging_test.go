@@ -3,6 +3,7 @@ package messaging
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	firebase_messaging "firebase.google.com/go/messaging"
@@ -24,6 +25,12 @@ type fakeFirebase struct {
 	multicastMsg *firebase_messaging.MulticastMessage
 	multicastErr error
 	multicastRsp *firebase_messaging.BatchResponse
+	// multicastCalls records each batch passed to SendMulticastDryRun so that
+	// chunking behavior can be asserted from tests.
+	multicastCalls [][]string
+	// multicastRspFor lets callers return different BatchResponses per batch
+	// (indexed by call number). Falls back to multicastRsp when nil/short.
+	multicastRspFor []*firebase_messaging.BatchResponse
 }
 
 func (f *fakeFirebase) SubscribeToTopic(_ context.Context, tokens []string, topic string) (*firebase_messaging.TopicManagementResponse, error) {
@@ -45,7 +52,16 @@ func (f *fakeFirebase) Send(_ context.Context, message *firebase_messaging.Messa
 
 func (f *fakeFirebase) SendMulticastDryRun(_ context.Context, message *firebase_messaging.MulticastMessage) (*firebase_messaging.BatchResponse, error) {
 	f.multicastMsg = message
-	return f.multicastRsp, f.multicastErr
+	callIdx := len(f.multicastCalls)
+	tokensCopy := append([]string(nil), message.Tokens...)
+	f.multicastCalls = append(f.multicastCalls, tokensCopy)
+	if f.multicastErr != nil {
+		return nil, f.multicastErr
+	}
+	if callIdx < len(f.multicastRspFor) && f.multicastRspFor[callIdx] != nil {
+		return f.multicastRspFor[callIdx], nil
+	}
+	return f.multicastRsp, nil
 }
 
 func newMessaging(fake *fakeFirebase) *messaging {
@@ -175,4 +191,70 @@ func TestBatchSendDryRun_AllFailure(t *testing.T) {
 	invalid, err := m.BatchSendDryRun(context.Background(), []string{"a", "b"})
 	require.Error(t, err)
 	assert.Empty(t, invalid)
+}
+
+// TestBatchSendDryRun_ChunksOverMax verifies that requests larger than
+// MaximumTokensPerBatch are split into multiple SendMulticastDryRun calls
+// and that invalid-token results merge across batches.
+func TestBatchSendDryRun_ChunksOverMax(t *testing.T) {
+	const total = MaximumTokensPerBatch + 1
+	tokens := make([]string, total)
+	for i := range tokens {
+		tokens[i] = fmt.Sprintf("tok-%d", i)
+	}
+
+	// First batch (500 tokens) reports one failure at index 0.
+	first := &firebase_messaging.BatchResponse{
+		SuccessCount: MaximumTokensPerBatch - 1,
+		FailureCount: 1,
+		Responses:    make([]*firebase_messaging.SendResponse, MaximumTokensPerBatch),
+	}
+	for i := range first.Responses {
+		first.Responses[i] = &firebase_messaging.SendResponse{Success: true}
+	}
+	first.Responses[0] = &firebase_messaging.SendResponse{Error: errors.New("invalid")}
+
+	// Second batch (1 token) all success.
+	second := &firebase_messaging.BatchResponse{
+		SuccessCount: 1,
+		Responses:    []*firebase_messaging.SendResponse{{Success: true}},
+	}
+
+	fake := &fakeFirebase{multicastRspFor: []*firebase_messaging.BatchResponse{first, second}}
+	m := newMessaging(fake)
+
+	invalid, err := m.BatchSendDryRun(context.Background(), tokens)
+	require.Error(t, err, "partial-error expected when any chunk reports failures")
+	require.Len(t, fake.multicastCalls, 2, "expected two SendMulticastDryRun calls for 501 tokens")
+	assert.Equal(t, MaximumTokensPerBatch, len(fake.multicastCalls[0]))
+	assert.Equal(t, 1, len(fake.multicastCalls[1]))
+	assert.Equal(t, []string{tokens[0]}, invalid)
+}
+
+func TestBatchSendDryRun_ChunksOverMaxAllSuccess(t *testing.T) {
+	const total = MaximumTokensPerBatch + 1
+	tokens := make([]string, total)
+	for i := range tokens {
+		tokens[i] = fmt.Sprintf("tok-%d", i)
+	}
+
+	first := &firebase_messaging.BatchResponse{
+		SuccessCount: MaximumTokensPerBatch,
+		Responses:    make([]*firebase_messaging.SendResponse, MaximumTokensPerBatch),
+	}
+	for i := range first.Responses {
+		first.Responses[i] = &firebase_messaging.SendResponse{Success: true}
+	}
+	second := &firebase_messaging.BatchResponse{
+		SuccessCount: 1,
+		Responses:    []*firebase_messaging.SendResponse{{Success: true}},
+	}
+
+	fake := &fakeFirebase{multicastRspFor: []*firebase_messaging.BatchResponse{first, second}}
+	m := newMessaging(fake)
+
+	invalid, err := m.BatchSendDryRun(context.Background(), tokens)
+	require.NoError(t, err)
+	assert.Empty(t, invalid)
+	require.Len(t, fake.multicastCalls, 2)
 }

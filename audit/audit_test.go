@@ -54,6 +54,30 @@ func Test_audit_Capture(t *testing.T) {
 	}
 }
 
+// Test_audit_Init_MultipleCalls regresses the pre-1.0.1 sync.Once bug where
+// the second (and later) Init calls returned an audit with a zero-value
+// zerolog.Logger because the once.Do body had already run.
+func Test_audit_Init_MultipleCalls(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	authMock := mock_auth.NewMockInterface(ctrl)
+	authMock.EXPECT().GetUserAuthInfo(gomock.Any()).Return(auth.UserAuthInfo{}, nil).AnyTimes()
+
+	first := Init(authMock)
+	second := Init(authMock)
+
+	ctx := appcontext.SetEventName(context.Background(), "tests")
+	// If the logger were zero-value, Capture would still not panic on
+	// zerolog (it writes to a nil writer fine), so additionally assert
+	// that the two audit values are independent allocations.
+	first.Capture(ctx)
+	second.Capture(ctx)
+
+	if first == second {
+		t.Fatalf("expected Init to return independent values; got the same pointer twice")
+	}
+}
+
 func Test_audit_Record(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

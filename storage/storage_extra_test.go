@@ -28,6 +28,15 @@ type fakeS3 struct {
 	getInput *s3.GetObjectInput
 	getBody  []byte
 	getErr   error
+	// getBodyOverride, if non-nil, is returned as the GetObjectOutput body
+	// instead of wrapping getBody in a NopCloser.
+	getBodyOverride io.ReadCloser
+	// getContentLengthOverride, if non-nil, replaces the auto-derived
+	// ContentLength on the GetObjectOutput.
+	getContentLengthOverride *int64
+	// getNilContentLength forces the response ContentLength to be nil,
+	// regardless of getContentLengthOverride.
+	getNilContentLength bool
 
 	deleteInput *s3.DeleteObjectInput
 	deleteErr   error
@@ -49,12 +58,21 @@ func (f *fakeS3) GetObjectWithContext(_ aws.Context, in *s3.GetObjectInput, _ ..
 	if f.getErr != nil {
 		return nil, f.getErr
 	}
-	body := io.NopCloser(bytes.NewReader(f.getBody))
+	var body io.ReadCloser = io.NopCloser(bytes.NewReader(f.getBody))
+	if f.getBodyOverride != nil {
+		body = f.getBodyOverride
+	}
 	size := int64(len(f.getBody))
-	return &s3.GetObjectOutput{
-		Body:          body,
-		ContentLength: &size,
-	}, nil
+	out := &s3.GetObjectOutput{Body: body}
+	switch {
+	case f.getNilContentLength:
+		out.ContentLength = nil
+	case f.getContentLengthOverride != nil:
+		out.ContentLength = f.getContentLengthOverride
+	default:
+		out.ContentLength = &size
+	}
+	return out, nil
 }
 
 func (f *fakeS3) DeleteObjectWithContext(_ aws.Context, in *s3.DeleteObjectInput, _ ...request.Option) (*s3.DeleteObjectOutput, error) {
@@ -146,6 +164,53 @@ func TestDownload_Error(t *testing.T) {
 	s := newStorage(t, fake)
 	_, err := s.Download(context.Background(), "k")
 	assert.Error(t, err)
+}
+
+// erroringReader returns a slice of bytes once and then a non-EOF error,
+// simulating a network/body failure partway through the stream.
+type erroringReader struct {
+	chunk   []byte
+	sent    bool
+	failErr error
+}
+
+func (e *erroringReader) Read(p []byte) (int, error) {
+	if !e.sent {
+		e.sent = true
+		n := copy(p, e.chunk)
+		return n, nil
+	}
+	return 0, e.failErr
+}
+
+func (e *erroringReader) Close() error { return nil }
+
+func TestDownload_PropagatesReadError(t *testing.T) {
+	fake := &fakeS3{
+		getBodyOverride: &erroringReader{chunk: []byte("partial"), failErr: errors.New("network glitch")},
+	}
+	// Force ContentLength to a non-matching positive value to make sure
+	// the body-read path is exercised even with a non-nil length.
+	cl := int64(1024)
+	fake.getContentLengthOverride = &cl
+	s := newStorage(t, fake)
+
+	_, err := s.Download(context.Background(), "k")
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "network glitch")
+}
+
+func TestDownload_NilContentLengthIsSafe(t *testing.T) {
+	body := []byte("payload")
+	fake := &fakeS3{
+		getBodyOverride:     io.NopCloser(bytes.NewReader(body)),
+		getNilContentLength: true,
+	}
+	s := newStorage(t, fake)
+
+	got, err := s.Download(context.Background(), "k")
+	require.NoError(t, err)
+	assert.Equal(t, body, got)
 }
 
 // ---------------- Delete ---------------- //

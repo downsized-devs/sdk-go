@@ -131,33 +131,48 @@ func (m *messaging) BroadcastToTopic(ctx context.Context, topic string, payload 
 	return nil
 }
 
-// Dry run function is to validate a batch of token. If some invalidate, we will unsubscribe it from the topic
+// Dry run function is to validate a batch of token. If some invalidate, we will unsubscribe it from the topic.
+//
+// Firebase rejects MulticastMessages with more than MaximumTokensPerBatch
+// tokens, so the input is chunked and SendMulticastDryRun is called once per
+// chunk; invalid-token results are merged across all chunks.
 func (m *messaging) BatchSendDryRun(ctx context.Context, tokens []string) ([]string, error) {
 	invalidTokens := []string{}
-	message := &firebase_messaging.MulticastMessage{
-		Tokens: tokens,
-		Data: map[string]string{
-			"desc": "dry run to validate token",
-		},
+	if len(tokens) == 0 {
+		return invalidTokens, nil
 	}
 
-	multicastResponse, err := m.firebase.SendMulticastDryRun(ctx, message)
+	hasFailures := false
+	for start := 0; start < len(tokens); start += MaximumTokensPerBatch {
+		end := min(start+MaximumTokensPerBatch, len(tokens))
+		batch := tokens[start:end]
 
-	// As firebase documentation mentioned, this mean that ALL the token is not valid/internal server error within firebase
-	if err != nil {
-		return invalidTokens, err
-	}
-
-	// This means some of the token is not valid
-	if multicastResponse.FailureCount > 0 {
-		for i, response := range multicastResponse.Responses {
-			if response.Error != nil {
-				invalidTokens = append(invalidTokens, tokens[i])
-			}
+		message := &firebase_messaging.MulticastMessage{
+			Tokens: batch,
+			Data: map[string]string{
+				"desc": "dry run to validate token",
+			},
 		}
 
-		return invalidTokens, errors.New("partial error")
+		multicastResponse, err := m.firebase.SendMulticastDryRun(ctx, message)
+		// As firebase documentation mentions, this means the whole batch is
+		// either invalid or hit an internal firebase error.
+		if err != nil {
+			return invalidTokens, err
+		}
+
+		if multicastResponse.FailureCount > 0 {
+			hasFailures = true
+			for i, response := range multicastResponse.Responses {
+				if response.Error != nil {
+					invalidTokens = append(invalidTokens, batch[i])
+				}
+			}
+		}
 	}
 
+	if hasFailures {
+		return invalidTokens, errors.New("partial error")
+	}
 	return invalidTokens, nil
 }

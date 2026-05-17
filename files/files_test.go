@@ -70,6 +70,15 @@ func TestIsExist(t *testing.T) {
 			args: args{filename: "test_folder"},
 			want: false,
 		},
+		{
+			// Stat errors that are not "not found" (e.g. permission denied
+			// inside an unreadable directory) used to dereference a nil
+			// FileInfo. The fix swaps in a generic err != nil check; this
+			// case asserts the function returns false instead of panicking.
+			name: "stat error path returns false",
+			args: args{filename: "test_folder/no-such-dir/no-such-file"},
+			want: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

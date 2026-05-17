@@ -48,6 +48,14 @@ func TestToArrInt64(t *testing.T) {
 			want:    []int64{1, 2, 3},
 			wantErr: false,
 		},
+		{
+			// Prior to v1.0.1 this branch panicked because reflect.TypeOf(nil)
+			// returns a nil Type and .Kind() would dereference it.
+			name:    "nil input returns error without panic",
+			args:    args{i: nil},
+			want:    nil,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -3,8 +3,10 @@ package auth
 import (
 	"context"
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
+	"unsafe"
 
 	firebase_auth "firebase.google.com/go/auth"
 	mock_logger "github.com/downsized-devs/sdk-go/tests/mock/logger"
@@ -20,12 +22,14 @@ type fakeFirebaseAuth struct {
 	getUsersErr error
 	getUsersIds []firebase_auth.UserIdentifier
 
-	createRes *firebase_auth.UserRecord
-	createErr error
+	createRes    *firebase_auth.UserRecord
+	createErr    error
+	createParams *firebase_auth.UserToCreate
 
-	updateRes *firebase_auth.UserRecord
-	updateErr error
-	updateUID string
+	updateRes    *firebase_auth.UserRecord
+	updateErr    error
+	updateUID    string
+	updateParams *firebase_auth.UserToUpdate
 
 	deleteErr error
 	deleteUID string
@@ -43,12 +47,14 @@ func (f *fakeFirebaseAuth) GetUsers(_ context.Context, identifiers []firebase_au
 	return f.getUsersRes, f.getUsersErr
 }
 
-func (f *fakeFirebaseAuth) CreateUser(_ context.Context, _ *firebase_auth.UserToCreate) (*firebase_auth.UserRecord, error) {
+func (f *fakeFirebaseAuth) CreateUser(_ context.Context, p *firebase_auth.UserToCreate) (*firebase_auth.UserRecord, error) {
+	f.createParams = p
 	return f.createRes, f.createErr
 }
 
-func (f *fakeFirebaseAuth) UpdateUser(_ context.Context, uid string, _ *firebase_auth.UserToUpdate) (*firebase_auth.UserRecord, error) {
+func (f *fakeFirebaseAuth) UpdateUser(_ context.Context, uid string, p *firebase_auth.UserToUpdate) (*firebase_auth.UserRecord, error) {
 	f.updateUID = uid
+	f.updateParams = p
 	return f.updateRes, f.updateErr
 }
 
@@ -179,6 +185,36 @@ func TestRegisterUser_Success(t *testing.T) {
 	assert.Equal(t, "uid-new", got.ID)
 }
 
+func TestRegisterUser_ForwardsIsDisabled(t *testing.T) {
+	cases := []struct {
+		name     string
+		disabled bool
+	}{
+		{"disabled=true", true},
+		{"disabled=false", false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			fake := &fakeFirebaseAuth{createRes: sampleUserRecord("uid", "x@y")}
+			a := newAuthWithFake(t, fake)
+
+			in := FirebaseUser{Email: "x@y", Password: "pw", DisplayName: "X"}
+			// Email verified flipped opposite to ensure the wrong field isn't forwarded.
+			in.IsEmailVerified.Valid = true
+			in.IsEmailVerified.Bool = !tc.disabled
+			in.IsDisabled.Valid = true
+			in.IsDisabled.Bool = tc.disabled
+
+			_, err := a.RegisterUser(context.Background(), in)
+			require.NoError(t, err)
+
+			got, ok := userToCreateParams(fake.createParams)["disabled"].(bool)
+			require.True(t, ok, "disabled param should be set as a bool")
+			assert.Equal(t, tc.disabled, got)
+		})
+	}
+}
+
 func TestRegisterUser_Error(t *testing.T) {
 	fake := &fakeFirebaseAuth{createErr: errors.New("create failed")}
 	a := newAuthWithFake(t, fake)
@@ -204,6 +240,35 @@ func TestUpdateUser_Success(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "uid-1", got.ID)
 	assert.Equal(t, "uid-1", fake.updateUID)
+}
+
+func TestUpdateUser_ForwardsIsDisabled(t *testing.T) {
+	cases := []struct {
+		name     string
+		disabled bool
+	}{
+		{"disabled=true", true},
+		{"disabled=false", false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			fake := &fakeFirebaseAuth{updateRes: sampleUserRecord("uid-1", "x@y")}
+			a := newAuthWithFake(t, fake)
+
+			in := FirebaseUser{ID: "uid-1", Email: "x@y"}
+			in.IsEmailVerified.Valid = true
+			in.IsEmailVerified.Bool = !tc.disabled
+			in.IsDisabled.Valid = true
+			in.IsDisabled.Bool = tc.disabled
+
+			_, err := a.UpdateUser(context.Background(), in)
+			require.NoError(t, err)
+
+			got, ok := userToUpdateParams(fake.updateParams)["disableUser"].(bool)
+			require.True(t, ok, "disableUser param should be set as a bool")
+			assert.Equal(t, tc.disabled, got)
+		})
+	}
 }
 
 func TestUpdateUser_Error(t *testing.T) {
@@ -293,6 +358,27 @@ func sampleUserRecord(uid, email string) *firebase_auth.UserRecord {
 			LastLogInTimestamp: 2_000,
 		},
 	}
+}
+
+// userToCreateParams reads the unexported params map from a firebase
+// UserToCreate so tests can assert which fields were forwarded.
+func userToCreateParams(u *firebase_auth.UserToCreate) map[string]interface{} {
+	return readParamsField(u)
+}
+
+// userToUpdateParams reads the unexported params map from a firebase
+// UserToUpdate so tests can assert which fields were forwarded.
+func userToUpdateParams(u *firebase_auth.UserToUpdate) map[string]interface{} {
+	return readParamsField(u)
+}
+
+func readParamsField(v any) map[string]interface{} {
+	rv := reflect.ValueOf(v).Elem().FieldByName("params")
+	rv = reflect.NewAt(rv.Type(), unsafe.Pointer(rv.UnsafeAddr())).Elem()
+	if rv.IsNil() {
+		return nil
+	}
+	return rv.Interface().(map[string]interface{})
 }
 
 // authWithLoggerCapture builds an auth with a real-enough logger mock that

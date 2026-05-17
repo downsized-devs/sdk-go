@@ -137,12 +137,12 @@ func (s *sqlDB) connect(toLeader bool) (*sqlx.DB, error) {
 	}
 
 	if !toLeader {
-		if s.cfg.Leader.MockDB != nil {
-			return sqlx.NewDb(s.cfg.Leader.MockDB, s.cfg.Driver), nil
-		}
-	} else {
 		if s.cfg.Follower.MockDB != nil {
 			return sqlx.NewDb(s.cfg.Follower.MockDB, s.cfg.Driver), nil
+		}
+	} else {
+		if s.cfg.Leader.MockDB != nil {
+			return sqlx.NewDb(s.cfg.Leader.MockDB, s.cfg.Driver), nil
 		}
 	}
 
@@ -177,10 +177,12 @@ func (s *sqlDB) connect(toLeader bool) (*sqlx.DB, error) {
 }
 
 func (s *sqlDB) isFollowerEnabled() bool {
-	isHostNotEmpty := s.cfg.Follower.Host != ""
-	isHostDifferent := (s.cfg.Follower.Host != s.cfg.Leader.Host && s.cfg.Follower.Port == s.cfg.Leader.Port)
-	isPortDifferent := (s.cfg.Follower.Host == s.cfg.Leader.Host && s.cfg.Follower.Port != s.cfg.Leader.Port)
-	return isHostNotEmpty && (isHostDifferent || isPortDifferent)
+	if s.cfg.Follower.Host == "" {
+		return false
+	}
+	leaderAddr := fmt.Sprintf("%s:%d", s.cfg.Leader.Host, s.cfg.Leader.Port)
+	followerAddr := fmt.Sprintf("%s:%d", s.cfg.Follower.Host, s.cfg.Follower.Port)
+	return leaderAddr != followerAddr
 }
 
 func (s *sqlDB) getURI(conf ConnConfig) (string, error) {
