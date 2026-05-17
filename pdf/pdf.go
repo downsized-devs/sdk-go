@@ -24,8 +24,20 @@ import (
 )
 
 // Default watermark description string passed through to pdfcpu. Callers who
-// need a different font/size/opacity can use AddTextWatermarkWithDesc.
-const defaultWatermarkDesc = "font:Helvetica, points:24, opacity:0.5, scale:0.5"
+// need a different font/size/opacity can use AddTextWatermarkWithDesc. Declared
+// as a var (not const) so tests can swap in an invalid value to exercise the
+// api.TextWatermark error branch.
+var defaultWatermarkDesc = "font:Helvetica, points:24, opacity:0.5, scale:0.5"
+
+// Test seams for filesystem operations used by Split. Production code uses the
+// os.* implementations; tests swap these to drive the error branches that are
+// otherwise unreachable once MkdirTemp has handed us a fresh temp directory.
+var (
+	osMkdirTemp = os.MkdirTemp
+	osWriteFile = os.WriteFile
+	osReadDir   = os.ReadDir
+	osReadFile  = os.ReadFile
+)
 
 type Interface interface {
 	Encrypt(ctx context.Context, data []byte, password string) ([]byte, error)
@@ -110,21 +122,21 @@ func (p *pdf) Split(_ context.Context, data []byte, span int) ([][]byte, error) 
 		return nil, errors.NewWithCode(codes.CodeBadRequest, "pdf: empty input")
 	}
 
-	dir, err := os.MkdirTemp("", "sdkgo-pdf-split-")
+	dir, err := osMkdirTemp("", "sdkgo-pdf-split-")
 	if err != nil {
 		return nil, err
 	}
 	defer os.RemoveAll(dir)
 
 	inPath := filepath.Join(dir, "in.pdf")
-	if err := os.WriteFile(inPath, data, 0o600); err != nil {
+	if err := osWriteFile(inPath, data, 0o600); err != nil {
 		return nil, err
 	}
 	if err := api.SplitFile(inPath, dir, span, model.NewDefaultConfiguration()); err != nil {
 		return nil, err
 	}
 
-	entries, err := os.ReadDir(dir)
+	entries, err := osReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +152,7 @@ func (p *pdf) Split(_ context.Context, data []byte, span int) ([][]byte, error) 
 
 	chunks := make([][]byte, 0, len(names))
 	for _, n := range names {
-		b, err := os.ReadFile(filepath.Join(dir, n))
+		b, err := osReadFile(filepath.Join(dir, n))
 		if err != nil {
 			return nil, err
 		}
