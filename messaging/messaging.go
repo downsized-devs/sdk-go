@@ -61,7 +61,12 @@ type Config struct {
 	Firebase         FirebaseConf
 }
 
-func Init(cfg Config, log logger.Interface, json parser.JsonInterface, httpClient *http.Client) Interface {
+// Init builds a messaging client. The httpClient parameter is ignored
+// because the underlying Firebase SDK manages its own HTTP transport.
+//
+// Deprecated: httpClient is not used and will be removed in v2.0.0. Pass
+// nil for forward-compatibility.
+func Init(cfg Config, log logger.Interface, json parser.JsonInterface, _ *http.Client) Interface {
 	if cfg.SkipFirebaseInit {
 		return &messaging{
 			log: log,

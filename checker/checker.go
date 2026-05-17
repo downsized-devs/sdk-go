@@ -2,9 +2,11 @@ package checker
 
 import "regexp"
 
-const (
-	phoneRegex = `^[0][8]\d{8,14}$`
-	emailRegex = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`
+// phoneRegex and emailRegex are compiled once at package init so that
+// IsPhoneNumber and IsEmail do not pay the regex-compile cost on every call.
+var (
+	phoneRegex = regexp.MustCompile(`^[0][8]\d{8,14}$`)
+	emailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 )
 
 type AllowedDataType interface {
@@ -45,11 +47,9 @@ func ArrayDeduplicate[T AllowedDataType](values []T) []T {
 }
 
 func IsPhoneNumber(phone string) bool {
-	phoneRegex := regexp.MustCompile(phoneRegex)
 	return phoneRegex.MatchString(phone)
 }
 
 func IsEmail(email string) bool {
-	emailRegex := regexp.MustCompile(emailRegex)
 	return emailRegex.MatchString(email)
 }
