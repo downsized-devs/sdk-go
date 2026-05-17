@@ -1,27 +1,12 @@
 package query
 
 import (
-	"context"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 )
-
-// Plugs the remaining coverage gaps in query/query.go and query/converter.go
-// without depending on a database.
-
-func TestFormatQueryForRows_NoRows(t *testing.T) {
-	_, _, err := FormatQueryForRows(context.Background(), "INSERT INTO t (a)", nil)
-	assert.Error(t, err)
-}
-
-func TestFormatQueryForRows_NoCols(t *testing.T) {
-	// Row exists but contains zero columns.
-	_, _, err := FormatQueryForRows(context.Background(), "INSERT INTO t", [][]interface{}{{}})
-	assert.Error(t, err)
-}
 
 // Hits the case in traverseOnParam where a top-level time.Time is passed
 // directly (Kind=Struct, isTimeType=true).

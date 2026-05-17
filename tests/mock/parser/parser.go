@@ -16,31 +16,32 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockParser is a mock of Parser interface.
-type MockParser struct {
+// MockInterface is a mock of Interface interface.
+type MockInterface struct {
 	ctrl     *gomock.Controller
-	recorder *MockParserMockRecorder
+	recorder *MockInterfaceMockRecorder
+	isgomock struct{}
 }
 
-// MockParserMockRecorder is the mock recorder for MockParser.
-type MockParserMockRecorder struct {
-	mock *MockParser
+// MockInterfaceMockRecorder is the mock recorder for MockInterface.
+type MockInterfaceMockRecorder struct {
+	mock *MockInterface
 }
 
-// NewMockParser creates a new mock instance.
-func NewMockParser(ctrl *gomock.Controller) *MockParser {
-	mock := &MockParser{ctrl: ctrl}
-	mock.recorder = &MockParserMockRecorder{mock}
+// NewMockInterface creates a new mock instance.
+func NewMockInterface(ctrl *gomock.Controller) *MockInterface {
+	mock := &MockInterface{ctrl: ctrl}
+	mock.recorder = &MockInterfaceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockParser) EXPECT() *MockParserMockRecorder {
+func (m *MockInterface) EXPECT() *MockInterfaceMockRecorder {
 	return m.recorder
 }
 
 // CsvParser mocks base method.
-func (m *MockParser) CsvParser() parser.CsvInterface {
+func (m *MockInterface) CsvParser() parser.CsvInterface {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CsvParser")
 	ret0, _ := ret[0].(parser.CsvInterface)
@@ -48,13 +49,13 @@ func (m *MockParser) CsvParser() parser.CsvInterface {
 }
 
 // CsvParser indicates an expected call of CsvParser.
-func (mr *MockParserMockRecorder) CsvParser() *gomock.Call {
+func (mr *MockInterfaceMockRecorder) CsvParser() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CsvParser", reflect.TypeOf((*MockParser)(nil).CsvParser))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CsvParser", reflect.TypeOf((*MockInterface)(nil).CsvParser))
 }
 
 // JsonParser mocks base method.
-func (m *MockParser) JsonParser() parser.JsonInterface {
+func (m *MockInterface) JsonParser() parser.JsonInterface {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "JsonParser")
 	ret0, _ := ret[0].(parser.JsonInterface)
@@ -62,7 +63,7 @@ func (m *MockParser) JsonParser() parser.JsonInterface {
 }
 
 // JsonParser indicates an expected call of JsonParser.
-func (mr *MockParserMockRecorder) JsonParser() *gomock.Call {
+func (mr *MockInterfaceMockRecorder) JsonParser() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JsonParser", reflect.TypeOf((*MockParser)(nil).JsonParser))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JsonParser", reflect.TypeOf((*MockInterface)(nil).JsonParser))
 }

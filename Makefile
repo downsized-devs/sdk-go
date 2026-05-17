@@ -61,5 +61,7 @@ mock-all:
 	@make mock util=security subutil=security
 	@make mock util=tracker subutil=tracker
 	@make mock util=messaging subutil=messaging
+	@make mock util=nosql subutil=nosql
 	@make mock util=pdf subutil=pdf
-	@make mock util=local_storage subutil=local_storage
+	@make mock util=scheduler subutil=scheduler
+	@make mock util=localstorage subutil=localstorage

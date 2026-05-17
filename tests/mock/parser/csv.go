@@ -20,6 +20,7 @@ import (
 type MockCsvInterface struct {
 	ctrl     *gomock.Controller
 	recorder *MockCsvInterfaceMockRecorder
+	isgomock struct{}
 }
 
 // MockCsvInterfaceMockRecorder is the mock recorder for MockCsvInterface.

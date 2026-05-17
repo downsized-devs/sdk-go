@@ -15,5 +15,8 @@ coverage:
         threshold: 1%
     patch:
       default:
-        # Patch coverage is informational, not a merge blocker.
-        informational: true
+        # Patch coverage is a merge blocker: changed lines must be at
+        # least 80% covered by tests.
+        target: 80%
+        threshold: 0%
+        informational: false

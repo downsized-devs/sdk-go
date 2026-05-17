@@ -42,10 +42,21 @@ type Interface interface {
 	RefreshToken(ctx context.Context, refreshToken string) (RefreshTokenResponse, error)
 }
 
+// firebaseAuthClient is the internal seam over firebase.google.com/go/auth.Client
+// so tests can swap in a fake. *firebase_auth.Client satisfies it automatically.
+type firebaseAuthClient interface {
+	GetUsers(ctx context.Context, identifiers []firebase_auth.UserIdentifier) (*firebase_auth.GetUsersResult, error)
+	CreateUser(ctx context.Context, user *firebase_auth.UserToCreate) (*firebase_auth.UserRecord, error)
+	UpdateUser(ctx context.Context, uid string, user *firebase_auth.UserToUpdate) (*firebase_auth.UserRecord, error)
+	DeleteUser(ctx context.Context, uid string) error
+	VerifyIDTokenAndCheckRevoked(ctx context.Context, idToken string) (*firebase_auth.Token, error)
+	RevokeRefreshTokens(ctx context.Context, uid string) error
+}
+
 type auth struct {
 	log               logger.Interface
 	json              parser.JsonInterface
-	firebase          *firebase_auth.Client
+	firebase          firebaseAuthClient
 	identitytoolkitv1 *identitytoolkitv1.Service
 	identitytoolkitv3 *identitytoolkitv3.Service
 	httpClient        *http.Client

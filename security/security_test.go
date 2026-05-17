@@ -16,7 +16,7 @@ func Test_security_Init(t *testing.T) {
 		Rounds:              8,
 		MemoryCost:          14,
 	}
-	s := Init(log, cfg)
+	s := Init(cfg, log)
 	if s == nil {
 		t.Error("Init() should not return nil")
 	}

@@ -9,6 +9,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/downsized-devs/sdk-go/codes"
@@ -37,8 +38,17 @@ type AWSS3Config struct {
 	PresignDuration time.Duration
 }
 
+// s3API is the internal seam over *s3.S3 so tests can swap in a fake.
+// *s3.S3 satisfies it automatically.
+type s3API interface {
+	PutObjectWithContext(ctx aws.Context, in *s3.PutObjectInput, opts ...request.Option) (*s3.PutObjectOutput, error)
+	GetObjectWithContext(ctx aws.Context, in *s3.GetObjectInput, opts ...request.Option) (*s3.GetObjectOutput, error)
+	DeleteObjectWithContext(ctx aws.Context, in *s3.DeleteObjectInput, opts ...request.Option) (*s3.DeleteObjectOutput, error)
+	GetObjectRequest(in *s3.GetObjectInput) (*request.Request, *s3.GetObjectOutput)
+}
+
 type storage struct {
-	s3     *s3.S3
+	s3     s3API
 	config Config
 	log    logger.Interface
 }

@@ -75,5 +75,5 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md). Migrating to AWS SDK v2 would be a ma
 
 ## Related Packages
 
-- [`local_storage`](../local_storage) — on-disk full-text index (different problem).
+- [`localstorage`](../localstorage) — on-disk full-text index (different problem).
 - [`files`](../files) — local-file helpers.

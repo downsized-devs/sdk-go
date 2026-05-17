@@ -16,40 +16,136 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockPdfInterface is a mock of PdfInterface interface.
-type MockPdfInterface struct {
+// MockInterface is a mock of Interface interface.
+type MockInterface struct {
 	ctrl     *gomock.Controller
-	recorder *MockPdfInterfaceMockRecorder
+	recorder *MockInterfaceMockRecorder
+	isgomock struct{}
 }
 
-// MockPdfInterfaceMockRecorder is the mock recorder for MockPdfInterface.
-type MockPdfInterfaceMockRecorder struct {
-	mock *MockPdfInterface
+// MockInterfaceMockRecorder is the mock recorder for MockInterface.
+type MockInterfaceMockRecorder struct {
+	mock *MockInterface
 }
 
-// NewMockPdfInterface creates a new mock instance.
-func NewMockPdfInterface(ctrl *gomock.Controller) *MockPdfInterface {
-	mock := &MockPdfInterface{ctrl: ctrl}
-	mock.recorder = &MockPdfInterfaceMockRecorder{mock}
+// NewMockInterface creates a new mock instance.
+func NewMockInterface(ctrl *gomock.Controller) *MockInterface {
+	mock := &MockInterface{ctrl: ctrl}
+	mock.recorder = &MockInterfaceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockPdfInterface) EXPECT() *MockPdfInterfaceMockRecorder {
+func (m *MockInterface) EXPECT() *MockInterfaceMockRecorder {
 	return m.recorder
 }
 
-// SetPasswordFile mocks base method.
-func (m *MockPdfInterface) SetPasswordFile(ctx context.Context, password string, data []byte) ([]byte, error) {
+// AddTextWatermark mocks base method.
+func (m *MockInterface) AddTextWatermark(ctx context.Context, data []byte, text string) ([]byte, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetPasswordFile", ctx, password, data)
+	ret := m.ctrl.Call(m, "AddTextWatermark", ctx, data, text)
 	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// SetPasswordFile indicates an expected call of SetPasswordFile.
-func (mr *MockPdfInterfaceMockRecorder) SetPasswordFile(ctx, password, data any) *gomock.Call {
+// AddTextWatermark indicates an expected call of AddTextWatermark.
+func (mr *MockInterfaceMockRecorder) AddTextWatermark(ctx, data, text any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPasswordFile", reflect.TypeOf((*MockPdfInterface)(nil).SetPasswordFile), ctx, password, data)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddTextWatermark", reflect.TypeOf((*MockInterface)(nil).AddTextWatermark), ctx, data, text)
+}
+
+// Encrypt mocks base method.
+func (m *MockInterface) Encrypt(ctx context.Context, data []byte, password string) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Encrypt", ctx, data, password)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Encrypt indicates an expected call of Encrypt.
+func (mr *MockInterfaceMockRecorder) Encrypt(ctx, data, password any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Encrypt", reflect.TypeOf((*MockInterface)(nil).Encrypt), ctx, data, password)
+}
+
+// ExtractText mocks base method.
+func (m *MockInterface) ExtractText(ctx context.Context, data []byte) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExtractText", ctx, data)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExtractText indicates an expected call of ExtractText.
+func (mr *MockInterfaceMockRecorder) ExtractText(ctx, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExtractText", reflect.TypeOf((*MockInterface)(nil).ExtractText), ctx, data)
+}
+
+// Merge mocks base method.
+func (m *MockInterface) Merge(ctx context.Context, parts ...[]byte) ([]byte, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx}
+	for _, a := range parts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Merge", varargs...)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Merge indicates an expected call of Merge.
+func (mr *MockInterfaceMockRecorder) Merge(ctx any, parts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx}, parts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Merge", reflect.TypeOf((*MockInterface)(nil).Merge), varargs...)
+}
+
+// PageCount mocks base method.
+func (m *MockInterface) PageCount(ctx context.Context, data []byte) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PageCount", ctx, data)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PageCount indicates an expected call of PageCount.
+func (mr *MockInterfaceMockRecorder) PageCount(ctx, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PageCount", reflect.TypeOf((*MockInterface)(nil).PageCount), ctx, data)
+}
+
+// RemovePassword mocks base method.
+func (m *MockInterface) RemovePassword(ctx context.Context, data []byte, password string) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemovePassword", ctx, data, password)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RemovePassword indicates an expected call of RemovePassword.
+func (mr *MockInterfaceMockRecorder) RemovePassword(ctx, data, password any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemovePassword", reflect.TypeOf((*MockInterface)(nil).RemovePassword), ctx, data, password)
+}
+
+// Split mocks base method.
+func (m *MockInterface) Split(ctx context.Context, data []byte, span int) ([][]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Split", ctx, data, span)
+	ret0, _ := ret[0].([][]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Split indicates an expected call of Split.
+func (mr *MockInterfaceMockRecorder) Split(ctx, data, span any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Split", reflect.TypeOf((*MockInterface)(nil).Split), ctx, data, span)
 }

@@ -45,7 +45,7 @@ type ScryptConfig struct {
 	MemoryCost          int
 }
 
-func Init(log logger.Interface, scrypt ScryptConfig) Interface {
+func Init(scrypt ScryptConfig, log logger.Interface) Interface {
 	return &security{
 		log:    log,
 		scrypt: scrypt,

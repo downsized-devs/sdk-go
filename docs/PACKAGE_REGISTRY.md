@@ -1,21 +1,21 @@
 # Package Registry
 
-> Comprehensive index of every Go package in this monorepo. Stability is **inferred from code signals** (tests, exported interfaces, TODO/FIXME markers) — see [STABILITY.md](../STABILITY.md) for the policy and override mechanism. "Last updated" reflects the most recent `git log` commit touching the package directory as of 2026-05-15.
+> Comprehensive index of every Go package in this monorepo. Stability matches the binding policy in [STABILITY.md](../STABILITY.md). "Last updated" reflects the most recent `git log` commit touching the package directory as of 2026-05-16.
 
-All packages share the import root `github.com/downsized-devs/sdk-go`.
+All packages share the import root `github.com/downsized-devs/sdk-go`. The scaffolding CLI previously at `generator/` was extracted to a sibling repo, [`scaffolder-go`](https://github.com/downsized-devs/scaffolder-go).
 
 ## Index by Category
 
 - **Configuration & bootstrap**: [appcontext](#appcontext) · [configbuilder](#configbuilder) · [configreader](#configreader) · [featureflag](#featureflag)
 - **Logging, errors, observability**: [logger](#logger) · [errors](#errors) · [codes](#codes) · [audit](#audit) · [instrument](#instrument) · [tracker](#tracker)
-- **Data & storage**: [sql](#sql) · [nosql](#nosql) · [redis](#redis) · [storage](#storage) · [local_storage](#local_storage) · [query](#query) · [null](#null)
+- **Data & storage**: [sql](#sql) · [nosql](#nosql) · [redis](#redis) · [storage](#storage) · [localstorage](#localstorage) · [query](#query) · [null](#null)
 - **Auth & security**: [auth](#auth) · [security](#security) · [ratelimiter](#ratelimiter)
 - **Messaging & integrations**: [email](#email) · [messaging](#messaging) · [slack](#slack) · [gqlclient](#gqlclient)
 - **I18n & locale**: [language](#language) · [translator](#translator)
 - **Time & jobs**: [clock](#clock) · [dates](#dates) · [scheduler](#scheduler)
 - **Files & documents**: [files](#files) · [pdf](#pdf) · [parser](#parser)
 - **Utilities & primitives**: [character](#character) · [checker](#checker) · [convert](#convert) · [num](#num) · [operator](#operator) · [stringlib](#stringlib) · [header](#header)
-- **Tooling**: [generator](#generator) · [tests](#tests)
+- **Tooling**: [tests](#tests)
 
 ## Registry Table
 
@@ -34,26 +34,25 @@ All packages share the import root `github.com/downsized-devs/sdk-go`.
 | <a id="dates"></a>**dates** | Date arithmetic helpers | `Difference` (day-level diff between two times) | Stable | Jun 2024 |
 | <a id="email"></a>**email** | SMTP email sender with MJML templating | `SendEmail`, `GenerateBody`, `FromHTML`, `FromMJML` | Stable | Apr 2026 |
 | <a id="errors"></a>**errors** | Error wrapping with codes & stack traces | `NewWithCode`, `WrapWithCode`, `Compile`, `GetCode`, `GetCaller`, `Is`/`As` | Stable | May 2026 |
-| <a id="featureflag"></a>**featureflag** | Wrapper around `go-feature-flag` | `CheckUserFlags`, `GetAllUserFlags`, `Refresh` | Beta — no tests in package | Jun 2024 |
+| <a id="featureflag"></a>**featureflag** | Wrapper around `go-feature-flag` | `CheckUserFlags`, `GetAllUserFlags`, `Refresh` | Stable | May 2026 |
 | <a id="files"></a>**files** | Filesystem helpers | `GetExtension`, `IsExist` | Stable | Jun 2024 |
-| <a id="generator"></a>**generator** | Code-scaffolding CLI | `go run ./generator --name <X> --path <p> --api`; templates + modifiers + services | Experimental — CLI tool, not a library | May 2026 |
 | <a id="gqlclient"></a>**gqlclient** | Low-level GraphQL HTTP client | JSON and multipart `Run`; `WithHTTPClient`, `UseMultipartForm` options | Stable | May 2026 |
 | <a id="header"></a>**header** | HTTP header & MIME constants | ~18 string constants (content types, cache control, header keys) | Stable | Jun 2024 |
 | <a id="instrument"></a>**instrument** | Prometheus metrics for HTTP, DB, scheduler | `MetricsHandler`, `HTTPRequestTimer`/`Counter`, `RegisterDBStats`, `DatabaseQueryTimer`, `SchedulerRunningTimer`/`Counter` | Stable | May 2026 |
 | <a id="language"></a>**language** | Locale constants + HTTP status text | EN/ID/JA/DE constants; `HTTPStatusText(lang, code)` | Stable | May 2026 |
-| <a id="local_storage"></a>**local_storage** | Bleve-backed full-text local index | `NewIndex`, `Index`, `Search`, `DeleteIndex` | Stable | May 2026 |
+| <a id="localstorage"></a>**localstorage** | Bleve-backed full-text local index | `NewIndex`, `Index`, `Search`, `DeleteIndex` | Stable | May 2026 |
 | <a id="logger"></a>**logger** | Structured logging on zerolog | Trace/Debug/Info/Warn/Error/Fatal/Panic, `Debugf`, context-field extraction | Stable | May 2026 |
-| <a id="messaging"></a>**messaging** | Firebase Cloud Messaging | `SubscribeToTopic`, `UnsubscribeFromTopic`, `BroadcastToTopic`, `BatchSendDryRun` | Beta — no tests in package | Feb 2025 |
-| <a id="nosql"></a>**nosql** | MongoDB wrapper | `Find`, `FindOne`, `InsertOne`, `UpdateOne`, `UpdateMany`, `Close` | Beta — no tests in package | Apr 2026 |
+| <a id="messaging"></a>**messaging** | Firebase Cloud Messaging | `SubscribeToTopic`, `UnsubscribeFromTopic`, `BroadcastToTopic`, `BatchSendDryRun` | Stable | May 2026 |
+| <a id="nosql"></a>**nosql** | MongoDB wrapper | `Find`, `FindOne`, `InsertOne`, `UpdateOne`, `UpdateMany`, `Close` | Stable | May 2026 |
 | <a id="null"></a>**null** | SQL-nullable JSON-friendly types | `Bool`, `Int64`, `Float64`, `String`, `Time` with `SqlNull` flag | Stable | Mar 2025 |
 | <a id="num"></a>**num** | Numeric & matrix utilities | `SafeDivision`, `RandomString`, `RoundFloat`, `ExcelGenerateCoords`, `EmptyStringSlice` | Stable | Mar 2025 |
 | <a id="operator"></a>**operator** | Bitwise & ternary helpers | `CheckBitOnPosition`, generic `Ternary[T comparable]` | Stable | May 2026 |
 | <a id="parser"></a>**parser** | JSON + CSV parsing with schema validation | `JsonInterface` (5 marshal/unmarshal variants), `CsvInterface`, JSON-schema enforcement | Stable | Apr 2026 |
-| <a id="pdf"></a>**pdf** | PDF password protection | `SetPasswordFile` (AES-256 via pdfcpu) | Beta — single-feature, basic test | Mar 2025 |
-| <a id="query"></a>**query** | SQL query/clause builder | `FormatQueryForRows` bulk insert, struct-tag-driven WHERE/ORDER builder, cursor pagination | Beta — "find a better way" comment on `FormatQueryForRows` | May 2026 |
+| <a id="pdf"></a>**pdf** | PDF manipulation | `Encrypt`, `RemovePassword`, `Merge`, `Split`, `AddTextWatermark`, `ExtractText`, `PageCount` | Stable | May 2026 |
+| <a id="query"></a>**query** | SQL query/clause builder | Struct-tag-driven WHERE/ORDER builder, cursor pagination, typed converters | Stable | May 2026 |
 | <a id="ratelimiter"></a>**ratelimiter** | Gin rate-limiting middleware | Per-path `ConfigPath`, `GinMiddleware`, ulule/limiter backend | Stable | Jun 2024 |
 | <a id="redis"></a>**redis** | Redis client with distributed locks | `Get`, `SetEX`, `Lock`/`LockRelease` (redislock), `Del`, `Flush*`, `Ping`, `CRC16` | Stable | May 2026 |
-| <a id="scheduler"></a>**scheduler** | gocron v2 wrapper | `Register` with duration/daily/weekly/monthly job types, `Start`/`Shutdown` | Beta — no tests in package | Mar 2025 |
+| <a id="scheduler"></a>**scheduler** | gocron v2 wrapper | `Register` with duration/daily/weekly/monthly job types, `Start`/`Shutdown` | Stable | May 2026 |
 | <a id="security"></a>**security** | Cryptographic primitives | AES-GCM encrypt/decrypt, PBKDF2, Scrypt password hashing, HMAC | Stable | May 2026 |
 | <a id="slack"></a>**slack** | Slack message sender | `SendMessage` with attachments and attachment fields | Stable | Jun 2024 |
 | <a id="sql"></a>**sql** | SQL DB abstraction with leader/follower | Multi-driver (MySQL/Postgres/SQLite), prepared statements, transactions, instrumentation | Stable | Apr 2026 |
@@ -82,12 +81,11 @@ import (
     "github.com/downsized-devs/sdk-go/errors"
     "github.com/downsized-devs/sdk-go/featureflag"
     "github.com/downsized-devs/sdk-go/files"
-    // generator is a CLI: go run github.com/downsized-devs/sdk-go/generator
     "github.com/downsized-devs/sdk-go/gqlclient"
     "github.com/downsized-devs/sdk-go/header"
     "github.com/downsized-devs/sdk-go/instrument"
     "github.com/downsized-devs/sdk-go/language"
-    "github.com/downsized-devs/sdk-go/local_storage"
+    "github.com/downsized-devs/sdk-go/localstorage"
     "github.com/downsized-devs/sdk-go/logger"
     "github.com/downsized-devs/sdk-go/messaging"
     "github.com/downsized-devs/sdk-go/nosql"

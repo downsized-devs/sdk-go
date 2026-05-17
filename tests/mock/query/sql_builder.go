@@ -19,6 +19,7 @@ import (
 type MockCursor struct {
 	ctrl     *gomock.Controller
 	recorder *MockCursorMockRecorder
+	isgomock struct{}
 }
 
 // MockCursorMockRecorder is the mock recorder for MockCursor.
