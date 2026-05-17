@@ -59,7 +59,9 @@ func Init(opt Options) Interface {
 			panic(fmt.Errorf("fatal error found during reading additional config file. err: %w", err))
 		}
 		if addConf.ConfigKey == "" {
-			vp.MergeConfigMap(vpAddConf.AllSettings())
+			if err := vp.MergeConfigMap(vpAddConf.AllSettings()); err != nil {
+				panic(fmt.Errorf("fatal error merging additional config %s: %w", addConf.ConfigFile, err))
+			}
 		} else {
 			vp.Set(strings.ToLower(addConf.ConfigKey), vpAddConf.AllSettings())
 		}

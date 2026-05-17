@@ -44,6 +44,11 @@ jobs:
           exit 1
         fi
 
+    - name: Check go mod tidy
+      run: |
+        go mod tidy
+        git diff --exit-code go.mod go.sum
+
     - name: Run tests
       run: make run-tests
 

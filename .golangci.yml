@@ -8,11 +8,9 @@ linters:
     - gosec
     - misspell
   disable:
-    - errcheck
     - asasalint
     - asciicheck
     - bidichk
-    - bodyclose
     - containedctx
     - contextcheck
     - cyclop

@@ -129,7 +129,10 @@ func (l *logger) Fatal(ctx context.Context, obj any) {
 }
 
 func (l *logger) Panic(obj any) {
-	defer func() { recover() }()
+	// Suppress the panic raised by zerolog so callers receive a logged
+	// stack trace without crashing the process. The recovered value is
+	// intentionally discarded — it carries no useful state once logged.
+	defer func() { _ = recover() }()
 	l.log.Panic().
 		Fields(getPanicStacktrace()).
 		Msg(fmt.Sprint(getCaller(obj)))

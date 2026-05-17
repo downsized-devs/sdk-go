@@ -58,7 +58,7 @@ func (f *fakeS3) GetObjectWithContext(_ aws.Context, in *s3.GetObjectInput, _ ..
 	if f.getErr != nil {
 		return nil, f.getErr
 	}
-	var body io.ReadCloser = io.NopCloser(bytes.NewReader(f.getBody))
+	body := io.ReadCloser(io.NopCloser(bytes.NewReader(f.getBody)))
 	if f.getBodyOverride != nil {
 		body = f.getBodyOverride
 	}
