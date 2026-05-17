@@ -1,3 +1,8 @@
+// Package auth wraps the Firebase Admin SDK to provide ID-token
+// verification, password sign-in, refresh-token exchange, and user
+// CRUD. It exposes an Interface that callers can mock for tests and a
+// SetUserAuthInfo/GetUserAuthInfo pair for propagating authenticated
+// principals through context.
 package auth
 
 import (
@@ -27,6 +32,8 @@ const (
 	userAuthInfo contextKey = "UserAuthInfo"
 )
 
+// Interface is the public surface of the auth package. Callers depend
+// on this interface so they can swap in a mock for tests.
 type Interface interface {
 	VerifyToken(ctx context.Context, bearertoken string) (*firebase_auth.Token, error)
 	GetUser(ctx context.Context, userParam FirebaseUserParam) ([]FirebaseUser, error)
@@ -63,16 +70,23 @@ type auth struct {
 	conf              Config
 }
 
+// Config controls how Init builds the auth client. SkipFirebaseInit is
+// intended for tests or environments where the upstream Firebase
+// connection should be skipped entirely; the returned Interface still
+// satisfies the contract but all live operations return CodeNotImplemented.
 type Config struct {
 	SkipFirebaseInit bool
 	Firebase         FirebaseConf
 }
 
+// FirebaseConf groups the Firebase-specific credentials.
 type FirebaseConf struct {
 	AccountKey FirebaseAccountKey
 	ApiKey     string
 }
 
+// FirebaseAccountKey mirrors the JSON shape of a Firebase service-account
+// credentials file.
 type FirebaseAccountKey struct {
 	Type                    string `json:"type"`
 	ProjectID               string `json:"project_id"`
@@ -86,6 +100,10 @@ type FirebaseAccountKey struct {
 	Clientx509CertURL       string `json:"client_x509_cert_url"`
 }
 
+// Init constructs an auth client from cfg. It calls log.Fatal on
+// non-recoverable initialization failures (bad credentials, network
+// errors during Firebase bootstrap). Pass cfg.SkipFirebaseInit=true to
+// short-circuit the live Firebase connection — useful for tests.
 func Init(cfg Config, log logger.Interface, json parser.JsonInterface, httpClient *http.Client) Interface {
 	if cfg.SkipFirebaseInit {
 		return &auth{

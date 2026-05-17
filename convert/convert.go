@@ -1,3 +1,6 @@
+// Package convert offers type-coercion helpers (To/Int64, ToArrInt64,
+// ToFloat64, etc.) backed by reflection and the go-conv library. All
+// helpers return wrapped errors with CodeInvalidValue on failure.
 package convert
 
 import (

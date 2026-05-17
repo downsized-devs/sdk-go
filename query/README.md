@@ -9,9 +9,14 @@ Dynamic SQL clause builder driven by struct tags. Builds WHERE, ORDER BY, LIMIT,
 ## Features
 
 - Struct-tag-driven WHERE clause builder (matches db/param/field tags)
-- Cursor-based pagination (`Cursor` interface)
 - Sort param normalisation (`sort_by`, `sort-by`, `sortBy`, `sortby` all accepted)
 - Typed converters for int/int8/.../uint64, float, string, bool, time, plus their `*Arr` variants
+
+> **Cursor pagination:** the `Cursor` interface is present as a placeholder
+> for a future implementation; the builder does not yet apply cursor
+> filtering automatically. Callers that need keyset pagination today must
+> append the cursor predicate manually via `AddPrefixQuery` (or equivalent)
+> on the parameter struct before handing it to the builder.
 
 ## Installation
 

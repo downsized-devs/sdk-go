@@ -1,3 +1,7 @@
+// Package messaging is a thin wrapper over Firebase Cloud Messaging
+// (FCM). It exposes topic subscription management, single-topic
+// broadcasts, and a dry-run helper for validating large batches of
+// device tokens.
 package messaging
 
 import (
@@ -16,6 +20,8 @@ const (
 	MaximumTokensPerBatch = 500
 )
 
+// Interface is the public surface of the messaging package — mockable
+// for tests via the firebaseMessenger seam underneath.
 type Interface interface {
 	SubscribeToTopic(ctx context.Context, deviceToken, topic string) error
 	UnsubscribeFromTopic(ctx context.Context, deviceToken, topic string) error
@@ -56,6 +62,9 @@ type FirebaseConf struct {
 	ApiKey     string
 }
 
+// Config controls how Init builds the messaging client. Setting
+// SkipFirebaseInit short-circuits the live Firebase Cloud Messaging
+// connection — useful for tests.
 type Config struct {
 	SkipFirebaseInit bool
 	Firebase         FirebaseConf

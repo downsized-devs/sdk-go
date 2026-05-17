@@ -1,3 +1,6 @@
+// Package checker provides small validation predicates (phone, email)
+// and generic slice helpers (Contains, Deduplicate) used throughout the
+// SDK.
 package checker
 
 import "regexp"

@@ -1,3 +1,5 @@
+// Package dates collects small date/time helpers (differences,
+// formatting) that the rest of the SDK and consumers reuse.
 package dates
 
 import "time"

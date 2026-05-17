@@ -25,14 +25,24 @@ const (
 	Sunday    = "sunday"
 )
 
+// Interface is the public surface of the scheduler. Start kicks off
+// the underlying gocron engine, Shutdown drains it, and Register adds a
+// new job described by opt that runs handlerFunc on schedule.
 type Interface interface {
 	Start(ctx context.Context)
 	Shutdown(ctx context.Context)
 	Register(ctx context.Context, opt JobOption, handlerFunc any) error
 }
 
+// Config is currently empty; it exists so that callers wire scheduler
+// the same way as the other Init-style packages and so future
+// configuration can be added without breaking the API.
 type Config struct{}
 
+// JobOption describes a single registered job. JobType selects the
+// scheduling strategy (see the package-level Duration, Daily, Weekly,
+// Monthly, RandomDuration constants); the other fields apply
+// conditionally based on the JobType chosen.
 type JobOption struct {
 	JobType     string
 	Duration    time.Duration
@@ -47,6 +57,9 @@ type scheduler struct {
 	engine gocron.Scheduler
 }
 
+// Init constructs a scheduler. It panics (through log.Panic) if the
+// underlying gocron engine cannot be created — fail-fast on a
+// misconfigured environment.
 func Init(cfg Config, log logger.Interface) Interface {
 	engine, err := gocron.NewScheduler()
 	if err != nil {

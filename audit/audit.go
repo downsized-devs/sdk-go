@@ -1,3 +1,6 @@
+// Package audit emits structured audit records (HTTP captures and
+// domain-level Record events) as zerolog log lines, enriched from the
+// surrounding appcontext and the resolved user identity.
 package audit
 
 import (

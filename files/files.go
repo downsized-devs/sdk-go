@@ -1,3 +1,5 @@
+// Package files contains small file-system helpers: extension parsing
+// and existence checks that never panic on permission errors.
 package files
 
 import (

@@ -1,3 +1,5 @@
+// Package tracker pushes ad-hoc counter metrics to a Prometheus
+// PushGateway and forwards event payloads to a configured webhook URL.
 package tracker
 
 import (
