@@ -164,6 +164,26 @@ func TestUpdateMany(t *testing.T) {
 // mtest mock client double-disconnects the mock and panics, so we cover the
 // error-wrap branch via a real client check in integration tests instead.
 
+func TestRedactDSN(t *testing.T) {
+	tests := []struct {
+		name string
+		raw  string
+		want string
+	}{
+		{"empty", "", ""},
+		{"no credentials", "mongodb://host:27017/db", "mongodb://host:27017/db"},
+		{"with password", "mongodb://user:secret@host:27017/db", "mongodb://user@host:27017/db"},
+		{"username only", "mongodb://user@host:27017/db", "mongodb://user@host:27017/db"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := redactDSN(tt.raw)
+			assert.Equal(t, tt.want, got)
+			assert.NotContains(t, got, "secret")
+		})
+	}
+}
+
 func TestReplaceBindvarsWithArgs(t *testing.T) {
 	t.Run("primitive ? placeholders are replaced positionally", func(t *testing.T) {
 		got := replaceBindvarsWithArgs("SELECT ?, ?", 1, "two")

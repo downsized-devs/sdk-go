@@ -157,7 +157,10 @@ func (s *security) HashPassword(ctx context.Context, secretKey, password string)
 }
 
 func (s *security) CompareHashPassword(ctx context.Context, secretKey, hashPassword, password string) bool {
-	return hashPassword == s.HashPassword(ctx, secretKey, password)
+	// Use subtle.ConstantTimeCompare to guard against timing side-channels
+	// that string equality would otherwise expose.
+	expected := s.HashPassword(ctx, secretKey, password)
+	return subtle.ConstantTimeCompare([]byte(hashPassword), []byte(expected)) == 1
 }
 
 func (s *security) ScryptPassword(ctx context.Context, salt string, password string) string {

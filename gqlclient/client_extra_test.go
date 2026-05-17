@@ -179,6 +179,33 @@ func TestRun_JSON_EncodeBodyError(t *testing.T) {
 	assert.Contains(t, err.Error(), "encode body")
 }
 
+func TestRedactHeaders(t *testing.T) {
+	in := http.Header{
+		"Authorization": []string{"Bearer secret-token"},
+		"Cookie":        []string{"session=abc"},
+		"X-Api-Key":     []string{"key-value"},
+		"User-Agent":    []string{"unit-test"},
+	}
+	got := redactHeaders(in)
+
+	assert.Equal(t, []string{"[REDACTED]"}, got["Authorization"])
+	assert.Equal(t, []string{"[REDACTED]"}, got["Cookie"])
+	assert.Equal(t, []string{"[REDACTED]"}, got["X-Api-Key"])
+	assert.Equal(t, []string{"unit-test"}, got["User-Agent"])
+	// Original must not have been mutated.
+	assert.Equal(t, "Bearer secret-token", in.Get("Authorization"))
+}
+
+func TestTruncateForLog(t *testing.T) {
+	short := strings.Repeat("a", maxLoggedBodyBytes)
+	long := strings.Repeat("b", maxLoggedBodyBytes+50)
+
+	assert.Equal(t, short, truncateForLog(short))
+	got := truncateForLog(long)
+	assert.True(t, strings.HasSuffix(got, "(truncated)"))
+	assert.Equal(t, maxLoggedBodyBytes+len("(truncated)"), len(got))
+}
+
 // Triggers the multipart non-200 + bad JSON body path.
 func TestRun_Multipart_Non200WithBadBody(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {

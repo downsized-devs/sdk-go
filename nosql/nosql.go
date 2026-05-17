@@ -3,6 +3,7 @@ package nosql
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"reflect"
 	"strings"
 	"time"
@@ -40,9 +41,9 @@ func Init(cfg Config, log logger.Interface) Interface {
 	client := options.Client().ApplyURI(cfg.DBUrl)
 	dbClient, err := mongo.Connect(ctx, client)
 	if err != nil {
-		log.Fatal(ctx, fmt.Sprintf("[FATAL] cannot connect to dbURL %s, err : %v", cfg.DBUrl, err))
+		log.Fatal(ctx, fmt.Sprintf("[FATAL] cannot connect to dbURL %s, err : %v", redactDSN(cfg.DBUrl), err))
 	}
-	log.Info(ctx, fmt.Sprintf("NoSQL: dbURL=%s db=%s", cfg.DBUrl, cfg.DB))
+	log.Info(ctx, fmt.Sprintf("NoSQL: dbURL=%s db=%s", redactDSN(cfg.DBUrl), cfg.DB))
 
 	nosql := &mongoDB{
 		client: dbClient,
@@ -110,6 +111,26 @@ func (m *mongoDB) UpdateMany(ctx context.Context, collection string, filter inte
 	}
 
 	return updateResult, nil
+}
+
+// redactDSN strips any embedded password from a MongoDB connection URL so
+// that fatal/info logs never expose credentials. If the input cannot be
+// parsed (e.g. malformed), it returns "[redacted]" rather than leak it.
+func redactDSN(raw string) string {
+	if raw == "" {
+		return ""
+	}
+	u, err := url.Parse(raw)
+	if err != nil || u.User == nil {
+		if err != nil {
+			return "[redacted]"
+		}
+		return raw
+	}
+	if _, hasPassword := u.User.Password(); hasPassword {
+		u.User = url.User(u.User.Username())
+	}
+	return u.String()
 }
 
 // Replace query bindvars with args value

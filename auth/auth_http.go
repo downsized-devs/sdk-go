@@ -3,7 +3,6 @@ package auth
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -37,14 +36,17 @@ func (a *auth) exchangeRefreshToken(ctx context.Context, payLoad RefreshTokenReq
 	if err != nil {
 		return result, errors.NewWithCode(codes.CodeErrorHttpDo, "%s", err.Error())
 	}
+	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return result, errors.NewWithCode(codes.CodeErrorIoutilReadAll, "%s", err.Error())
 	}
 
-	if resp.StatusCode != 200 {
-		a.log.Error(ctx, fmt.Sprintf("error exchange refresh token, req: %v, resp: %s", payLoad, string(body)))
+	if resp.StatusCode != http.StatusOK {
+		// Do not log the refresh-token payload or the upstream response body;
+		// both can carry secrets. Only the status code is safe to record.
+		a.log.Error(ctx, errors.NewWithCode(codes.CodeErrorHttpDo, "error exchange refresh token, status=%d", resp.StatusCode))
 		return result, errors.NewWithCode(codes.CodeErrorHttpDo, "error exchangeRefreshToken")
 	}
 

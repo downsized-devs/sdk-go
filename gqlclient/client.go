@@ -39,7 +39,50 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strings"
 )
+
+// maxLoggedBodyBytes caps how much of a variables payload or response body
+// is written to the debug log. Bodies above this size are truncated and an
+// explicit "(truncated)" suffix is appended so operators know the log line
+// is incomplete.
+const maxLoggedBodyBytes = 512
+
+// sensitiveHeaders is the case-insensitive set of headers whose values are
+// replaced with a fixed placeholder before being logged. Anything matching
+// here is assumed to carry credentials or session state.
+var sensitiveHeaders = map[string]struct{}{
+	"authorization": {},
+	"cookie":        {},
+	"x-api-key":     {},
+}
+
+// redactHeaders returns a shallow copy of h with the values of any
+// sensitive header replaced by "[REDACTED]". The original header map is
+// not mutated so the outgoing request is unaffected.
+func redactHeaders(h http.Header) http.Header {
+	if h == nil {
+		return nil
+	}
+	redacted := make(http.Header, len(h))
+	for k, v := range h {
+		if _, ok := sensitiveHeaders[strings.ToLower(k)]; ok {
+			redacted[k] = []string{"[REDACTED]"}
+			continue
+		}
+		redacted[k] = append([]string(nil), v...)
+	}
+	return redacted
+}
+
+// truncateForLog returns s capped at maxLoggedBodyBytes bytes with a
+// trailing "(truncated)" marker when the input is larger.
+func truncateForLog(s string) string {
+	if len(s) <= maxLoggedBodyBytes {
+		return s
+	}
+	return s[:maxLoggedBodyBytes] + "(truncated)"
+}
 
 type Interface interface {
 	Run(ctx context.Context, req *Request, resp interface{}) error
@@ -111,7 +154,7 @@ func (c *Client) runWithJSON(ctx context.Context, req *Request, resp interface{}
 	if err := json.NewEncoder(&requestBody).Encode(requestBodyObj); err != nil {
 		return fmt.Errorf("encode body: %w", err)
 	}
-	c.logf(">> variables: %v", req.vars)
+	c.logf(">> variables: %s", truncateForLog(fmt.Sprintf("%v", req.vars)))
 	c.logf(">> query: %s", req.q)
 	gr := &graphResponse{
 		Data: resp,
@@ -128,7 +171,7 @@ func (c *Client) runWithJSON(ctx context.Context, req *Request, resp interface{}
 			r.Header.Add(key, value)
 		}
 	}
-	c.logf(">> headers: %v", r.Header)
+	c.logf(">> headers: %v", redactHeaders(r.Header))
 	r = r.WithContext(ctx)
 	res, err := c.httpClient.Do(r)
 	if err != nil {
@@ -139,7 +182,7 @@ func (c *Client) runWithJSON(ctx context.Context, req *Request, resp interface{}
 	if _, err := io.Copy(&buf, res.Body); err != nil {
 		return fmt.Errorf("reading body: %w", err)
 	}
-	c.logf("<< %s", buf.String())
+	c.logf("<< %s", truncateForLog(buf.String()))
 	if err := json.NewDecoder(&buf).Decode(&gr); err != nil {
 		if res.StatusCode != http.StatusOK {
 			return fmt.Errorf("graphql: server returned a non-200 status code: %v", res.StatusCode)
@@ -181,7 +224,7 @@ func (c *Client) runWithPostFields(ctx context.Context, req *Request, resp inter
 	if err := writer.Close(); err != nil {
 		return fmt.Errorf("close writer: %w", err)
 	}
-	c.logf(">> variables: %s", variablesBuf.String())
+	c.logf(">> variables: %s", truncateForLog(variablesBuf.String()))
 	c.logf(">> files: %d", len(req.files))
 	c.logf(">> query: %s", req.q)
 	gr := &graphResponse{
@@ -199,7 +242,7 @@ func (c *Client) runWithPostFields(ctx context.Context, req *Request, resp inter
 			r.Header.Add(key, value)
 		}
 	}
-	c.logf(">> headers: %v", r.Header)
+	c.logf(">> headers: %v", redactHeaders(r.Header))
 	r = r.WithContext(ctx)
 	res, err := c.httpClient.Do(r)
 	if err != nil {
@@ -210,7 +253,7 @@ func (c *Client) runWithPostFields(ctx context.Context, req *Request, resp inter
 	if _, err := io.Copy(&buf, res.Body); err != nil {
 		return fmt.Errorf("reading body: %w", err)
 	}
-	c.logf("<< %s", buf.String())
+	c.logf("<< %s", truncateForLog(buf.String()))
 	if err := json.NewDecoder(&buf).Decode(&gr); err != nil {
 		if res.StatusCode != http.StatusOK {
 			return fmt.Errorf("graphql: server returned a non-200 status code: %v", res.StatusCode)
