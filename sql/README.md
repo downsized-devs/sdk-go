@@ -8,7 +8,7 @@ Multi-driver (`MySQL`, `Postgres`, `SQLite`) database client built on `sqlx`, wi
 
 ## Features
 
-- Leader/follower routing (`Leader(ctx)`, `Follower(ctx)`)
+- Leader/follower routing (`Leader()`, `Follower()`)
 - Multi-driver: `github.com/go-sql-driver/mysql`, `github.com/lib/pq`, `modernc.org/sqlite`
 - Transactions with `BeginTx`
 - Prepared statements (`Prepare`)
@@ -33,21 +33,31 @@ import (
 )
 
 log := logger.Init(logger.Config{Level: "info"})
-metrics := instrument.Init(instrument.Config{Enabled: true})
+metrics := instrument.Init(instrument.Config{
+    Metrics: instrument.MetricsConfig{Enabled: true},
+})
 
 db := sql.Init(sql.Config{
     Driver: "postgres",
     Leader: sql.ConnConfig{
-        DSN: "postgres://user:pass@leader:5432/app?sslmode=disable",
+        Host:     "leader",
+        Port:     5432,
+        DB:       "app",
+        User:     "user",
+        Password: "pass",
     },
     Follower: sql.ConnConfig{
-        DSN: "postgres://user:pass@follower:5432/app?sslmode=disable",
+        Host:     "follower",
+        Port:     5432,
+        DB:       "app",
+        User:     "user",
+        Password: "pass",
     },
 }, log, metrics)
 defer db.Stop()
 
 var u User
-if err := db.Follower(ctx).Get(ctx, &u, "SELECT * FROM users WHERE id=$1", 1); err != nil {
+if err := db.Follower().Get(ctx, &u, "SELECT * FROM users WHERE id=$1", 1); err != nil {
     if errors.Is(err, sql.ErrNotFound) { /* miss */ }
 }
 ```
@@ -56,10 +66,10 @@ if err := db.Follower(ctx).Get(ctx, &u, "SELECT * FROM users WHERE id=$1", 1); e
 
 | Symbol | Signature |
 |---|---|
-| `Init` | `func Init(cfg Config, log logger.Interface, metrics instrument.Interface) Interface` |
-| `Interface.Leader` | `(ctx) Command` — read/write connection. |
-| `Interface.Follower` | `(ctx) Command` — read-only connection. |
-| `Interface.Stop` | `() error` — close all pools. |
+| `Init` | `func Init(cfg Config, log logger.Interface, instr instrument.Interface) Interface` |
+| `Interface.Leader` | `() Command` — read/write connection. |
+| `Interface.Follower` | `() Command` — read-only connection. |
+| `Interface.Stop` | `()` — close all pools. |
 | `Command.Query` | `(ctx, dest, q, args...) error` |
 | `Command.Exec` | `(ctx, q, args...) (Result, error)` |
 | `Command.Get` | `(ctx, dest, q, args...) error` — single row. |
@@ -72,16 +82,16 @@ if err := db.Follower(ctx).Get(ctx, &u, "SELECT * FROM users WHERE id=$1", 1); e
 
 | Field | Required | Description |
 |---|---|---|
-| `Driver` | yes | `mysql`, `postgres`, or `sqlite`. |
-| `Leader.DSN` / `Follower.DSN` | yes | Connection strings. |
-| `Leader.MaxOpen`, `MaxIdle`, `MaxLifetime` | no | Pool tuning. Same for follower. |
+| `Driver` | yes | `mysql`, `postgres`, or `sqlite3`. |
+| `Leader` / `Follower` | yes | `ConnConfig{Host, Port, DB, User, Password, SSL, Schema, Options}`. |
+| `Leader.Options.MaxOpen`, `MaxIdle`, `MaxLifeTime` | no | Pool tuning. Same for follower. |
 
 ## Examples
 
 ### Run a transaction
 
 ```go
-tx, err := db.Leader(ctx).BeginTx(ctx, sql.TxOptions{})
+tx, err := db.Leader().BeginTx(ctx, sql.TxOptions{})
 if err != nil { return err }
 defer tx.Rollback()
 
@@ -94,7 +104,7 @@ return tx.Commit()
 ### Use a prepared statement
 
 ```go
-stmt, _ := db.Leader(ctx).Prepare(ctx, "INSERT INTO events(name, payload) VALUES (?, ?)")
+stmt, _ := db.Leader().Prepare(ctx, "INSERT INTO events(name, payload) VALUES (?, ?)")
 defer stmt.Close()
 for _, e := range events {
     _, _ = stmt.Exec(ctx, e.Name, e.Payload)

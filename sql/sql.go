@@ -1,3 +1,6 @@
+// Package sql is a sqlx-backed SQL client with leader/follower routing,
+// transactions, prepared statements, and optional Prometheus
+// instrumentation. It targets MySQL, Postgres, and SQLite drivers.
 package sql
 
 import (
@@ -24,6 +27,10 @@ const (
 	connTypeFollower = "follower"
 )
 
+// Config controls how Init builds the SQL client: which driver to use,
+// connection settings for the leader and follower, whether to emit
+// instrumentation metrics, and whether to log every query (useful in
+// development and noisy in production).
 type Config struct {
 	UseInstrument bool
 	LogQuery      bool
@@ -33,6 +40,10 @@ type Config struct {
 	Follower      ConnConfig
 }
 
+// ConnConfig describes a single connection. MockDB, when non-nil, is
+// preferred over the Host/Port/DB/User/Password fields and lets tests
+// inject a pre-built *sql.DB (for example a sqlmock or an in-memory
+// sqlite database).
 type ConnConfig struct {
 	Host     string
 	Port     int
@@ -45,12 +56,17 @@ type ConnConfig struct {
 	MockDB   *sql.DB
 }
 
+// ConnOptions tunes the underlying database/sql pool.
 type ConnOptions struct {
 	MaxLifeTime time.Duration
 	MaxIdle     int
 	MaxOpen     int
 }
 
+// Interface is the public surface of the sql package. Leader returns
+// the read/write Command, Follower returns the read-only Command (or
+// the leader when no follower is configured), and Stop closes both
+// pools at most once.
 type Interface interface {
 	Leader() Command
 	Follower() Command
@@ -66,6 +82,10 @@ type sqlDB struct {
 	instrument instrument.Interface
 }
 
+// Init constructs a sql client from cfg. When cfg.Driver is "sqlmock"
+// instrumentation is force-disabled. cfg.Name defaults to cfg.Driver
+// when empty. Init calls log.Fatal if the leader connection cannot be
+// established.
 func Init(cfg Config, log logger.Interface, instr instrument.Interface) Interface {
 	if cfg.Driver == "sqlmock" {
 		cfg.UseInstrument = false
@@ -137,12 +157,12 @@ func (s *sqlDB) connect(toLeader bool) (*sqlx.DB, error) {
 	}
 
 	if !toLeader {
-		if s.cfg.Leader.MockDB != nil {
-			return sqlx.NewDb(s.cfg.Leader.MockDB, s.cfg.Driver), nil
-		}
-	} else {
 		if s.cfg.Follower.MockDB != nil {
 			return sqlx.NewDb(s.cfg.Follower.MockDB, s.cfg.Driver), nil
+		}
+	} else {
+		if s.cfg.Leader.MockDB != nil {
+			return sqlx.NewDb(s.cfg.Leader.MockDB, s.cfg.Driver), nil
 		}
 	}
 
@@ -177,10 +197,12 @@ func (s *sqlDB) connect(toLeader bool) (*sqlx.DB, error) {
 }
 
 func (s *sqlDB) isFollowerEnabled() bool {
-	isHostNotEmpty := s.cfg.Follower.Host != ""
-	isHostDifferent := (s.cfg.Follower.Host != s.cfg.Leader.Host && s.cfg.Follower.Port == s.cfg.Leader.Port)
-	isPortDifferent := (s.cfg.Follower.Host == s.cfg.Leader.Host && s.cfg.Follower.Port != s.cfg.Leader.Port)
-	return isHostNotEmpty && (isHostDifferent || isPortDifferent)
+	if s.cfg.Follower.Host == "" {
+		return false
+	}
+	leaderAddr := fmt.Sprintf("%s:%d", s.cfg.Leader.Host, s.cfg.Leader.Port)
+	followerAddr := fmt.Sprintf("%s:%d", s.cfg.Follower.Host, s.cfg.Follower.Port)
+	return leaderAddr != followerAddr
 }
 
 func (s *sqlDB) getURI(conf ConnConfig) (string, error) {

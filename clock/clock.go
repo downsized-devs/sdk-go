@@ -1,3 +1,5 @@
+// Package clock exposes a tiny seam over time.Now and time.Since so
+// callers can inject deterministic clocks in tests.
 package clock
 
 import (

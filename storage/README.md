@@ -22,16 +22,17 @@ go get github.com/downsized-devs/sdk-go/storage
 
 ```go
 s := storage.Init(storage.Config{
-    AWS: storage.AWSS3Config{
-        Region:    "ap-southeast-1",
-        Bucket:    "my-bucket",
-        AccessKey: "<KEY>",
-        Secret:    "<SECRET>",
+    AWSS3: storage.AWSS3Config{
+        Region:          "ap-southeast-1",
+        BucketName:      "my-bucket",
+        AccessKeyID:     "<KEY>",
+        SecretAccessKey: "<SECRET>",
+        PresignDuration: 15 * time.Minute,
     },
 }, log)
 
-_ = s.Upload(ctx, "key/path.jpg", fileReader, "image/jpeg")
-url, _ := s.GetPresignedUrl(ctx, "key/path.jpg")
+url, _ := s.Upload(ctx, "key/path.jpg", "path.jpg", "image/jpeg", fileBytes)
+presigned, _ := s.GetPresignedUrl(ctx, "key/path.jpg")
 ```
 
 ## API Reference
@@ -39,7 +40,7 @@ url, _ := s.GetPresignedUrl(ctx, "key/path.jpg")
 | Symbol | Signature |
 |---|---|
 | `Init` | `func Init(cfg Config, log logger.Interface) Interface` |
-| `Interface.Upload` | `(ctx, key string, body io.Reader, contentType string) error` |
+| `Interface.Upload` | `(ctx, key string, filename, contentType string, data []byte) (url string, err error)` |
 | `Interface.Download` | `(ctx, key string) ([]byte, error)` |
 | `Interface.Delete` | `(ctx, key string) error` |
 | `Interface.GetPresignedUrl` | `(ctx, key string) (string, error)` |
@@ -50,9 +51,10 @@ url, _ := s.GetPresignedUrl(ctx, "key/path.jpg")
 
 | Field | Required | Description |
 |---|---|---|
-| `AWS.Region` | yes | S3 region. |
-| `AWS.Bucket` | yes | Default bucket. |
-| `AWS.AccessKey` / `AWS.Secret` | yes | IAM credentials. Use IRSA / IAM-role-for-service-account in EKS instead when possible. |
+| `AWSS3.Region` | yes | S3 region. |
+| `AWSS3.BucketName` | yes | Default bucket. |
+| `AWSS3.AccessKeyID` / `AWSS3.SecretAccessKey` | yes | IAM credentials. Use IRSA / IAM-role-for-service-account in EKS instead when possible. |
+| `AWSS3.PresignDuration` | no | Default expiry used by `GetPresignedUrl`. |
 
 ## Error Handling
 

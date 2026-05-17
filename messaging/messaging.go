@@ -1,3 +1,7 @@
+// Package messaging is a thin wrapper over Firebase Cloud Messaging
+// (FCM). It exposes topic subscription management, single-topic
+// broadcasts, and a dry-run helper for validating large batches of
+// device tokens.
 package messaging
 
 import (
@@ -16,6 +20,8 @@ const (
 	MaximumTokensPerBatch = 500
 )
 
+// Interface is the public surface of the messaging package — mockable
+// for tests via the firebaseMessenger seam underneath.
 type Interface interface {
 	SubscribeToTopic(ctx context.Context, deviceToken, topic string) error
 	UnsubscribeFromTopic(ctx context.Context, deviceToken, topic string) error
@@ -56,12 +62,20 @@ type FirebaseConf struct {
 	ApiKey     string
 }
 
+// Config controls how Init builds the messaging client. Setting
+// SkipFirebaseInit short-circuits the live Firebase Cloud Messaging
+// connection — useful for tests.
 type Config struct {
 	SkipFirebaseInit bool
 	Firebase         FirebaseConf
 }
 
-func Init(cfg Config, log logger.Interface, json parser.JsonInterface, httpClient *http.Client) Interface {
+// Init builds a messaging client. The httpClient parameter is ignored
+// because the underlying Firebase SDK manages its own HTTP transport.
+//
+// Deprecated: httpClient is not used and will be removed in v2.0.0. Pass
+// nil for forward-compatibility.
+func Init(cfg Config, log logger.Interface, json parser.JsonInterface, _ *http.Client) Interface {
 	if cfg.SkipFirebaseInit {
 		return &messaging{
 			log: log,
@@ -131,33 +145,48 @@ func (m *messaging) BroadcastToTopic(ctx context.Context, topic string, payload 
 	return nil
 }
 
-// Dry run function is to validate a batch of token. If some invalidate, we will unsubscribe it from the topic
+// Dry run function is to validate a batch of token. If some invalidate, we will unsubscribe it from the topic.
+//
+// Firebase rejects MulticastMessages with more than MaximumTokensPerBatch
+// tokens, so the input is chunked and SendMulticastDryRun is called once per
+// chunk; invalid-token results are merged across all chunks.
 func (m *messaging) BatchSendDryRun(ctx context.Context, tokens []string) ([]string, error) {
 	invalidTokens := []string{}
-	message := &firebase_messaging.MulticastMessage{
-		Tokens: tokens,
-		Data: map[string]string{
-			"desc": "dry run to validate token",
-		},
+	if len(tokens) == 0 {
+		return invalidTokens, nil
 	}
 
-	multicastResponse, err := m.firebase.SendMulticastDryRun(ctx, message)
+	hasFailures := false
+	for start := 0; start < len(tokens); start += MaximumTokensPerBatch {
+		end := min(start+MaximumTokensPerBatch, len(tokens))
+		batch := tokens[start:end]
 
-	// As firebase documentation mentioned, this mean that ALL the token is not valid/internal server error within firebase
-	if err != nil {
-		return invalidTokens, err
-	}
-
-	// This means some of the token is not valid
-	if multicastResponse.FailureCount > 0 {
-		for i, response := range multicastResponse.Responses {
-			if response.Error != nil {
-				invalidTokens = append(invalidTokens, tokens[i])
-			}
+		message := &firebase_messaging.MulticastMessage{
+			Tokens: batch,
+			Data: map[string]string{
+				"desc": "dry run to validate token",
+			},
 		}
 
-		return invalidTokens, errors.New("partial error")
+		multicastResponse, err := m.firebase.SendMulticastDryRun(ctx, message)
+		// As firebase documentation mentions, this means the whole batch is
+		// either invalid or hit an internal firebase error.
+		if err != nil {
+			return invalidTokens, err
+		}
+
+		if multicastResponse.FailureCount > 0 {
+			hasFailures = true
+			for i, response := range multicastResponse.Responses {
+				if response.Error != nil {
+					invalidTokens = append(invalidTokens, batch[i])
+				}
+			}
+		}
 	}
 
+	if hasFailures {
+		return invalidTokens, errors.New("partial error")
+	}
 	return invalidTokens, nil
 }

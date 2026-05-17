@@ -1,3 +1,6 @@
+// Package appcontext defines typed accessors and setters for
+// request-scoped values (request id, user agent, IP, body, headers,
+// timings) carried through a context.Context.
 package appcontext
 
 import (

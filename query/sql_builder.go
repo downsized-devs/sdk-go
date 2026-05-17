@@ -15,6 +15,10 @@ import (
 
 const cursorField = "cursorField"
 
+// sortClauseRegex is compiled once for use by sqlClausebuilder.sort so that
+// every call no longer pays the regexp.MustCompile cost.
+var sortClauseRegex = regexp.MustCompile(`(?P<sign>-)?(?P<col>[a-zA-Z_\.0-9]+),?`)
+
 type Cursor interface {
 	DecodeCursor(v string) error
 	EncodeCursor() (string, error)
@@ -226,8 +230,8 @@ func (s *sqlClausebuilder) BuildUpdate(update interface{}, where interface{}) (s
 }
 
 func (s *sqlClausebuilder) sort() {
+	reg := sortClauseRegex
 	for _, param := range s.paramSortBy {
-		reg := regexp.MustCompile(`(?P<sign>-)?(?P<col>[a-zA-Z_\.0-9]+),?`)
 		if reg.MatchString(param) {
 			for _, _s := range strings.Split(param, ",") {
 				direction := "ASC"

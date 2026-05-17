@@ -1,17 +1,17 @@
+// Package audit emits structured audit records (HTTP captures and
+// domain-level Record events) as zerolog log lines, enriched from the
+// surrounding appcontext and the resolved user identity.
 package audit
 
 import (
 	"context"
 	"os"
-	"sync"
 
 	"github.com/downsized-devs/sdk-go/appcontext"
 	"github.com/downsized-devs/sdk-go/auth"
 	"github.com/downsized-devs/sdk-go/operator"
 	"github.com/rs/zerolog"
 )
-
-var once = sync.Once{}
 
 type Interface interface {
 	Capture(ctx context.Context)
@@ -24,15 +24,12 @@ type audit struct {
 }
 
 func Init(auth auth.Interface) Interface {
-	var zeroLogging zerolog.Logger
-
-	// Initialize a new Zerolog object to handle the split log file
-	once.Do(func() {
-		zeroLogging = zerolog.New(os.Stdout).
-			With().
-			Timestamp().
-			Logger()
-	})
+	// A fresh logger is built on every Init call so that successive
+	// Inits don't share zero-value state with the first one.
+	zeroLogging := zerolog.New(os.Stdout).
+		With().
+		Timestamp().
+		Logger()
 
 	return &audit{log: zeroLogging, auth: auth}
 }

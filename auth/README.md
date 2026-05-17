@@ -35,7 +35,7 @@ import (
 )
 
 log := logger.Init(logger.Config{Level: "info"})
-json := parser.InitParser(log, parser.Options{}).JSONParser()
+json := parser.Init(log, parser.Options{}).JSONParser()
 
 a := auth.Init(auth.Config{
     Firebase: auth.FirebaseConf{
@@ -44,7 +44,7 @@ a := auth.Init(auth.Config{
     },
 }, log, json, http.DefaultClient)
 
-tok, err := a.VerifyToken(context.Background(), "Bearer eyJhbGciOi...")
+tok, err := a.VerifyToken(context.Background(), "<ID_TOKEN>")
 ```
 
 ## API Reference
@@ -95,7 +95,9 @@ func AuthMiddleware(a auth.Interface) gin.HandlerFunc {
             c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
             return
         }
-        ctx := a.SetUserAuthInfo(c.Request.Context(), auth.UserAuthParam{UID: tok.UID})
+        ctx := a.SetUserAuthInfo(c.Request.Context(), auth.UserAuthParam{
+            FirebaseToken: tok,
+        })
         c.Request = c.Request.WithContext(ctx)
         c.Next()
     }

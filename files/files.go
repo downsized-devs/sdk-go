@@ -1,3 +1,5 @@
+// Package files contains small file-system helpers: extension parsing
+// and existence checks that never panic on permission errors.
 package files
 
 import (
@@ -22,7 +24,10 @@ func GetExtension(filename string) string {
 // Checks if a file exists and is not a directory
 func IsExist(filename string) bool {
 	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
+	if err != nil {
+		// Treat any stat error (not-found, permission denied, etc.) as
+		// "not a known regular file" so the caller never has to handle a
+		// nil FileInfo dereference here.
 		return false
 	}
 

@@ -1,3 +1,7 @@
+// Package query is a struct-tag-driven SQL clause builder. It turns a
+// typed parameter struct (matching `db` / `param` / `field` tags) into
+// WHERE, ORDER BY, LIMIT, and OFFSET fragments that the sql package can
+// execute.
 package query
 
 import (

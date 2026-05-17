@@ -1,3 +1,6 @@
+// Package storage wraps the AWS S3 v1 SDK with a small Interface
+// covering upload, download, delete, presigned URL generation, and
+// static URL construction.
 package storage
 
 import (
@@ -17,6 +20,7 @@ import (
 	"github.com/downsized-devs/sdk-go/logger"
 )
 
+// Interface is the public surface of the storage package. Mockable for tests.
 type Interface interface {
 	Upload(ctx context.Context, key string, filename, filemimetype string, data []byte) (url string, err error)
 	Download(ctx context.Context, url string) ([]byte, error)
@@ -26,10 +30,13 @@ type Interface interface {
 	CreateUrlByKey(key string) string
 }
 
+// Config wraps the AWS-specific options consumed by Init.
 type Config struct {
 	AWSS3 AWSS3Config
 }
 
+// AWSS3Config carries the bucket, region, IAM credentials, and the
+// default presign duration applied by GetPresignedUrl.
 type AWSS3Config struct {
 	Region          string
 	BucketName      string
@@ -53,6 +60,9 @@ type storage struct {
 	log    logger.Interface
 }
 
+// Init constructs an S3-backed storage client. It calls log.Fatal when
+// the configured credentials are empty so misconfigured services fail
+// fast at startup rather than at the first request.
 func Init(cfg Config, log logger.Interface) Interface {
 	if cfg.AWSS3.AccessKeyID == "" || cfg.AWSS3.SecretAccessKey == "" {
 		log.Fatal(context.Background(), "storage credentials not found")
@@ -95,21 +105,18 @@ func (s *storage) Download(ctx context.Context, key string) ([]byte, error) {
 	if err != nil {
 		return nil, errors.NewWithCode(codes.CodeStorageS3Download, "failed to download file, with err: %v", err)
 	}
-
-	size := int(*obj.ContentLength)
-	buffer := make([]byte, size)
 	defer obj.Body.Close()
-	var bbuffer bytes.Buffer
-	for {
-		byteSize, err := obj.Body.Read(buffer)
-		if byteSize > 0 {
-			bbuffer.Write(buffer[:byteSize])
-		} else if err == io.EOF || err != nil {
-			break
-		}
+
+	data, err := io.ReadAll(obj.Body)
+	if err != nil {
+		return nil, errors.NewWithCode(codes.CodeStorageS3Download, "failed to read object body for key %s: %v", key, err)
 	}
 
-	return bbuffer.Bytes(), nil
+	if obj.ContentLength != nil && int64(len(data)) != *obj.ContentLength {
+		return nil, errors.NewWithCode(codes.CodeStorageS3Download, "short read for key %s: got %d bytes, expected %d", key, len(data), *obj.ContentLength)
+	}
+
+	return data, nil
 }
 
 func (s *storage) Delete(ctx context.Context, key string) error {

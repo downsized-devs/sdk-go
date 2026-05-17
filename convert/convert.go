@@ -1,3 +1,6 @@
+// Package convert offers type-coercion helpers (To/Int64, ToArrInt64,
+// ToFloat64, etc.) backed by reflection and the go-conv library. All
+// helpers return wrapped errors with CodeInvalidValue on failure.
 package convert
 
 import (
@@ -19,6 +22,9 @@ func ToInt64(i interface{}) (int64, error) {
 }
 
 func ToArrInt64(i interface{}) ([]int64, error) {
+	if i == nil {
+		return nil, errors.NewWithCode(codes.CodeInvalidValue, "input is nil")
+	}
 	val := make([]int64, 0)
 	// if the input is not a slice, convert the input to slice with one member
 	if reflect.TypeOf(i).Kind() != reflect.Slice {

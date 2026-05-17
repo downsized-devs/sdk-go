@@ -1,3 +1,6 @@
+// Package localstorage stores and reads files on the local filesystem
+// using a configurable base directory. It is intended as a drop-in
+// stand-in for cloud object storage in development and tests.
 package localstorage
 
 import (

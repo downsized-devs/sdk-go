@@ -1,3 +1,5 @@
+// Package tracker pushes ad-hoc counter metrics to a Prometheus
+// PushGateway and forwards event payloads to a configured webhook URL.
 package tracker
 
 import (
@@ -76,10 +78,9 @@ func (t *tracker) Push(ctx context.Context, trackingName string, labels map[stri
 
 	opsProcessed.Inc()
 
-	conn := fmt.Sprintf("%s:%s", t.opt.URL, t.opt.Port)
-	if conn == "" {
-		conn = fmt.Sprintf("%s:%s", defaultURL, defaultPort)
-	}
+	url := operator.Ternary(t.opt.URL != "", t.opt.URL, defaultURL)
+	port := operator.Ternary(t.opt.Port != "", t.opt.Port, defaultPort)
+	conn := fmt.Sprintf("%s:%s", url, port)
 
 	jobName := operator.Ternary(t.opt.JobName != "", t.opt.JobName, defaultJobName)
 	timeout := operator.Ternary(t.opt.Timeout > 0, t.opt.Timeout, defaultTimeout)
@@ -113,13 +114,14 @@ func (t *tracker) PushWebhook(ctx context.Context, payload []byte, headers map[s
 	if err != nil {
 		return errors.NewWithCode(codes.CodeErrorHttpDo, "%s", err.Error())
 	}
+	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return errors.NewWithCode(codes.CodeErrorIoutilReadAll, "%s", err.Error())
 	}
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		return errors.NewWithCode(codes.CodeErrorHttpDo, "send event webhook error: %s", string(body))
 	}
 

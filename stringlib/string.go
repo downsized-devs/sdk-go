@@ -1,3 +1,5 @@
+// Package stringlib provides string utilities: random-string generation,
+// trimming, case helpers, and other small reusable string operations.
 package stringlib
 
 import "math/rand"

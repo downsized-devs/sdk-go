@@ -2,15 +2,15 @@
 
 `import "github.com/downsized-devs/sdk-go/messaging"`
 
-**Stability:** Beta — no tests in package. See [STABILITY.md](../STABILITY.md).
+**Stability:** Stable. See [STABILITY.md](../STABILITY.md).
 
 Push notifications via Firebase Cloud Messaging (FCM). Manages device-token topic subscriptions and broadcasts.
 
 ## Features
 
 - `SubscribeToTopic`, `UnsubscribeFromTopic`
-- `BroadcastToTopic` — send a notification to every device on a topic.
-- `BatchSendDryRun` — validate a batch send without delivering.
+- `BroadcastToTopic` — send a data payload to every device on a topic.
+- `BatchSendDryRun` — validate token batches without delivering; chunked to `MaximumTokensPerBatch` (500) per call.
 
 ## Installation
 
@@ -22,22 +22,29 @@ go get github.com/downsized-devs/sdk-go/messaging
 
 ```go
 m := messaging.Init(messaging.Config{
-    Firebase: messaging.FirebaseConf{ AccountKey: messaging.FirebaseAccountKey{ /* ... */ } },
-}, log, jsonParser)
+    Firebase: messaging.FirebaseConf{
+        AccountKey: messaging.FirebaseAccountKey{ /* ... */ },
+    },
+}, log, jsonParser, nil) // httpClient is deprecated; pass nil
 
-_ = m.SubscribeToTopic(ctx, []string{"deviceToken1"}, "news")
-_ = m.BroadcastToTopic(ctx, "news", "Daily update", "...body...")
+_ = m.SubscribeToTopic(ctx, "deviceToken1", "news")
+_ = m.BroadcastToTopic(ctx, "news", map[string]string{
+    "title": "Daily update",
+    "body":  "...body...",
+})
 ```
 
 ## API Reference
 
 | Symbol | Signature |
 |---|---|
-| `Init` | `func Init(cfg Config, log logger.Interface, json parser.JsonInterface) Interface` |
-| `Interface.SubscribeToTopic` | `(ctx, tokens []string, topic string) error` |
-| `Interface.UnsubscribeFromTopic` | `(ctx, tokens []string, topic string) error` |
-| `Interface.BroadcastToTopic` | `(ctx, topic, title, body string) error` |
-| `Interface.BatchSendDryRun` | `(ctx, [...]) error` |
+| `Init` | `func Init(cfg Config, log logger.Interface, json parser.JsonInterface, _ *http.Client) Interface` |
+| `Interface.SubscribeToTopic` | `(ctx, deviceToken string, topic string) error` |
+| `Interface.UnsubscribeFromTopic` | `(ctx, deviceToken string, topic string) error` |
+| `Interface.BroadcastToTopic` | `(ctx, topic string, payload map[string]string) error` |
+| `Interface.BatchSendDryRun` | `(ctx, tokens []string) ([]string, error)` |
+
+The `httpClient` argument to `Init` is accepted for backwards-compatibility but ignored — see the GoDoc for the `Deprecated:` notice.
 
 ## Configuration
 
@@ -50,7 +57,7 @@ _ = m.BroadcastToTopic(ctx, "news", "Daily update", "...body...")
 
 ## Testing
 
-No tests yet. Use the Firebase Admin SDK's fake-app pattern when adding them.
+Unit tests cover the public surface using a `firebaseMessenger` seam; no network calls are made.
 
 ```bash
 go test ./messaging/...
@@ -58,7 +65,7 @@ go test ./messaging/...
 
 ## Contributing
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md). Test coverage gates promotion to Stable.
+See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## Related Packages
 
